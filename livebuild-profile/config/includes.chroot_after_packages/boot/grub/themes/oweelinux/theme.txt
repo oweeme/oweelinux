@@ -1,0 +1,33 @@
+# Tema de GRUB de OweeLinux
+title-text: ""
+desktop-image: "background.png"
+desktop-color: "#102019"
+terminal-font: "DejaVu Sans Regular 14"
+
++ boot_menu {
+    left = 12%
+    top = 32%
+    width = 76%
+    height = 42%
+
+    item_font = "DejaVu Sans Regular 16"
+    item_color = "#eff0f1"
+    selected_item_font = "DejaVu Sans Bold 16"
+    selected_item_color = "#4fd1c5"
+
+    item_height = 36
+    item_padding = 8
+    item_spacing = 10
+    icon_width = 0
+    icon_height = 0
+}
+
++ label {
+    top = 88%
+    left = 0
+    width = 100%
+    align = "center"
+    color = "#a0a8a5"
+    text = "OweeLinux"
+    font = "DejaVu Sans Regular 12"
+}

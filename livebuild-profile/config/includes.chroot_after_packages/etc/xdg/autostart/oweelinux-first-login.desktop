@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=OweeLinux First Login Setup
+Exec=/usr/local/bin/oweelinux-first-login
+NoDisplay=true
+X-KDE-autostart-phase=1

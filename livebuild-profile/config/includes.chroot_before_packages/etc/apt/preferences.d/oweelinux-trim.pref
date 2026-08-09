@@ -1,0 +1,23 @@
+# Evita que apt-recommends=true arrastre paquetes irrelevantes para
+# laptops/desktops de usuario final (cientos de MB de fuentes de
+# escrituras antiguas y firmware de hardware empresarial/datacenter
+# que ningún usuario objetivo de OweeLinux va a tener).
+
+Package: fonts-noto-extra fonts-noto-cjk-extra fonts-noto-ui-extra
+Pin: release *
+Pin-Priority: -1
+
+# Herramientas de desarrollo de LLVM (headers/tools, no runtime) que
+# nadie usa en un sistema instalado; confirmado con
+# "apt-get remove --simulate" que no rompe nada (Mesa/Vulkan usan solo
+# el runtime llvm-19, que NO está pineado acá).
+Package: llvm-19-dev libclang-cpp19 libz3-dev llvm-19-tools
+Pin: release *
+Pin-Priority: -1
+
+# Recommends de WPS Office: requiere internet + aceptar un EULA de
+# Microsoft de forma interactiva. No apto para un build desatendido;
+# quien lo quiera lo instala manualmente después.
+Package: ttf-mscorefonts-installer
+Pin: release *
+Pin-Priority: -1

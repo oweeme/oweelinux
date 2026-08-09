@@ -1,0 +1,37 @@
+---
+componentName:   oweelinux
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,580px
+windowPlacement: center
+
+strings:
+    productName:         OweeLinux
+    shortProductName:    OweeLinux
+    version:             1
+    shortVersion:        1
+    versionedName:       OweeLinux 1
+    shortVersionedName:  OweeLinux 1
+    bootloaderEntryName: OweeLinux
+    productUrl:          https://github.com/oweeme
+    supportUrl:          https://github.com/oweeme
+    knownIssuesUrl:      https://github.com/oweeme
+    releaseNotesUrl:     https://github.com/oweeme
+    donateUrl:           https://github.com/oweeme
+
+sidebar: widget
+navigation: widget
+
+images:
+    productLogo:         "oweelinux-logo.png"
+    productIcon:         "oweelinux-logo.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+
+style:
+   SidebarBackground:    "#102019"
+   SidebarText:          "#FFFFFF"
+   SidebarTextCurrent:   "#FFFFFF"
+   SidebarBackgroundCurrent: "#217867"

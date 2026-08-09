@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+GPU=$(lspci -d 10de: | grep -iE "VGA|3D" || true)
+
+if [ -z "$GPU" ]; then
+    kdialog --title "OweeLinux" \
+        --msgbox "No se detectó una GPU Nvidia en este equipo.
+
+No hace falta instalar nada."
+    exit 0
+fi
+
+if kdialog --title "OweeLinux" --yesno "Se detectó una GPU Nvidia:
+
+${GPU}
+
+¿Instalar el driver propietario ahora?
+
+Necesita conexión a internet y vas a tener que reiniciar al terminar."; then
+    konsole --hold -e pkexec /usr/local/bin/oweelinux-install-nvidia-worker
+fi

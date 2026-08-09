@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "hector@oweeme.com",
+                "Name": "Héctor Martínez"
+            }
+        ],
+        "Description": "Wallpaper oficial de OweeLinux",
+        "Id": "OweeLinux",
+        "License": "CC0",
+        "Name": "OweeLinux"
+    }
+}

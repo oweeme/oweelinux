@@ -1,0 +1,5 @@
+Component: main
+Origin: OweeLinux
+Label: OweeLinux
+Architecture: amd64
+Description: Repo APT propio de OweeLinux (oweeide y futuras apps)

@@ -1,0 +1,5 @@
+Types: deb
+URIs: file:///usr/share/oweelinux/apt-repo
+Suites: trixie
+Components: main
+Trusted: yes

@@ -1,0 +1,90 @@
+# OweeLinux Fase 1: KDE mínimo
+plasma-desktop
+sddm
+sddm-theme-breeze
+dolphin
+konsole
+plasma-nm
+plasma-pa
+systemsettings
+network-manager
+wpasupplicant
+
+# Esencial para laptops: batería, bluetooth, impresoras
+upower
+power-profiles-daemon
+bluez
+bluedevil
+cups
+
+# Multi-monitor (HDMI, etc.) y tabletas gráficas (Wacom)
+kscreen
+kde-config-tablet
+xserver-xorg-input-wacom
+print-manager
+
+# Driver de input para Xorg (usado por el greeter de SDDM en modo X11;
+# sin esto Xorg detecta teclado/mouse por udev pero no puede usarlos)
+xserver-xorg-input-libinput
+
+# Sesión X11 de KWin (kwin-x11), necesaria para que el greeter/sesión X11
+# de SDDM funcione de punta a punta, no solo la sesión Wayland
+kwin-x11
+
+# Instalador gráfico
+calamares
+calamares-settings-debian
+squashfs-tools
+
+# Bootloader del sistema instalado (sin esto Calamares necesita internet
+# para bajarlos durante la instalación, y falla si no hay red)
+grub-efi-amd64
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+grub-pc-bin
+grub2-common
+shim-signed
+shim-unsigned
+mokutil
+efibootmgr
+
+# Store de aplicaciones
+plasma-discover
+plasma-discover-backend-flatpak
+flatpak
+
+# OweeLinux Fase 3: Dev stack
+python3
+zstd
+rustup
+golang-go
+gnat
+pyenv
+git
+curl
+adb
+fastboot
+ripgrep
+fzf
+bat
+starship
+zsh
+kde-spectacle
+
+# Apps básicas para usuarios generales / chicos (sin terminal)
+kate
+gwenview
+ark
+okular
+kcalc
+falkon
+
+# OweeLinux Fase 4: bajo consumo + branding
+zram-tools
+plymouth
+plymouth-themes
+
+# Fuentes (cobertura amplia de idiomas: latín, cirílico/ruso, griego, CJK)
+fonts-noto-core
+fonts-noto-cjk
+fonts-noto-color-emoji

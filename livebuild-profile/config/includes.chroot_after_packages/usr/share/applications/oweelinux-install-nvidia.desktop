@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar driver Nvidia
+GenericName=Instalador de driver Nvidia
+Exec=oweelinux-install-nvidia
+Comment=Detecta si hay una GPU Nvidia y ofrece instalar el driver propietario
+Keywords=nvidia;driver;gpu;graphics;
+Icon=preferences-desktop-display
+Terminal=false
+Categories=Qt;System;
+StartupNotify=True

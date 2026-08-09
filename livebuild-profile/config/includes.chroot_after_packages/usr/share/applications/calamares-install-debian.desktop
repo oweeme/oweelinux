@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar OweeLinux
+GenericName=Instalador OweeLinux
+Exec=calamares-install-debian
+Comment=Instala OweeLinux en tu computadora
+Keywords=calamares;system;install;oweelinux;installer
+Icon=/etc/calamares/branding/oweelinux/oweelinux-logo.png
+Terminal=false
+Categories=Qt;System;
+StartupWMClass=calamares
+StartupNotify=True

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=OweeLinux
+Description=OweeLinux boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/oweelinux
+ScriptFile=/usr/share/plymouth/themes/oweelinux/oweelinux.script

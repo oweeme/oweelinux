@@ -1,0 +1,19 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "hector@oweeme.com",
+                "Name": "Héctor Martínez"
+            }
+        ],
+        "Category": "",
+        "Description": "Splash de arranque de sesión de OweeLinux",
+        "Id": "org.oweelinux.desktop",
+        "License": "GPLv2+",
+        "Name": "OweeLinux",
+        "Website": "https://github.com/oweeme"
+    },
+    "Keywords": "Desktop;Workspace;Appearance;Look and Feel;",
+    "X-Plasma-APIVersion": 2
+}

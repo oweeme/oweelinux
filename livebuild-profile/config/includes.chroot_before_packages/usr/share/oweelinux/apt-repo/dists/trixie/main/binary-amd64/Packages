@@ -1,0 +1,48 @@
+Package: oweeme-ide
+Version: 1.2.0
+Architecture: amd64
+Installed-Size: 34990
+Maintainer: Héctor Martínez <hector@oweeme.com>
+Homepage: https://oweeme.com
+Depends: libwebkit2gtk-4.1-0, libgtk-3-0, libayatana-appindicator3-1, libwebkit2gtk-4.1-0, libgtk-3-0
+Priority: optional
+Section: devel
+Filename: pool/main/o/oweeme-ide/oweeme-ide_1.2.0_amd64.deb
+Size: 11793980
+SHA256: 4fa6910480e8cba2862cb10e8d645c1b50d792baf05d4fd962b1c443e5ad360b
+SHA1: b17596c0a2230601132a425050ba2361a7674927
+MD5sum: a3743037aa81fc0ea38c60c52b276b2b
+Description: OweemeIDE — El IDE para el desarrollador moderno
+ OweemeIDE es un entorno de desarrollo integrado creado por Héctor Martínez (hector@oweeme.com — oweeme.com) pensado para las necesidades reales del desarrollador. Incluye editor de código con resaltado de sintaxis, terminal integrada, explorador de archivos, cliente de bases de datos (MySQL/MariaDB/PostgreSQL/SQLite) y asistente de IA. Desarrollado con Tauri 2, Vue 3 y Rust. Para soporte y actualizaciones futuras visita oweeme.com o escribe a hector@oweeme.com.
+
+Package: wps-office
+Name: wps-office
+Relocations: /opt/kingsoft
+Installed-Size: 1630564
+Maintainer: WPS Office Community Team <wps_linux@kingsoft.com>
+Architecture: amd64
+Multi-Arch: foreign
+Version: 11.1.0.11723.XA
+Replaces: kingsoft-office
+Recommends: ttf-mscorefonts-installer
+Homepage: http://wps-community.org
+Depends: libc6 (>= 2.15) | libc6.1, libstdc++6 (>= 4.6), libfreetype6 (>= 2.4),
+         libcups2, libglib2.0-0, libglu1-mesa,
+         libsm6, libxrender1, libfontconfig1,
+         libxext6, libxcb1, libbz2-1.0
+Priority: optional
+Section: editors
+Filename: pool/main/w/wps-office/wps-office_11.1.0.11723.XA_amd64.deb
+Size: 318892996
+SHA256: fe6326210f69d94efdbf2728914d293036be391b93a614f58cd0e1ff1d4923b3
+SHA1: 24132c03e1b53fe8983274c5165caa9128bdb1a6
+MD5sum: d480f6be1cb20d2fb83ea798338a5cbf
+Description: WPS Office, is an office productivity suite.
+ WPS Office including Writer, Presentation
+ and Spreadsheets, is a powerful office suite, which is able to process
+ word file, produce wonderful slides, and analyze data as well. It is
+ deeply compatible with all of the latest Microsoft Office file formats. 
+ It can easily open and read the documents created with Microsoft Office.
+ This is the Linux version, and it's now a TESTING package.
+ Welcome to our website: http://wps-community.org
+

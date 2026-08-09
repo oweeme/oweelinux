@@ -1,0 +1,6 @@
+Origin: OweeLinux
+Label: OweeLinux
+Codename: trixie
+Architectures: amd64
+Components: main
+Description: Repo APT propio de OweeLinux (oweeide y futuras apps)

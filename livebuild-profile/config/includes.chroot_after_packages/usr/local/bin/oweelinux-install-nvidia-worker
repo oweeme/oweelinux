@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+apt-get update
+apt-get install -y nvidia-driver firmware-misc-nonfree "linux-headers-$(uname -r)"
+
+echo
+echo "Listo. Reiniciá el equipo para activar el driver Nvidia."

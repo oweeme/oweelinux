@@ -1,0 +1,31 @@
+Window.SetBackgroundTopColor(0.063, 0.110, 0.098);
+Window.SetBackgroundBottomColor(0.063, 0.110, 0.098);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+logo_width = logo.image.GetWidth();
+logo_height = logo.image.GetHeight();
+
+logo.sprite.SetX(screen_width / 2 - logo_width / 2);
+logo.sprite.SetY(screen_height / 2 - logo_height / 2 - 30);
+logo.sprite.SetZ(10);
+
+progress_bar.original_image = Image("progress_bar.png");
+progress_bar.sprite = Sprite();
+progress_bar.x = screen_width / 2 - progress_bar.original_image.GetWidth() / 2;
+progress_bar.y = screen_height / 2 + logo_height / 2 + 20;
+progress_bar.sprite.SetPosition(progress_bar.x, progress_bar.y, 10);
+
+fun progress_callback(duration, progress)
+{
+  if (progress_bar.original_image.GetWidth() * progress >= 1)
+  {
+    cropped_image = progress_bar.original_image.Crop(0, 0, progress_bar.original_image.GetWidth() * progress, progress_bar.original_image.GetHeight());
+    progress_bar.sprite.SetImage(cropped_image);
+  }
+}
+
+Plymouth.SetBootProgressFunction(progress_callback);

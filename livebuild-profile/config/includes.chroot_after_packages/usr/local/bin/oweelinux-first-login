@@ -1,0 +1,9 @@
+#!/bin/sh
+MARKER="$HOME/.config/.oweelinux-wallpaper-set"
+
+if [ ! -f "$MARKER" ]; then
+    mkdir -p "$HOME/.config"
+    plasma-apply-wallpaperimage /usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg
+    plasma-apply-colorscheme OweeLinux
+    touch "$MARKER"
+fi

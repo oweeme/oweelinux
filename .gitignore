@@ -1,0 +1,33 @@
+# Artefactos de build de live-build (se regeneran con cada build, no van a git)
+livebuild-profile/chroot/
+livebuild-profile/cache/
+livebuild-profile/.build/
+livebuild-profile/binary*
+livebuild-profile/live-image-amd64.*
+livebuild-profile/local/
+livebuild-profile/*.iso
+livebuild-profile/*.qcow2
+livebuild-profile/chroot.files
+livebuild-profile/chroot.packages.*
+
+# Repo APT: las bases de datos internas de reprepro se regeneran solas,
+# no hace falta versionarlas
+packaging/apt-repo/db/
+packaging/apt-repo/lists/
+
+# .deb binarios: WPS Office pesa 305MB, por encima del límite de 100MB
+# de GitHub (el push fallaría). Se excluyen todos los .deb del repo APT
+# (fuente de verdad Y la copia embebida en el perfil de live-build), el
+# build output de oweeide, y de docs/ — quedan solo en disco local,
+# necesarios para reconstruir el ISO pero no para el código fuente del
+# proyecto en sí.
+packaging/apt-repo/pool/
+packaging/apt-repo/db/
+packaging/oweeide-build-output/
+livebuild-profile/config/includes.chroot_before_packages/usr/share/oweelinux/apt-repo/pool/
+livebuild-profile/config/includes.chroot_before_packages/usr/share/oweelinux/apt-repo/db/
+docs/*.deb
+
+# Archivos de sistema/editor
+.directory
+*.swp

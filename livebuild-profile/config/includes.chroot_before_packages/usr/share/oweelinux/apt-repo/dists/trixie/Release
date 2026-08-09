@@ -1,0 +1,19 @@
+Origin: OweeLinux
+Label: OweeLinux
+Codename: trixie
+Date: Sat, 08 Aug 2026 18:33:57 UTC
+Architectures: amd64
+Components: main
+Description: Repo APT propio de OweeLinux (oweeide y futuras apps)
+MD5Sum:
+ 72aea0d6ab315f97967be9e631a8974c 2377 main/binary-amd64/Packages
+ be0accaf72c20e09d840b23b2331dbaf 1311 main/binary-amd64/Packages.gz
+ 895227629b55a08446de854688c286b6 138 main/binary-amd64/Release
+SHA1:
+ 9add901541e50b90962541e75f90b5fb73bd16aa 2377 main/binary-amd64/Packages
+ 6b5cfc2e30f5b5b7dce31a3364fbc6f38d4cdd06 1311 main/binary-amd64/Packages.gz
+ f046fba259d681898623b163650f2abfb35f1f2b 138 main/binary-amd64/Release
+SHA256:
+ a43456f9061bdf92258f013789bc22cc929b4d8c0170a50abd940be8f3aa776f 2377 main/binary-amd64/Packages
+ 67d33baeb30113f6e3af8168672daacf131e9a47a683beaa5a1daffa1a398190 1311 main/binary-amd64/Packages.gz
+ d5810b09b9b69c77e6dfd7b1205f531b90b50da25b51d4530c7ad2f7d8f393d0 138 main/binary-amd64/Release
