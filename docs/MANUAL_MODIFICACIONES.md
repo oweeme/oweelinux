@@ -230,6 +230,7 @@ inventadas de memoria) para evitar bugs de sintaxis fantasma.
 | Esquema de colores | `includes.chroot_after_packages/usr/share/color-schemes/OweeLinux.colors` | INI KConfig, basado en `BreezeDark.colors` real con los valores cambiados |
 | GRUB (sistema instalado) | `includes.chroot_after_packages/boot/grub/themes/oweelinux/` + `etc/default/grub` | `theme.txt` propio de GRUB |
 | Instalador (Calamares) | ver sección propia abajo | YAML + QML |
+| Identidad del sistema (`/etc/os-release`) | `includes.chroot_after_packages/etc/os-release` + `includes.chroot_after_packages/usr/share/icons/hicolor/*/apps/distributor-logo-oweelinux.png` | `os-release` (formato `KEY=value` de systemd) + icon theme hicolor |
 
 **Wallpaper y esquema de colores no se aplican por archivo de config
 estático** — se aplican con un script que corre en el primer login
@@ -238,6 +239,22 @@ estático** — se aplican con un script que corre en el primer login
 (`plasma-apply-wallpaperimage`, `plasma-apply-colorscheme`). Es más robusto
 que tratar de escribir a mano el `plasma-org.kde.plasma.desktop-appletsrc` o
 `kdeglobals`, que tienen formato frágil y specific a la versión de Plasma.
+
+**`/etc/os-release` es la identidad que leen las herramientas del sistema**
+(KDE "Acerca de este sistema"/kinfocenter, `neofetch`, cualquier script que
+chequee la distro) — cambiar el tema visual (Plymouth/SDDM/colores) no toca
+esto para nada, son subsistemas totalmente separados. Sin overridearlo, el
+sistema se identifica como "Debian GNU/Linux 13" aunque todo el branding
+visual esté puesto. Campos clave: `ID=oweelinux` (identificador machine-readable),
+`ID_LIKE=debian` (mantiene compatibilidad con scripts que chequean por
+distros basadas en Debian), `PRETTY_NAME`/`NAME`/`VERSION*` (lo que se
+muestra), `LOGO=distributor-logo-oweelinux` (nombre de ícono, **no** un path —
+sigue el icon naming spec de freedesktop, resuelto vía `KOSRelease::logo()`
+de KCoreAddons). El ícono correspondiente se instala en el tema `hicolor`
+(`usr/share/icons/hicolor/<size>x<size>/apps/distributor-logo-oweelinux.png`,
+generado a partir del logo koi de 256×256 ya usado en Calamares) — sin el
+ícono en el theme, `LOGO` apunta a un nombre que no resuelve a nada y
+kinfocenter cae al ícono genérico.
 
 **Paleta de referencia** (usada en todos los subsistemas de arriba):
 - Fondo oscuro base: `#102019` (RGB 16,32,25)
