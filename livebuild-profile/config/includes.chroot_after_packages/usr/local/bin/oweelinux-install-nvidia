@@ -11,6 +11,20 @@ No hace falta instalar nada."
     exit 0
 fi
 
+# El módulo del driver Nvidia (nvidia-kernel-dkms) se compila sin firmar.
+# Con Secure Boot activado, la instalación "funciona" pero el módulo nunca
+# carga al reiniciar, sin ningún mensaje de error visible para el usuario.
+if command -v mokutil >/dev/null 2>&1 && \
+   mokutil --sb-state 2>/dev/null | grep -qi "SecureBoot enabled"; then
+    kdialog --title "OweeLinux" --sorry \
+        "Secure Boot está activado en este equipo.
+
+El driver Nvidia no va a funcionar así: el sistema lo instala pero el módulo nunca carga al reiniciar.
+
+Desactivá Secure Boot en la BIOS/UEFI (normalmente presionando F2 o F12 al arrancar, buscá una opción llamada \"Secure Boot\") y volvé a intentar."
+    exit 1
+fi
+
 if kdialog --title "OweeLinux" --yesno "Se detectó una GPU Nvidia:
 
 ${GPU}

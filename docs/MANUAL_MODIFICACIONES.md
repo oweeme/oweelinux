@@ -310,6 +310,34 @@ para que quede embebida *offline* dentro del ISO — el sistema instalado no
 necesita internet para `apt install oweeide` ni para futuros `apt upgrade`
 sobre esos paquetes.
 
+**Un clon fresco del repo de git NO trae los `.deb` reales — el build falla
+en el hook de oweeide hasta que se repueblan.** `packaging/apt-repo/pool/` y
+su copia embebida (`.../apt-repo/pool/`) están en `.gitignore` a propósito
+(WPS Office pesa 305MB, por encima del límite de 100MB de GitHub) — lo único
+que viaja en git son los metadatos de `reprepro` (`dists/*/Packages`,
+`Release`), no los binarios. Sin el `pool/`, `lb build` falla así:
+
+```
+E: Failed to fetch file:/usr/share/oweelinux/apt-repo/pool/main/o/oweeme-ide/oweeme-ide_1.2.0_amd64.deb  File not found
+E: config/hooks/normal/9220-install-oweeide.hook.chroot failed
+```
+
+**Fix, si ya tenés OweeLinux instalado en algún equipo** (el sistema
+instalado conserva una copia completa en `/usr/share/oweelinux/apt-repo/pool/`,
+puesta ahí por Calamares al copiar el squashfs del live):
+
+```sh
+cp -r /usr/share/oweelinux/apt-repo/pool/. packaging/apt-repo/pool/
+cp -r /usr/share/oweelinux/apt-repo/pool/. \
+  livebuild-profile/config/includes.chroot_before_packages/usr/share/oweelinux/apt-repo/pool/
+```
+
+Verificar que los hashes coincidan con lo que ya dice `Packages` antes de
+confiar en la copia (`sha256sum` contra el campo `SHA256:` de cada paquete)
+— si no coinciden, el `.deb` real hay que conseguirlo de otro lado (el build
+output original de oweeide, o bajar WPS Office de nuevo) y volver a
+agregarlo con `reprepro includedeb` (ver abajo), no solo copiarlo a mano.
+
 **Agregar una app nueva al repo:**
 
 ```sh
@@ -348,6 +376,20 @@ también en `usr/share/applications/`) que llama a un script en
 hay Nvidia no hace nada, si hay pregunta con `kdialog` y corre la instalación
 real con `pkexec` (para pedir la contraseña de forma gráfica, sin depender de
 que el usuario abra una terminal).
+
+**Chequeo de Secure Boot antes de instalar:** el módulo `nvidia-kernel-dkms`
+se compila sin firmar. Con Secure Boot activado (default de fábrica en varios
+laptops OEM) la instalación termina "bien" pero el módulo nunca carga al
+reiniciar, sin ningún error visible — justo el tipo de falla silenciosa que
+más rompe a un usuario sin experiencia técnica. `oweelinux-install-nvidia`
+chequea `mokutil --sb-state` antes de ofrecer instalar; si está activado,
+avisa con instrucciones para desactivarlo en la BIOS/UEFI y no continúa
+(`mokutil`/`shim-signed` ya estaban en el `package-lists` base por la razón 7
+de Lecciones aprendidas, así que la herramienta de detección no hace falta
+agregarla). Deliberadamente **no** se automatiza el enrolamiento de MOK
+(generar clave, firmar el módulo, guiar por el reinicio a MokManager) —
+avisar y dejar que el usuario lo resuelva en la BIOS es más simple y robusto
+que un flujo desatendido que puede fallar a mitad de camino.
 
 ## Lecciones aprendidas (bugs reales y su causa raíz)
 
@@ -458,18 +500,24 @@ diagnóstico real. Si algo se rompe de forma parecida, empezar por acá.
 ## Estado y fases
 
 - ✅ **Fase 1** — Base Debian + KDE mínimo
-- 🔶 **Fase 2** — Driver Nvidia: arquitectura lista (script de detección +
-  instalación opcional post-instalación, ver [Apps opcionales](#apps-opcionales-post-instalación)),
-  **todavía no validado en hardware real con GPU Nvidia**
+- ✅ **Fase 2** — Driver Nvidia: script de detección + instalación opcional
+  post-instalación (ver [Apps opcionales](#apps-opcionales-post-instalación)),
+  **validado en hardware real** (Dell G3 3579, GTX 1050 Pascal, driver
+  `nvidia-driver` 550.163.01 de los repos non-free de Debian trixie,
+  `nvidia-smi` y KWin Wayland funcionando sobre la GPU). Gap encontrado y
+  corregido en esta validación: el instalador no chequeaba Secure Boot antes
+  de instalar (ver nota en [Apps opcionales](#apps-opcionales-post-instalación)) —
+  en esta máquina funcionó porque Secure Boot estaba desactivado.
 - ✅ **Fase 3** — Dev stack (Rust/Go/Ada/Python vía gestores de versión)
 - ✅ **Fase 4** — Branding completo (Plymouth, SDDM, KSplash, wallpaper, GRUB,
   esquema de colores)
 - ✅ **Fase 5** — `oweeide` empaquetado como `.deb`, preinstalado por defecto
 - ✅ **Fase 6** — Repo APT propio (`reprepro`), embebido offline en el ISO
 
-**Validado en hardware real (HP, sin Nvidia):** instalación completa, WiFi,
-batería, Bluetooth, audio, GRUB con tema. **Pendiente de validar:** el driver
-Nvidia en la Dell G3 3579 (o el Lenovo ThinkPad, si tiene GPU dedicada).
+**Validado en hardware real:** HP sin Nvidia (instalación completa, WiFi,
+batería, Bluetooth, audio, GRUB con tema) y Dell G3 3579 con GTX 1050 Pascal
+(driver Nvidia funcionando de punta a punta, incluyendo el fix de Secure Boot
+de esta sección).
 
 **Otros pendientes conocidos, prioridad baja:**
 - Firmar el repo APT propio con GPG (solo necesario si se publica afuera del
