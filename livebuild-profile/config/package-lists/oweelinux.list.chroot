@@ -8,6 +8,12 @@ plasma-nm
 plasma-pa
 systemsettings
 network-manager
+
+# kdialog: usado por los scripts de usr/local/bin/ para diálogos gráficos
+# (instalador de Nvidia, apps recomendadas) — nunca estuvo instalado pese a
+# ser dependencia real de esos launchers, confirmado que faltaba tanto en
+# el ISO como en hardware real ya instalado
+kdialog
 wpasupplicant
 
 # Esencial para laptops: batería, bluetooth, impresoras
@@ -68,6 +74,11 @@ ripgrep
 fzf
 bat
 starship
+podman
+
+# Requerido por el launcher "Apps recomendadas"
+# (usr/local/bin/oweelinux-recommended-apps) para leer el manifiesto JSON
+jq
 zsh
 kde-spectacle
 

@@ -364,12 +364,13 @@ se publica externamente para que la gente lo agregue a mano a su
 
 ## Apps opcionales post-instalación
 
-Patrón usado para todo lo que es "pesado" o "no todos lo necesitan" (WPS
-Office, driver Nvidia, y a futuro cualquier cosa similar — Podman, Ollama,
-bases de datos quedan en esta misma categoría, sin empaquetar todavía): un
-ícono en el escritorio (`etc/skel/Desktop/*.desktop`, con el mismo `.desktop`
-también en `usr/share/applications/`) que llama a un script en
-`usr/local/bin/`.
+Patrón usado para todo lo que es "pesado" o "no todos lo necesitan" (driver
+Nvidia, y el launcher de apps recomendadas de abajo): un ícono en el
+escritorio (`etc/skel/Desktop/*.desktop`, con el mismo `.desktop` también en
+`usr/share/applications/`) que llama a un script en `usr/local/bin/`. Ollama y
+bases de datos quedan en esta misma categoría a futuro, sin empaquetar
+todavía. (Podman pasó a estar preinstalado en el ISO base — es herramienta de
+terminal, no tiene sentido como ícono de instalación con un click.)
 
 **Ejemplo real, driver Nvidia** (`oweelinux-install-nvidia` +
 `oweelinux-install-nvidia-worker`): detecta la GPU con `lspci -d 10de:`, si no
@@ -390,6 +391,50 @@ agregarla). Deliberadamente **no** se automatiza el enrolamiento de MOK
 (generar clave, firmar el módulo, guiar por el reinicio a MokManager) —
 avisar y dejar que el usuario lo resuelva en la BIOS es más simple y robusto
 que un flujo desatendido que puede fallar a mitad de camino.
+
+### Apps recomendadas (`oweelinux-recommended-apps`)
+
+Ícono "Apps recomendadas" en el escritorio: una pantalla con checklist
+(`kdialog --checklist`) de apps sugeridas (ofimática, dibujo, video, juegos —
+hoy: Geany, Krita, WPS Office, Typora, Inkscape, VLC, Blender, Hedgewars,
+Kooha, Obsidian) para que el usuario elija cuáles instalar de una.
+
+**La lista de apps NO está fija por versión del ISO.** El launcher
+(`usr/local/bin/oweelinux-recommended-apps`) intenta bajar
+`recommended-apps.json` desde
+`raw.githubusercontent.com/oweeme/oweelinux/main/.../usr/share/oweelinux/recommended-apps.json`
+(el mismo archivo del repo, fetcheado en caliente) con un timeout corto; si
+falla (sin internet, GitHub caído) cae a la copia embebida en
+`/usr/share/oweelinux/recommended-apps.json`. Agregar/sacar apps de la lista
+es editar el JSON en el repo y hacer `git push` — **no** requiere una nueva
+versión de OweeLinux, cualquier instalación ya existente la ve la próxima vez
+que abre el ícono.
+
+**Tres formas de instalar, según el campo `type` de cada entrada del JSON:**
+- `flatpak`: no necesita root. El launcher hace
+  `xdg-open appstream://<flatpak_id>`, que abre Discover ya posicionado en la
+  página de esa app (Discover registra el manejador de `x-scheme-handler/appstream`,
+  confirmado con `xdg-mime query default`) — un click más adentro de Discover
+  la instala. Requiere que la app esté en Flathub (remoto ya agregado por
+  `9200-flathub-remote.hook.chroot`).
+- `apt-debian` / `apt-repo-own`: paquete de los repos de Debian o del repo
+  propio de OweeLinux. El launcher junta los IDs seleccionados y llama a
+  `pkexec oweelinux-recommended-apps-worker <manifiesto> <ids...>`, que hace
+  `apt-get install` de una sola vez (un solo prompt de contraseña aunque se
+  elijan varias).
+- `apt-thirdparty`: paquete de un repo externo de terceros (ej. Typora) que
+  no vive ni en Debian ni en el repo propio. El JSON trae los campos
+  `key_url`/`keyring_path`/`repo_line`/`sources_file` completos; el worker
+  los usa para armar el repo (mismo patrón que ya usa VSCode/Yandex en un
+  sistema instalado: clave en `/etc/apt/keyrings/`, `Signed-By:` en el
+  `sources.list.d`) antes de instalar. Agregar una futura app de terceros
+  así es 100% editar el JSON, sin tocar el worker.
+
+El worker (`usr/local/bin/oweelinux-recommended-apps-worker`) es el único
+componente con privilegios — recibe la ruta al manifiesto ya descargado (no
+vuelve a pegarle a la red para el JSON) y las IDs elegidas, y es
+completamente genérico: no tiene ningún nombre de app hardcodeado, todo sale
+del JSON.
 
 ## Lecciones aprendidas (bugs reales y su causa raíz)
 
@@ -496,6 +541,20 @@ diagnóstico real. Si algo se rompe de forma parecida, empezar por acá.
     __GLX_VENDOR_LIBRARY_NAME=nvidia`) o vía el menú contextual de KDE ("Run
     using Discrete Graphics"). No intentar portar `prime-select` a Debian, no
     hace falta.
+
+11. **`kdialog` nunca estuvo en el `package-lists`, pese a ser dependencia
+    real de todos los scripts de `usr/local/bin/` que muestran diálogos
+    gráficos** (`oweelinux-install-nvidia`, `oweelinux-recommended-apps`).
+    Pasó desapercibido porque nadie había ejecutado esos íconos de punta a
+    punta — la validación de Nvidia en hardware real (Dell G3 3579) se hizo
+    con `apt install nvidia-driver` directo por terminal, no clickeando el
+    ícono del escritorio, así que el `kdialog: not found` (exit code 127)
+    nunca salió a la luz hasta probar el ícono en una VM limpia de QEMU.
+    Confirmado que faltaba tanto en el ISO como en el propio hardware ya
+    instalado. Lección: un flujo que depende de un ícono de escritorio hay
+    que probarlo clickeando el ícono, no ejecutando el comando equivalente a
+    mano — son caminos de código distintos aunque terminen haciendo lo
+    mismo.
 
 ## Estado y fases
 

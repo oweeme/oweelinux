@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Apps recomendadas
+GenericName=Instalador de apps recomendadas
+Exec=oweelinux-recommended-apps
+Comment=Elegí e instalá apps recomendadas para OweeLinux (ofimática, dibujo, video, juegos)
+Keywords=apps;software;discover;install;instalar;
+Icon=plasmadiscover
+Terminal=false
+Categories=Qt;System;
+StartupNotify=True

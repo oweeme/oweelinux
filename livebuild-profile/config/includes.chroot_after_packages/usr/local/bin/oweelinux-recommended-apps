@@ -1,0 +1,61 @@
+#!/bin/sh
+set -e
+
+MANIFEST_URL="https://raw.githubusercontent.com/oweeme/oweelinux/main/livebuild-profile/config/includes.chroot_after_packages/usr/share/oweelinux/recommended-apps.json"
+LOCAL_MANIFEST="/usr/share/oweelinux/recommended-apps.json"
+CACHE="/tmp/oweelinux-recommended-apps-manifest.json"
+
+# Intenta traer la lista actualizada; si no hay internet o falla, usa la
+# copia embebida en el ISO. Así la lista se puede actualizar editando el
+# JSON en GitHub, sin necesidad de una nueva versión de OweeLinux.
+if curl -fsSL --max-time 5 "$MANIFEST_URL" -o "$CACHE" 2>/dev/null && jq empty "$CACHE" 2>/dev/null; then
+    :
+else
+    cp "$LOCAL_MANIFEST" "$CACHE"
+fi
+
+# Arma el checklist: tag = id, texto = "Nombre — descripción", estado = off.
+# Los textos tienen espacios (y guiones largos), así que no se puede pasar
+# como una sola variable sin comillas a kdialog (word-splitting rompe cada
+# descripción en varios argumentos sueltos) — se arma con "set --" para que
+# cada campo llegue como un argumento propio, intacto.
+jq -r '.apps[] | "\(.id)\n\(.name) — \(.description)\noff"' "$CACHE" > "$CACHE.checklist"
+
+set --
+while IFS= read -r id; do
+    IFS= read -r text
+    IFS= read -r state
+    set -- "$@" "$id" "$text" "$state"
+done < "$CACHE.checklist"
+
+SELECTED=$(kdialog --title "OweeLinux" --separate-output \
+    --checklist "Elegí qué instalar:" "$@") || exit 0
+
+[ -z "$SELECTED" ] && exit 0
+
+APT_IDS=""
+FLATPAK_IDS=""
+
+for id in $SELECTED; do
+    type=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .type' "$CACHE")
+    case "$type" in
+        apt-debian|apt-repo-own|apt-thirdparty)
+            APT_IDS="$APT_IDS $id"
+            ;;
+        flatpak)
+            FLATPAK_IDS="$FLATPAK_IDS $id"
+            ;;
+    esac
+done
+
+# Las apps Flatpak no necesitan root: se abre Discover ya posicionado en la
+# página de cada una, lista para instalar con un click desde ahí.
+for id in $FLATPAK_IDS; do
+    flatpak_id=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .flatpak_id' "$CACHE")
+    xdg-open "appstream://${flatpak_id}" &
+done
+
+# Las apps de apt (propias, de Debian, o de terceros) sí necesitan root.
+if [ -n "$APT_IDS" ]; then
+    konsole --hold -e pkexec /usr/local/bin/oweelinux-recommended-apps-worker "$CACHE" $APT_IDS
+fi

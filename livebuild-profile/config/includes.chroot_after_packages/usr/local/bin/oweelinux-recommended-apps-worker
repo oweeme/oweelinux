@@ -1,0 +1,33 @@
+#!/bin/sh
+set -e
+
+MANIFEST="$1"
+shift
+
+APT_PACKAGES=""
+
+for id in "$@"; do
+    type=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .type' "$MANIFEST")
+    package=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .package' "$MANIFEST")
+
+    if [ "$type" = "apt-thirdparty" ]; then
+        key_url=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .key_url' "$MANIFEST")
+        keyring_path=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .keyring_path' "$MANIFEST")
+        repo_line=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .repo_line' "$MANIFEST")
+        sources_file=$(jq -r --arg id "$id" '.apps[] | select(.id == $id) | .sources_file' "$MANIFEST")
+
+        mkdir -p "$(dirname "$keyring_path")"
+        curl -fsSL "$key_url" -o "$keyring_path"
+        echo "$repo_line" > "$sources_file"
+    fi
+
+    APT_PACKAGES="$APT_PACKAGES $package"
+done
+
+if [ -n "$APT_PACKAGES" ]; then
+    apt-get update
+    apt-get install -y $APT_PACKAGES
+fi
+
+echo
+echo "Listo."

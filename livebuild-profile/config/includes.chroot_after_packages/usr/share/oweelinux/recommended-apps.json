@@ -1,0 +1,79 @@
+{
+  "updated": "2026-08-10",
+  "apps": [
+    {
+      "id": "geany",
+      "name": "Geany",
+      "description": "Editor de texto liviano para programar, con resaltado de sintaxis.",
+      "type": "apt-debian",
+      "package": "geany"
+    },
+    {
+      "id": "krita",
+      "name": "Krita",
+      "description": "Programa de dibujo e ilustración digital.",
+      "type": "apt-debian",
+      "package": "krita"
+    },
+    {
+      "id": "wps-office",
+      "name": "WPS Office",
+      "description": "Suite de oficina compatible con Word, Excel y PowerPoint.",
+      "type": "apt-repo-own",
+      "package": "wps-office"
+    },
+    {
+      "id": "typora",
+      "name": "Typora",
+      "description": "Editor de Markdown con vista previa en vivo (privativo, con período de prueba).",
+      "type": "apt-thirdparty",
+      "package": "typora",
+      "key_url": "https://downloads.typora.io/typora.gpg",
+      "keyring_path": "/etc/apt/keyrings/typora.gpg",
+      "repo_line": "deb [signed-by=/etc/apt/keyrings/typora.gpg] https://downloads.typora.io/linux ./",
+      "sources_file": "/etc/apt/sources.list.d/typora.list"
+    },
+    {
+      "id": "org.inkscape.Inkscape",
+      "name": "Inkscape",
+      "description": "Editor de gráficos vectoriales.",
+      "type": "flatpak",
+      "flatpak_id": "org.inkscape.Inkscape"
+    },
+    {
+      "id": "org.videolan.VLC",
+      "name": "VLC",
+      "description": "Reproductor multimedia universal.",
+      "type": "flatpak",
+      "flatpak_id": "org.videolan.VLC"
+    },
+    {
+      "id": "org.blender.Blender",
+      "name": "Blender",
+      "description": "Suite de creación 3D: modelado, animación, render.",
+      "type": "flatpak",
+      "flatpak_id": "org.blender.Blender"
+    },
+    {
+      "id": "org.hedgewars.Hedgewars",
+      "name": "Hedgewars",
+      "description": "Juego de estrategia por turnos con erizos armados hasta los dientes.",
+      "type": "flatpak",
+      "flatpak_id": "org.hedgewars.Hedgewars"
+    },
+    {
+      "id": "io.github.seadve.Kooha",
+      "name": "Kooha",
+      "description": "Grabador de pantalla simple, un click para grabar.",
+      "type": "flatpak",
+      "flatpak_id": "io.github.seadve.Kooha"
+    },
+    {
+      "id": "md.obsidian.Obsidian",
+      "name": "Obsidian",
+      "description": "Editor de notas en Markdown con vínculos entre notas (gratuito).",
+      "type": "flatpak",
+      "flatpak_id": "md.obsidian.Obsidian"
+    }
+  ]
+}
