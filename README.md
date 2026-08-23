@@ -72,11 +72,19 @@ Instaladas, pero **no todas están activas por defecto** en una cuenta nueva
   Si querés poder escribir `bat` a secas: `echo "alias bat=batcat" >> ~/.zshrc`
   (o `~/.bashrc` si usás bash).
 - **`fzf`**: buscador difuso interactivo — filtra cualquier lista mientras
-  escribís. Los atajos más útiles, una vez en una terminal `zsh` o `bash` con
-  la integración de `fzf` cargada:
-  - `Ctrl+R`: busca en el historial de comandos escribiendo cualquier parte.
-  - `Ctrl+T`: busca un archivo y lo inserta en la línea de comandos.
-  - También sirve suelto: `cat lista.txt | fzf` filtra esa lista a mano.
+  escribís. Los atajos (`Ctrl+R` para buscar en el historial de comandos,
+  `Ctrl+T` para buscar un archivo e insertarlo en la línea de comandos) **no
+  vienen cargados solos**, hay que sumarlos al shell:
+  ```bash
+  # para zsh
+  echo 'source /usr/share/doc/fzf/examples/key-bindings.zsh' >> ~/.zshrc
+  echo 'source /usr/share/doc/fzf/examples/completion.zsh' >> ~/.zshrc
+  # para bash
+  echo 'source /usr/share/doc/fzf/examples/key-bindings.bash' >> ~/.bashrc
+  echo 'source /usr/share/doc/fzf/examples/completion.bash' >> ~/.bashrc
+  ```
+  También sirve suelto, sin nada de esto: `cat lista.txt | fzf` filtra
+  cualquier lista a mano.
 - **`starship`**: prompt de terminal personalizable — muestra la rama de git,
   si hay cambios sin commitear, versión del lenguaje del proyecto (Python,
   Rust, Node, etc.), todo automático según la carpeta en la que estés. **No
