@@ -35,7 +35,6 @@ oweelinux/
 │   └── oweeme-koi.png           # logo original
 ├── packaging/
 │   ├── apt-repo/                # repo APT propio (reprepro) — fuente de verdad
-│   ├── oweeide-build-output/    # .deb de oweeide ya construido
 │   └── wps-office/              # (vacío, el .deb real vive fuera de git, ver .gitignore)
 └── livebuild-profile/           # perfil de live-build, esto es "el ISO" en forma de config
     └── config/
@@ -570,10 +569,11 @@ diagnóstico real. Si algo se rompe de forma parecida, empezar por acá.
 - ✅ **Fase 3** — Dev stack (Rust/Go/Ada/Python vía gestores de versión)
 - ✅ **Fase 4** — Branding completo (Plymouth, SDDM, KSplash, wallpaper, GRUB,
   esquema de colores)
-- ⏸️ **Fase 5** — `oweeide` empaquetado como `.deb`, disponible en el repo
-  propio. Dejó de instalarse por defecto y de aparecer en "Apps recomendadas"
-  porque está en desarrollo (cambio de nombre y de licencia en curso);
-  instalable a mano con `apt install oweeme-ide` mientras tanto
+- ✅ **Fase 5** — IDE propio renombrado a **oweecode**
+  (github.com/oweeme/oweecode). Decisión de distribución: no va en el ISO ni
+  en el repo APT propio, para no inflar el tamaño de la descarga — se instala
+  aparte desde
+  [GitHub Releases](https://github.com/oweeme/oweecode/releases)
 - ✅ **Fase 6** — Repo APT propio (`reprepro`), embebido offline en el ISO
 
 **Validado en hardware real:** HP sin Nvidia (instalación completa, WiFi,

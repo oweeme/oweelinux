@@ -70,10 +70,10 @@ Lo que realmente está en el ISO hoy (verificado contra
 - **Captura de pantalla:** Spectacle (nativo de KDE, sin problemas de
   compatibilidad de portal como tuvimos con Kooha)
 
-**IDE propio:** oweeide (github.com/oweeme/oweeide, Tauri/Rust), empaquetado
-como `.deb` en el repo propio — actualmente en desarrollo (cambio de nombre y
-licencia en curso), no viene preinstalado; instalable a mano con
-`apt install oweeme-ide`.
+**IDE propio:** [oweecode](https://github.com/oweeme/oweecode) (antes
+"oweecode", Tauri/Rust) — no viene preinstalado ni empaquetado en el ISO;
+se instala aparte desde
+[GitHub Releases](https://github.com/oweeme/oweecode/releases).
 
 Editor gráfico, bases de datos, IA local, grabación de video y suite de
 oficina quedaron descartados de esta fase por no estar realmente
@@ -87,17 +87,23 @@ no acá.
 - Íconos Papirus con carpetas en teal (mismo mecanismo que ya funcionó, DE-agnóstico)
 - Esquema de color de Konsole a juego
 
-## 8. Empaquetado de apps propias
+## 8. Distribución de apps propias
 
-En Debian, el equivalente de un `PKGBUILD` es un paquete `.deb`:
-1. Se arma el paquete (`debuild`/`dpkg-buildpackage` o similar según corresponda a una app Tauri)
-2. Se sube a un repo APT propio
-3. Instalable con `apt install oweeide`, y las actualizaciones futuras llegan con `apt upgrade` — sin reinstalar el sistema
+Decisión deliberada: **las apps propias no van en el ISO**, para no inflar el
+tamaño de la descarga. Cada una se instala aparte, por el canal que le quede
+mejor:
+
+- **oweecode**: `.deb` publicado directo en
+  [GitHub Releases](https://github.com/oweeme/oweecode/releases) del propio
+  repo de la app.
+- Alternativa disponible si hiciera falta (ej. para que quede instalable vía
+  `apt upgrade` sin bajar un `.deb` a mano): empaquetar y subir al repo APT
+  propio, igual que ya se hace con WPS Office.
 
 ## 9. Repo APT propio
 
-- Herramienta: `reprepro` o `aptly`
-- Contenido: oweeide, y cualquier app propia futura
+- Herramienta: `reprepro`
+- Contenido hoy: WPS Office (redistribuido)
 - Se agrega como una entrada más en `sources.list.d`, se comporta como un repo oficial más
 
 ## 10. Pipeline de build de la ISO (live-build)
@@ -117,8 +123,10 @@ En Debian, el equivalente de un `PKGBUILD` es un paquete `.deb`:
 - **Fase 2 — Drivers:** Nvidia (si corresponde) + PRIME en el hardware real (Dell G3 3579)
 - **Fase 3 — Dev stack:** toolchains y terminal configurada
 - **Fase 4 — Branding:** logo, splash, tema, sin telemetría confirmado
-- **Fase 5 — App propia:** oweeide empaquetado como `.deb`
-- **Fase 6 — Repo propio:** repo APT propio para oweeide y futuras apps
+- **Fase 5 — App propia:** oweecode empaquetado como `.deb`, distribuido
+  aparte del ISO vía GitHub Releases
+- **Fase 6 — Repo propio:** repo APT propio para apps redistribuidas
+  (WPS Office) y futuras apps propias que lo necesiten
 
 ## 12. Pendiente por decidir
 
@@ -129,11 +137,11 @@ En Debian, el equivalente de un `PKGBUILD` es un paquete `.deb`:
 
 ## 13. Ideas futuras (no comprometidas)
 
-- **Memoria persistente para oweeide**: evaluar `TencentCloud/TencentDB-Agent-Memory`
+- **Memoria persistente para oweecode**: evaluar `TencentCloud/TencentDB-Agent-Memory`
   (github.com/TencentCloud/TencentDB-Agent-Memory) como posible backend para que
-  oweeide tenga memoria entre sesiones de código (chat memory, skills, wiki,
+  oweecode tenga memoria entre sesiones de código (chat memory, skills, wiki,
   code-graph). Es una stack de servicios Node.js/Docker que depende de una API de
   LLM externa — no es liviano, no es un simple "agregar paquete". Antes de integrar,
   verificar que no mande nada a servidores de Tencent por defecto (choca con la
   regla de cero telemetría del proyecto si no se confirma). No aplica a la distro
-  en sí, solo como posible feature de oweeide a futuro.
+  en sí, solo como posible feature de oweecode a futuro.

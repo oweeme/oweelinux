@@ -71,12 +71,14 @@ sin necesidad de una ISO nueva, editando un manifiesto JSON en este repo.
 
 ### Apps propias
 
-- **oweeide**: IDE propio (Tauri/Rust). Actualmente **en desarrollo** — está
-  cambiando de nombre y de licencia, así que por ahora no viene preinstalado
-  ni aparece en "Apps recomendadas". Quien quiera probarlo igual puede hacerlo
-  con `apt install oweeme-ide` una vez agregado el repo propio.
-- Repo APT propio (`reprepro`), embebido offline en el ISO — funciona sin
-  conexión desde el primer arranque.
+Las apps propias **no vienen incluidas en el ISO** — se instalan aparte, para
+no inflar el tamaño de la descarga.
+
+- **[oweecode](https://github.com/oweeme/oweecode)**: IDE propio (Tauri/Rust).
+  Se instala desde [GitHub Releases](https://github.com/oweeme/oweecode/releases),
+  no viene preinstalado ni en "Apps recomendadas".
+- Repo APT propio (`reprepro`), embebido offline en el ISO — hoy distribuye
+  WPS Office; funciona sin conexión desde el primer arranque.
 
 ## Estado actual
 
