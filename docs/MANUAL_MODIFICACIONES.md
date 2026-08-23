@@ -570,7 +570,10 @@ diagnóstico real. Si algo se rompe de forma parecida, empezar por acá.
 - ✅ **Fase 3** — Dev stack (Rust/Go/Ada/Python vía gestores de versión)
 - ✅ **Fase 4** — Branding completo (Plymouth, SDDM, KSplash, wallpaper, GRUB,
   esquema de colores)
-- ✅ **Fase 5** — `oweeide` empaquetado como `.deb`, preinstalado por defecto
+- ⏸️ **Fase 5** — `oweeide` empaquetado como `.deb`, disponible en el repo
+  propio. Dejó de instalarse por defecto y de aparecer en "Apps recomendadas"
+  porque está en desarrollo (cambio de nombre y de licencia en curso);
+  instalable a mano con `apt install oweeme-ide` mientras tanto
 - ✅ **Fase 6** — Repo APT propio (`reprepro`), embebido offline en el ISO
 
 **Validado en hardware real:** HP sin Nvidia (instalación completa, WiFi,

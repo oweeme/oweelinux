@@ -14,31 +14,102 @@ Principios del proyecto:
 - **Liviano pero completo** — no se sacrifica funcionalidad real (WiFi, batería,
   Bluetooth, HDMI, tabletas Wacom) solo por bajar el tamaño del ISO.
 - Instalable con clicks (instalador gráfico Calamares), sin necesitar terminal.
-- Las apps propias (`oweeide`, y las que vengan después) se instalan y actualizan
-  vía `apt`, desde un repo APT propio — nunca hace falta reinstalar el sistema
-  para tener la última versión.
+- Las apps propias se instalan y actualizan vía `apt`, desde un repo APT propio —
+  nunca hace falta reinstalar el sistema para tener la última versión.
+
+## Qué trae OweeLinux hoy
+
+### Escritorio
+
+- KDE Plasma 6, instalado **mínimo y curado** (no el meta-paquete `kde-full`).
+- Look-and-feel propio (`org.oweelinux.desktop`): panel único arriba, sin barra
+  de tareas abajo, reloj centrado.
+- Esquema de color propio (teal + coral, basado en el logo del koi), aplicado
+  en toda la interfaz — ventanas, diálogos, panel — no solo el wallpaper.
+- **6 wallpapers de koi** a elegir desde Configuración del Sistema, todos
+  ilustración vectorial propia: Solo, Duo, Pond, Sunset, Night, Dawn — además
+  del wallpaper foto que viene por defecto.
+- Splash de arranque (Plymouth), splash de sesión (KSplash), login (SDDM) y
+  GRUB, todos con el mismo branding.
+
+### Instalación
+
+- Instalador gráfico Calamares, sin terminal.
+- Particionado automático pensado para que los archivos del usuario sobrevivan
+  a una reinstalación: `/` (40GB) y `/home` separados, más un swap chico en
+  disco como colchón sobre zram.
+- Filesystem del instalador limitado a lo que el ISO puede formatear de
+  verdad (ext4, btrfs) — no se ofrecen opciones que fallarían a mitad de
+  instalación.
+- Driver Nvidia opcional post-instalación (ícono "Instalar driver Nvidia"),
+  con chequeo de Secure Boot antes de instalar.
+
+### Stack de desarrollo preinstalado
+
+Python 3, Rust (`rustup`), Go, Ada (`gnat`), Podman, `git`, `curl`, `adb` +
+`fastboot`, y una terminal moderna lista para usar: `ripgrep`, `fzf`, `bat`,
+`starship`, `zsh`.
+
+### Apps para todo el mundo (sin terminal)
+
+Dolphin, Konsole, Kate, Gwenview, Ark, Okular, KCalc, Falkon, Spectacle — más
+KDE Discover (con Flatpak) para instalar lo que falte.
+
+**Apps recomendadas**: un ícono en el escritorio abre un checklist gráfico de
+apps opcionales (Krita, WPS Office, Inkscape, VLC, Blender, Hedgewars, Kooha,
+Obsidian) — se instalan con un click, cada una desde la fuente que le
+corresponde (apt propio, Debian, Flatpak, o terceros). La lista se actualiza
+sin necesidad de una ISO nueva, editando un manifiesto JSON en este repo.
+
+### Bajo consumo de recursos
+
+- `zram` (50% de la RAM, compresión lz4) en vez de depender solo de swap en
+  disco.
+- Baloo (indexador de archivos) instalado pero con indexado desactivado por
+  defecto.
+- Sin Akonadi, Kontact, ni juegos/apps de relleno.
+
+### Apps propias
+
+- **oweeide**: IDE propio (Tauri/Rust). Actualmente **en desarrollo** — está
+  cambiando de nombre y de licencia, así que por ahora no viene preinstalado
+  ni aparece en "Apps recomendadas". Quien quiera probarlo igual puede hacerlo
+  con `apt install oweeme-ide` una vez agregado el repo propio.
+- Repo APT propio (`reprepro`), embebido offline en el ISO — funciona sin
+  conexión desde el primer arranque.
 
 ## Estado actual
 
-v1 funcional para hardware **sin Nvidia** (validado en un HP real): instalación
-gráfica de punta a punta, WiFi/batería/Bluetooth/HDMI/audio funcionando, apps
-básicas, IDE propio preinstalado, branding completo (splash, login, GRUB, colores).
+**v1 validada de punta a punta en hardware real**, incluyendo instalación
+gráfica completa con el particionado root+home+swap:
 
-Pendiente: validar el driver Nvidia (Fase 2) en hardware real con GPU Nvidia.
-Ver el detalle completo de qué falta en
+- ✅ Hardware sin Nvidia (HP): WiFi, batería, Bluetooth, HDMI, audio.
+- ✅ Hardware con Nvidia (Dell G3 3579, GTX 1050 Pascal): driver instalado y
+  funcionando sobre Wayland, con chequeo de Secure Boot.
+- ✅ Instalación gráfica completa probada en hardware real (no solo VM),
+  incluyendo el nuevo esquema de particiones.
+
+Ver el detalle completo — incluyendo los bugs reales que se encontraron y
+resolvieron en el camino — en
 [`docs/MANUAL_MODIFICACIONES.md`](docs/MANUAL_MODIFICACIONES.md#estado-y-fases).
 
 ## Descargar
 
-_(pendiente: link una vez publicada la ISO)_
+**[live-image-amd64.hybrid.iso](http://oweeme.com/iso/live-image-amd64.hybrid.iso)**
+
+Canal de YouTube: [@oweeme](https://www.youtube.com/@oweeme) — todavía sin
+videos, pero ahí van a subirse a medida que el autor trabaje con OweeLinux.
 
 ## Instalación rápida
 
 1. Grabar la ISO a un pendrive (recomendado: [KDE ISO Image Writer](https://apps.kde.org/isoimagewriter/)).
 2. Arrancar la máquina desde el pendrive.
-3. Abrir "Instalar OweeLinux" desde el escritorio y seguir el instalador.
+3. Abrir "Instalar OweeLinux" desde el escritorio y seguir el instalador. En
+   el paso de particiones, elegir **"Erase disk"** con **"Format"** (no
+   "Keep") para que se cree el esquema root+home+swap.
 4. Si la máquina tiene GPU Nvidia: después de instalar, correr el ícono
-   "Instalar driver Nvidia" del escritorio (detecta el hardware automáticamente).
+   "Instalar driver Nvidia" del escritorio (detecta el hardware
+   automáticamente).
 
 ## Para desarrollar / modificar esta distro
 
