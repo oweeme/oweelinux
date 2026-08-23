@@ -57,19 +57,28 @@ KDE tiene fama de "pesado" por el meta-paquete completo, no por el escritorio en
 
 ## 6. Paquete "dev-ready" preinstalado
 
-- **Editor:** VSCode oficial (build FOSS `code`, sin telemetría) — a confirmar disponibilidad/paquete en Debian
-- **Toolchains:** Python3, Rust (`rustup`), Go, Ada (`gcc-ada`), PHP 8.4 (repo de Sury, ya que Debian stable congela una versión vieja)
-- **Gestores de versión** (`nvm`, `pyenv`, `rustup`) en vez de depender de los paquetes de Debian, para no quedar atado a versiones congeladas
+Lo que realmente está en el ISO hoy (verificado contra
+`livebuild-profile/config/package-lists/oweelinux.list.chroot`):
+
+- **Toolchains:** Python3, Rust (`rustup`), Go, Ada (`gnat`)
+- **Gestores de versión:** `rustup`, `pyenv` — en vez de depender de los
+  paquetes congelados de Debian
 - **Contenedores:** Podman
-- **Bases de datos:** MariaDB, Redis
-- **Android:** `android-tools` + `scrcpy`
-- **IA local:** `ollama`, 100% local, cero telemetría
+- **Android:** `adb` + `fastboot`
 - **Terminal moderna:** `ripgrep`, `fzf`, `bat`, `starship`, zsh
 - **Explorador de archivos:** Dolphin (nativo de KDE, sin agregar nada aparte)
-- **Captura de pantalla:** Spectacle (nativo de KDE, sin problemas de compatibilidad de portal como tuvimos con Kooha)
-- **Grabación de video:** OBS Studio
-- **Suite de oficina:** a definir (OnlyOffice u otra) para el uso no-dev
-- **IDE propio:** oweeide (github.com/oweeme/oweeide, Tauri/Rust) empaquetado como `.deb`
+- **Captura de pantalla:** Spectacle (nativo de KDE, sin problemas de
+  compatibilidad de portal como tuvimos con Kooha)
+
+**IDE propio:** oweeide (github.com/oweeme/oweeide, Tauri/Rust), empaquetado
+como `.deb` en el repo propio — actualmente en desarrollo (cambio de nombre y
+licencia en curso), no viene preinstalado; instalable a mano con
+`apt install oweeme-ide`.
+
+Editor gráfico, bases de datos, IA local, grabación de video y suite de
+oficina quedaron descartados de esta fase por no estar realmente
+instalados — si se retoman, van en la sección 12 como pendiente por decidir,
+no acá.
 
 ## 7. Branding
 
