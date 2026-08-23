@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "hector@oweeme.com",
+                "Name": "Héctor Martínez"
+            }
+        ],
+        "Description": "Pareja de koi de OweeLinux, ilustración plana vectorial",
+        "Id": "OweeLinuxKoiDuo",
+        "License": "CC0",
+        "Name": "OweeLinux Koi Duo"
+    }
+}

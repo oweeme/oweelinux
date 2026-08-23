@@ -1,0 +1,9 @@
+[KDE]
+widgetStyle=Breeze
+LookAndFeelPackage=org.oweelinux.desktop
+
+[General]
+ColorScheme=OweeLinux
+
+[Icons]
+Theme=breeze-dark

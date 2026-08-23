@@ -79,7 +79,7 @@ sudo podman run --rm --privileged \
       --apt-recommends true \
       --bootappend-live 'boot=live components quiet splash noautologin' \
       --iso-application 'OweeLinux' \
-      --iso-publisher 'OweeLinux <https://github.com/oweeme>' \
+      --iso-publisher 'OweeLinux <https://oweeme.com>' \
       --iso-volume 'OWEELINUX' &&
     lb build
   "

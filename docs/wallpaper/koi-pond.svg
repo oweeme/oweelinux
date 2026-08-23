@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <title>OweeLinux Koi Pond</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1920" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0d1a15"/>
+      <stop offset="1" stop-color="#1c332a"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5fb3a3" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#5fb3a3" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="koiBodyP1"><ellipse cx="150" cy="0" rx="150" ry="45"/></clipPath>
+    <clipPath id="koiBodyP2"><ellipse cx="150" cy="0" rx="150" ry="45"/></clipPath>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#bg)"/>
+  <ellipse cx="1550" cy="200" rx="500" ry="380" fill="url(#sun)"/>
+
+  <g fill="none" stroke="#2a4a3d" stroke-width="3" stroke-linecap="round" opacity="0.16">
+    <path d="M -100,300 C 300,260 500,340 900,300 C 1300,260 1500,340 2020,300"/>
+    <path d="M -100,560 C 350,530 560,600 960,560 C 1360,520 1560,600 2020,560"/>
+    <path d="M -100,940 C 350,910 560,980 960,940 C 1360,900 1560,980 2020,940"/>
+  </g>
+
+  <!-- background silhouette koi (depth) -->
+  <g transform="translate(1600,280) rotate(-25) scale(0.75)" opacity="0.5">
+    <path d="M 280,-10 C 340,-40 380,-70 400,-90 C 370,-40 360,-10 350,0 C 360,10 370,40 400,90 C 380,70 340,40 280,10 Z" fill="#16281f"/>
+    <path d="M 100,-40 Q 140,-92 182,-40 Q 140,-52 100,-40 Z" fill="#16281f"/>
+    <ellipse cx="150" cy="0" rx="150" ry="45" fill="#16281f"/>
+  </g>
+
+  <!-- lily + lotus cluster, upper right, clear of panel -->
+  <g transform="translate(1700,190)">
+    <ellipse cx="-60" cy="60" rx="80" ry="26" fill="#2f5142" opacity="0.7"/>
+    <ellipse cx="70" cy="90" rx="60" ry="20" fill="#2a4a3d" opacity="0.65"/>
+    <g>
+      <g id="lotusPetals" fill="#eff0f1" opacity="0.92">
+        <ellipse cx="0" cy="-34" rx="16" ry="34"/>
+        <ellipse cx="29" cy="-17" rx="16" ry="34" transform="rotate(60 29 -17)"/>
+        <ellipse cx="29" cy="17" rx="16" ry="34" transform="rotate(120 29 17)"/>
+        <ellipse cx="0" cy="34" rx="16" ry="34" transform="rotate(180 0 34)"/>
+        <ellipse cx="-29" cy="17" rx="16" ry="34" transform="rotate(240 -29 17)"/>
+        <ellipse cx="-29" cy="-17" rx="16" ry="34" transform="rotate(300 -29 -17)"/>
+      </g>
+      <circle cx="0" cy="0" r="13" fill="#f06548"/>
+    </g>
+  </g>
+
+  <!-- medium koi: deep coral -->
+  <g transform="translate(1450,470) rotate(20) scale(1.3)">
+    <path d="M 280,-10 C 340,-40 380,-70 400,-90 C 370,-40 360,-10 350,0 C 360,10 370,40 400,90 C 380,70 340,40 280,10 Z" fill="#c9542f" opacity="0.9"/>
+    <path d="M 100,-40 Q 140,-92 182,-40 Q 140,-52 100,-40 Z" fill="#c9542f" opacity="0.9"/>
+    <path d="M 55,28 Q 88,72 132,34 Q 92,44 55,28 Z" fill="#c9542f" opacity="0.8"/>
+    <ellipse cx="150" cy="0" rx="150" ry="45" fill="#e2703f"/>
+    <g clip-path="url(#koiBodyP2)">
+      <ellipse cx="100" cy="-10" rx="26" ry="16" fill="#1c1c1c" opacity="0.85" transform="rotate(-10 100 -10)"/>
+      <ellipse cx="180" cy="12" rx="20" ry="13" fill="#1c1c1c" opacity="0.85" transform="rotate(8 180 12)"/>
+    </g>
+    <circle cx="28" cy="-10" r="6.5" fill="#0f0f0f"/>
+    <circle cx="26" cy="-12.5" r="2" fill="#f4f4f4"/>
+  </g>
+
+  <!-- foreground koi: cream + coral -->
+  <g transform="translate(680,880) rotate(-14) scale(2.1)">
+    <path d="M 280,-10 C 340,-40 380,-70 400,-90 C 370,-40 360,-10 350,0 C 360,10 370,40 400,90 C 380,70 340,40 280,10 Z" fill="#f06548" opacity="0.85"/>
+    <path d="M 100,-40 Q 140,-92 182,-40 Q 140,-52 100,-40 Z" fill="#f06548" opacity="0.85"/>
+    <path d="M 55,28 Q 88,72 132,34 Q 92,44 55,28 Z" fill="#f06548" opacity="0.75"/>
+    <ellipse cx="150" cy="0" rx="150" ry="45" fill="#eff0f1"/>
+    <g clip-path="url(#koiBodyP1)">
+      <ellipse cx="95" cy="-8" rx="48" ry="24" fill="#f06548" opacity="0.92" transform="rotate(-14 95 -8)"/>
+      <ellipse cx="195" cy="12" rx="38" ry="19" fill="#f06548" opacity="0.92" transform="rotate(10 195 12)"/>
+      <ellipse cx="55" cy="14" rx="20" ry="12" fill="#20201f" opacity="0.85"/>
+    </g>
+    <path d="M 8,6 Q -14,14 -22,26" stroke="#20201f" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 8,-4 Q -14,-14 -24,-22" stroke="#20201f" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="28" cy="-10" r="6.5" fill="#181818"/>
+    <circle cx="26" cy="-12.5" r="2" fill="#f4f4f4"/>
+  </g>
+
+  <g opacity="0.7">
+    <ellipse cx="220" cy="1000" rx="90" ry="28" fill="#2f5142"/>
+    <ellipse cx="380" cy="1040" rx="70" ry="22" fill="#2a4a3d"/>
+  </g>
+</svg>

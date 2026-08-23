@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <title>OweeLinux Koi Solo</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1920" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0d1a15"/>
+      <stop offset="1" stop-color="#1c332a"/>
+    </linearGradient>
+    <clipPath id="koiBody1">
+      <ellipse cx="150" cy="0" rx="150" ry="45"/>
+    </clipPath>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#bg)"/>
+
+  <g fill="none" stroke="#2a4a3d" stroke-width="3" stroke-linecap="round" opacity="0.18">
+    <path d="M -100,260 C 300,220 500,300 900,260 C 1300,220 1500,300 2020,260"/>
+    <path d="M -100,430 C 350,390 550,470 950,430 C 1350,390 1550,470 2020,430"/>
+    <path d="M -100,640 C 300,610 520,680 900,640 C 1300,600 1520,690 2020,650"/>
+    <path d="M -100,860 C 350,830 560,900 960,860 C 1360,820 1560,900 2020,860"/>
+  </g>
+
+  <g opacity="0.7">
+    <ellipse cx="160" cy="960" rx="95" ry="30" fill="#2f5142"/>
+    <ellipse cx="300" cy="1010" rx="80" ry="26" fill="#2a4a3d"/>
+    <ellipse cx="90" cy="1035" rx="60" ry="20" fill="#2f5142"/>
+  </g>
+
+  <g opacity="0.5" fill="#5fb3a3">
+    <circle cx="840" cy="545" r="9"/>
+    <circle cx="805" cy="500" r="7"/>
+    <circle cx="782" cy="458" r="5"/>
+  </g>
+
+  <!-- koi -->
+  <g transform="translate(1050,620) rotate(-10) scale(2.0)">
+    <!-- tail -->
+    <path d="M 280,-10 C 340,-40 380,-70 400,-90 C 370,-40 360,-10 350,0 C 360,10 370,40 400,90 C 380,70 340,40 280,10 Z"
+          fill="#f06548" opacity="0.85"/>
+    <!-- dorsal fin -->
+    <path d="M 100,-40 Q 140,-92 182,-40 Q 140,-52 100,-40 Z" fill="#f06548" opacity="0.85"/>
+    <!-- pectoral fin -->
+    <path d="M 55,28 Q 88,72 132,34 Q 92,44 55,28 Z" fill="#f06548" opacity="0.75"/>
+    <!-- body -->
+    <ellipse cx="150" cy="0" rx="150" ry="45" fill="#eff0f1"/>
+    <g clip-path="url(#koiBody1)">
+      <ellipse cx="95" cy="-8" rx="48" ry="24" fill="#f06548" opacity="0.92" transform="rotate(-14 95 -8)"/>
+      <ellipse cx="195" cy="12" rx="38" ry="19" fill="#f06548" opacity="0.92" transform="rotate(10 195 12)"/>
+      <ellipse cx="55" cy="14" rx="20" ry="12" fill="#20201f" opacity="0.85"/>
+    </g>
+    <!-- barbels -->
+    <path d="M 8,6 Q -14,14 -22,26" stroke="#20201f" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 8,-4 Q -14,-14 -24,-22" stroke="#20201f" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <!-- eye -->
+    <circle cx="28" cy="-10" r="6.5" fill="#181818"/>
+    <circle cx="26" cy="-12.5" r="2" fill="#f4f4f4"/>
+  </g>
+</svg>

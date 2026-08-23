@@ -8,11 +8,11 @@
             }
         ],
         "Category": "",
-        "Description": "Splash de arranque de sesión de OweeLinux",
+        "Description": "Tema de escritorio de OweeLinux: splash, wallpaper y panel superior único",
         "Id": "org.oweelinux.desktop",
         "License": "GPLv2+",
         "Name": "OweeLinux",
-        "Website": "https://github.com/oweeme"
+        "Website": "https://oweeme.com"
     },
     "Keywords": "Desktop;Workspace;Appearance;Look and Feel;",
     "X-Plasma-APIVersion": 2

@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "hector@oweeme.com",
+                "Name": "Héctor Martínez"
+            }
+        ],
+        "Description": "Koi de OweeLinux de noche, ilustración plana vectorial",
+        "Id": "OweeLinuxKoiNight",
+        "License": "CC0",
+        "Name": "OweeLinux Koi Night"
+    }
+}

@@ -1,7 +1,0 @@
-#!/bin/sh
-set -e
-
-apt-get update
-apt-get install -y oweeme-ide
-# wps-office queda disponible en el repo local (apt install wps-office)
-# pero no se instala por defecto: agrega ~1.6GB al ISO base.

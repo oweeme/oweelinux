@@ -14,11 +14,11 @@ strings:
     versionedName:       OweeLinux 1
     shortVersionedName:  OweeLinux 1
     bootloaderEntryName: OweeLinux
-    productUrl:          https://github.com/oweeme
-    supportUrl:          https://github.com/oweeme
-    knownIssuesUrl:      https://github.com/oweeme
-    releaseNotesUrl:     https://github.com/oweeme
-    donateUrl:           https://github.com/oweeme
+    productUrl:          https://oweeme.com
+    supportUrl:          https://oweeme.com
+    knownIssuesUrl:      https://github.com/oweeme/oweelinux/issues
+    releaseNotesUrl:     https://github.com/oweeme/oweelinux/releases
+    donateUrl:           https://oweeme.com
 
 sidebar: widget
 navigation: widget
