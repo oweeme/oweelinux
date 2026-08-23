@@ -65,7 +65,10 @@ Lo que realmente está en el ISO hoy (verificado contra
   paquetes congelados de Debian
 - **Contenedores:** Podman
 - **Android:** `adb` + `fastboot`
-- **Terminal moderna:** `ripgrep`, `fzf`, `bat`, `starship`, zsh
+- **Terminal moderna:** `ripgrep` (comando `rg`), `fzf`, `bat` (comando
+  `batcat` — Debian le cambia el nombre), `starship`, `zsh`. `starship` y
+  `zsh` quedan instalados pero no activos por defecto (hay que activarlos a
+  mano, ver README) — pendiente decidir si conviene activarlos de fábrica
 - **Explorador de archivos:** Dolphin (nativo de KDE, sin agregar nada aparte)
 - **Captura de pantalla:** Spectacle (nativo de KDE, sin problemas de
   compatibilidad de portal como tuvimos con Kooha)

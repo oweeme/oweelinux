@@ -47,8 +47,52 @@ Principios del proyecto:
 ### Stack de desarrollo preinstalado
 
 Python 3, Rust (`rustup`), Go, Ada (`gnat`), Podman, `git`, `curl`, `adb` +
-`fastboot`, y una terminal moderna lista para usar: `ripgrep`, `fzf`, `bat`,
-`starship`, `zsh`.
+`fastboot`.
+
+### Herramientas de terminal moderna
+
+Instaladas, pero **no todas están activas por defecto** en una cuenta nueva
+— hay que activarlas a mano una vez:
+
+- **[`rg`](https://github.com/BurntSushi/ripgrep)** (paquete `ripgrep`):
+  buscador de texto tipo `grep`, mucho más rápido, recursivo por defecto y
+  que ignora automáticamente lo que está en `.gitignore`.
+  ```bash
+  rg "texto a buscar"          # busca en la carpeta actual y subcarpetas
+  rg -i "sin mayúsculas"
+  rg --type py "def "          # solo en archivos .py
+  ```
+- **`batcat`** (paquete `bat` — Debian le cambia el nombre al comando porque
+  `bat` ya estaba tomado por otro paquete): como `cat`, pero con resaltado de
+  sintaxis, números de línea, y marcas de git en el margen.
+  ```bash
+  batcat archivo.py
+  batcat --paging=never archivo.txt   # sin paginador, como un cat normal
+  ```
+  Si querés poder escribir `bat` a secas: `echo "alias bat=batcat" >> ~/.zshrc`
+  (o `~/.bashrc` si usás bash).
+- **`fzf`**: buscador difuso interactivo — filtra cualquier lista mientras
+  escribís. Los atajos más útiles, una vez en una terminal `zsh` o `bash` con
+  la integración de `fzf` cargada:
+  - `Ctrl+R`: busca en el historial de comandos escribiendo cualquier parte.
+  - `Ctrl+T`: busca un archivo y lo inserta en la línea de comandos.
+  - También sirve suelto: `cat lista.txt | fzf` filtra esa lista a mano.
+- **`starship`**: prompt de terminal personalizable — muestra la rama de git,
+  si hay cambios sin commitear, versión del lenguaje del proyecto (Python,
+  Rust, Node, etc.), todo automático según la carpeta en la que estés. **No
+  se activa solo**: hay que agregar una línea al shell.
+  ```bash
+  # para zsh
+  echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+  # para bash
+  echo 'eval "$(starship init bash)"' >> ~/.bashrc
+  ```
+- **`zsh`**: shell alternativa a `bash`, con mejor autocompletado y soporte
+  de plugins. Está instalada pero **no es la shell por defecto** de una
+  cuenta nueva (sigue siendo `bash`, como en Debian). Para cambiar:
+  ```bash
+  chsh -s $(which zsh)   # pide la contraseña, aplica en el próximo login
+  ```
 
 ### Apps para todo el mundo (sin terminal)
 
