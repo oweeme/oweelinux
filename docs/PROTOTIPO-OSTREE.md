@@ -1,6 +1,6 @@
-# Prototipo ostree (F3a, F3b) — resultado
+# Prototipo ostree (F3a, F3b, F3c) — resultado
 
-Fecha: 2026-10-11. **Estado: F3a y F3b superadas.** Un Debian 13 mínimo arranca desde un
+Fecha: 2026-10-11. **Estado: F3a, F3b y F3c superadas.** Un Debian 13 mínimo arranca desde un
 despliegue ostree en QEMU/KVM con UEFI, con `/usr` de solo lectura.
 
 ## Qué se probó (`tools/ostree-proto/boot-test.sh`, 4/4 pasa)
@@ -49,6 +49,28 @@ vía red de QEMU) → reinicia → arranca en la release 2 y conserva la 1.
 4. **Seguridad:** el prototipo no firma commits (`gpg-verify=false`) y usa HTTP. **Antes de cualquier uso real hace falta firma y HTTPS.**
 5. **Nota de método:** un fallo de la primera prueba (parecía error de actualización) era del montaje (el disco ya estaba en la release 2). Las pruebas deben fijar la versión de partida.
 
+## F3c — rollback manual y automático (`tools/ostree-proto/rollback-test.sh`, 12/12 pasa)
+Una sola sesión de QEMU con 5 arranques:
+1. Release 1 (confirmada) → se crea `/home/dato.txt` → `owee-update` a la 2 (queda "a prueba").
+2. Release 2: `owee-health` comprueba que systemd llega a `running` y la **confirma sola**.
+3. `owee-rollback` (manual) → vuelve a la 1. `/home/dato.txt` intacto.
+4. `owee-update` a la release 3, que lleva un servicio roto a propósito → arranca a prueba.
+5. La 3 arranca, `owee-health` ve el sistema `degraded`, la **rechaza y reinicia**; GRUB vuelve a la 1 sola. `/home/dato.txt` intacto; el registro `/var/lib/owee/health.log` guarda 1 rechazo. 4 reinicios en total: sin bucle.
+
+**Mecanismo:** la versión nueva tiene UN intento (`trial=1`, que GRUB borra con `save_env` al elegirla). Solo se "confirma" (`confirmed=ID`) si la comprobación de salud pasa. Sin confirmación, el siguiente arranque va a la última versión confirmada. `rd.emergency=reboot panic=5` evita quedarse colgado si el fallo ocurre en el initramfs/kernel.
+
+### Hallazgos de F3c (los dos fallaron antes de pasar)
+1. **El id de versión debe ser único por despliegue.** `<bootcsum>-<n>` (de la ruta `ostree=`) es igual para todas las versiones que comparten kernel, así que "en uso" y "confirmada" siempre coincidían y el rollback nunca actuaba. Se usa `<commit>.<serie>` resuelto con `owee-id`.
+2. **GRUB interpreta un `default` que empieza por dígitos como NÚMERO de entrada.** Un id `5be8…` se leía como "entrada 5", no existía y GRUB caía en la entrada 0 (la versión rota) → bucle de reinicios. Los ids de GRUB llevan el prefijo `owee-`. Este fallo estuvo oculto mientras la versión confirmada coincidía con la entrada 0.
+3. Tras un `upgrade`, ostree renombra `boot.0`/`boot.1`: la ruta `ostree=` del kernel en marcha deja de existir. `owee-id` pregunta entonces a `ostree admin status`.
+4. `save_env` de GRUB sobre ext4 en UEFI **sí funciona** (comprobado aparte: `trial` pasa de 1 a 0 entre arranques).
+
+### Qué NO cubre todavía
+- Solo se probó la rotura por **servicio fallido** (`degraded`). La rotura de **initramfs/kernel** (`publish.sh ... initrd`) está implementada pero **no se ha probado**.
+- La comprobación de salud solo mira `systemctl is-system-running`; falta una lista de servicios críticos (red, gráficos, etc.).
+- Un sistema colgado sin reiniciar (p. ej. pantalla negra con systemd arriba) no lo detectaría; haría falta un temporizador *watchdog*.
+- Un mismo despliegue confirmado y luego desplegado otra vez conserva el mismo `<commit>.<serie>`; hay que revisar qué pasa si se reutiliza una serie.
+
 ## Pendiente (siguientes sub-fases)
-- F3c rollback: manual (elegir la versión anterior en GRUB / `ostree admin`) y **automático** (comprobación de salud tras arrancar la versión nueva).
+- F3c-bis: probar la rotura de initramfs y el *watchdog*.
 - F3d corte de energía repetido durante `pull` y durante el cambio de despliegue.

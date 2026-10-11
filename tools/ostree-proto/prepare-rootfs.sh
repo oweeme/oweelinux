@@ -51,9 +51,8 @@ ln -sf /usr/lib/systemd/system/systemd-networkd.service \
    "$R/etc/systemd/system/multi-user.target.wants/systemd-networkd.service"
 printf '[remote "owee"]\nurl=http://10.0.2.2:8000/pub\ngpg-verify=false\n' > "$R/etc/ostree/remotes.d/owee.conf"
 
-# 4c. Herramientas del proyecto: generador del menú de arranque y actualizador.
-HERE=$(cd "$(dirname "$0")" && pwd)
-install -m0755 "$HERE/owee-bootcfg" "$HERE/owee-update" "$R/usr/bin/"
+# 4c. Piezas propias: herramientas, servicio de salud, directorios de /var.
+"$(dirname "$0")/overlay-owee.sh" "$R"
 
 # 5. ostree espera la configuración en /usr/etc (el /etc de fábrica).
 rm -rf "$R/usr/etc"; mv "$R/etc" "$R/usr/etc"; mkdir "$R/etc"

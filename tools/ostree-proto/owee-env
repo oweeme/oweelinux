@@ -1,0 +1,21 @@
+#!/bin/sh
+# Lee/escribe un "environment block" de GRUB (1024 bytes) sin necesitar grub-editenv.
+# Uso: owee-env ARCHIVO get CLAVE | set CLAVE VALOR
+# La escritura es EN SITIO (conv=notrunc) para conservar los bloques del archivo: GRUB
+# guarda su estado (save_env) escribiendo directamente en esos bloques.
+set -eu
+f=$1; cmd=$2; key=$3
+case $cmd in
+  get) [ -f "$f" ] && sed -n "s/^$key=//p" "$f" | tail -1 || true ;;
+  set)
+    val=$4; t=$(mktemp)
+    { echo "# GRUB Environment Block"
+      [ -f "$f" ] && grep -v -e '^#' -e '^$' -e "^$key=" "$f" || true
+      echo "$key=$val"; } > "$t"
+    size=$(wc -c < "$t"); [ "$size" -le 1024 ] || { echo "owee-env: bloque lleno" >&2; exit 1; }
+    head -c $((1024 - size)) /dev/zero | tr '\0' '#' >> "$t"
+    if [ -f "$f" ]; then dd if="$t" of="$f" bs=1024 count=1 conv=notrunc 2>/dev/null
+    else cp "$t" "$f"; fi
+    rm -f "$t"; sync ;;
+  *) echo "uso: owee-env ARCHIVO get CLAVE | set CLAVE VALOR" >&2; exit 1 ;;
+esac

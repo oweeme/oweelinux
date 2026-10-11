@@ -1,0 +1,8 @@
+#!/bin/sh
+# Rollback manual: vuelve al despliegue anterior y lo marca como confirmado. Reiniciar después.
+set -eu
+ostree admin set-default 1
+owee-bootcfg
+id=$(sed -n "s/^menuentry .*--id 'owee-\([^']*\)'.*/\1/p" /boot/owee/grub.cfg | head -1)
+owee-env /boot/owee/grubenv set confirmed "$id"; owee-env /boot/owee/grubenv set trial 0
+echo "owee-rollback: la próxima vez arrancará $id (reinicia para aplicarlo)"

@@ -1,0 +1,10 @@
+[Unit]
+Description=OweeLinux: comprobación de salud tras actualizar
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/owee-health
+
+[Install]
+WantedBy=multi-user.target

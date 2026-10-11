@@ -1,0 +1,7 @@
+#!/bin/sh
+# Estado del arranque: qué versión corre, cuál está confirmada y si hay prueba pendiente.
+id=$(owee-id < /proc/cmdline)
+echo "booted=$id"
+echo "confirmed=$(owee-env /boot/owee/grubenv get confirmed)"
+echo "trial=$(owee-env /boot/owee/grubenv get trial)"
+echo "release=$(cat /usr/share/owee/release 2>/dev/null)"

@@ -1,0 +1,18 @@
+#!/bin/sh
+# Comprobación de salud tras arrancar. Solo actúa en un arranque "a prueba" (versión
+# distinta de la confirmada): si systemd llega a "running" la confirma; si no, reinicia y
+# GRUB (que ya gastó el intento) vuelve a la versión confirmada.
+id=$(owee-id < /proc/cmdline)
+confirmed=$(owee-env /boot/owee/grubenv get confirmed)
+[ "$id" = "$confirmed" ] && exit 0
+mkdir -p /var/lib/owee
+log() { echo "$(date -u +%FT%TZ) $*" >> /var/lib/owee/health.log; }
+state=$(timeout 90 systemctl is-system-running --wait 2>/dev/null || true)
+if [ "$state" = running ]; then
+  log "estado=running version=$id: confirmada"
+  owee-confirm
+else
+  log "estado=$state version=$id: rechazada, vuelve a $confirmed"
+  echo "owee-health: estado='$state' en la versión $id: reiniciando para volver a $confirmed" | tee /dev/kmsg
+  sleep 2; systemctl reboot
+fi

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Marca como "buena" la versión que está corriendo (la que arrancó con ostree=.../<csum>/<serie>).
+set -eu
+id=$(owee-id < /proc/cmdline)
+[ -n "$id" ] || { echo "owee-confirm: no es un arranque ostree" >&2; exit 1; }
+owee-env /boot/owee/grubenv set confirmed "$id"; owee-env /boot/owee/grubenv set trial 0
+echo "owee-confirm: $id confirmado"

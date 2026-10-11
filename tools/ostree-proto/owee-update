@@ -1,5 +1,14 @@
 #!/bin/sh
-# Actualiza el sistema (ostree) y regenera el arranque. Embrión de `owee update`.
+# Actualiza el sistema (ostree), regenera el arranque y, si hay versión nueva, la deja
+# "a prueba" (un único intento; se confirma con owee-health). Embrión de `owee update`.
 set -eu
+cur() { ostree admin status | sed -n '1,3p' | sed -n 's/^[* ] oweelinux \([0-9a-f]*\)\..*/\1/p' | head -1; }
+before=$(cur)
 ostree admin upgrade "$@"
 owee-bootcfg
+if [ "$(cur)" != "$before" ]; then
+  owee-env /boot/owee/grubenv set trial 1
+  echo "owee-update: versión nueva instalada; arrancará a prueba (se confirma si el sistema queda sano)"
+else
+  echo "owee-update: ya estás en la última versión"
+fi

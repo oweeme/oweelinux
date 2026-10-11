@@ -10,7 +10,8 @@ OFF_ESP=$((1*1024*1024)); OFF_ROOT=$(( (1+ESP_MIB)*1024*1024 ))
 ROOT_BYTES=$(( (SIZE-1-ESP_MIB)*1024*1024 - 1024*1024 ))   # deja 1 MiB final para la GPT de respaldo
 
 # El menú real lo genera owee-bootcfg desde las entradas BLS de ostree (ver ese script).
-"$(dirname "$0")/owee-bootcfg" "$SYSROOT/boot"
+HERE=$(cd "$(dirname "$0")" && pwd)
+PATH="$HERE:$PATH" owee-bootcfg "$SYSROOT/boot"
 
 W=$(mktemp -d); trap 'rm -rf "$W"' EXIT
 cat > "$W/grub.cfg" <<EOC

@@ -1,0 +1,17 @@
+#!/bin/sh
+# Identificador ÚNICO de un despliegue: <commit>.<serie>.
+# Lee por stdin una línea con "ostree=RUTA" (opciones BLS o /proc/cmdline) y resuelve el
+# enlace de /ostree/boot.N/... hacia /ostree/deploy/.../<commit>.<serie>.
+# (No sirve usar <bootcsum>/<n> de la ruta: dos versiones con el mismo kernel lo comparten.)
+# Uso: owee-id [PREFIJO_RAIZ]
+p=$(sed -n 's#.*ostree=\([^ ]*\).*#\1#p')
+[ -n "$p" ] || exit 1
+if [ -e "${1:-}$p" ]; then
+  basename "$(readlink -f "${1:-}$p")"
+elif [ -z "${1:-}" ]; then
+  # Tras un upgrade, ostree renombra boot.0/boot.1 y la ruta de la línea de kernel deja de
+  # existir en el sistema en marcha: se pregunta a ostree cuál es el despliegue arrancado.
+  ostree admin status | sed -n 's/^\* [^ ]* \([0-9a-f]*\.[0-9]*\).*/\1/p' | head -1
+else
+  exit 1
+fi

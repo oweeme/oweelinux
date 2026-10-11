@@ -2,25 +2,49 @@
 # Genera el menú de GRUB (/boot/owee/grub.cfg) a partir de las entradas BLS de ostree.
 # Debe ejecutarse tras CUALQUIER cambio de despliegues (upgrade, rollback, deploy): ostree
 # alterna entre boot.0 y boot.1, así que una configuración fija deja de funcionar.
+#
+# Arranque "a prueba" (rollback automático):
+#   grubenv/trial=1      -> el próximo arranque usa la entrada más nueva y GRUB borra la marca
+#                           (la versión nueva solo tiene UN intento);
+#   grubenv/confirmed=ID -> sin prueba pendiente, se arranca esta entrada (la última buena).
+# Si la versión nueva no llega a "confirmarse" (owee-health), el siguiente arranque vuelve
+# solo a la confirmada. En GRUB el id de la entrada lleva el prefijo "owee-": un `default`
+# que empieza por dígitos se interpreta como NÚMERO de entrada, no como id (bug real visto en pruebas).
+# ID = "<commit>.<serie>" del despliegue (ver owee-id).
 # Uso: owee-bootcfg [DIR_BOOT]   (por defecto /boot). La entrada más nueva va primero.
 set -eu
 BOOT=${1:-/boot}
-OUT=$BOOT/owee/grub.cfg
+OUT=$BOOT/owee/grub.cfg; ENV=$BOOT/owee/grubenv
+EXTRA="rd.shell=0 rd.emergency=reboot panic=5"   # si el arranque falla, reiniciar en vez de quedarse colgado
 mkdir -p "$BOOT/owee"
-n=0
-{
-  echo "set timeout=3"
-  echo "set default=0"
-  for e in $(ls -1 "$BOOT"/loader/entries/ostree-*.conf | sort -r -V); do
-    title=$(sed -n 's/^title //p' "$e"); linux=$(sed -n 's/^linux //p' "$e")
-    initrd=$(sed -n 's/^initrd //p' "$e"); opts=$(sed -n 's/^options //p' "$e")
-    echo "menuentry '$title' {"
-    echo "    linux /boot$linux $opts"
+ROOT=$(dirname "$BOOT")
+id_of() { echo "$1" | owee-id "$ROOT"; }
+n=0; first=""; body=$(mktemp)
+for e in $(ls -1 "$BOOT"/loader/entries/ostree-*.conf | sort -r -V); do
+  title=$(sed -n 's/^title //p' "$e"); linux=$(sed -n 's/^linux //p' "$e")
+  initrd=$(sed -n 's/^initrd //p' "$e"); opts=$(sed -n 's/^options //p' "$e")
+  id=$(id_of "$opts"); [ -n "$first" ] || first=$id
+  { echo "menuentry '$title' --id 'owee-$id' {"
+    echo "    linux /boot$linux $opts $EXTRA"
     echo "    initrd /boot$initrd"
-    echo "}"
-    n=$((n+1))
-  done
-} > "$OUT.new"
-[ "$n" -gt 0 ] || { echo "owee-bootcfg: no hay entradas BLS en $BOOT/loader/entries" >&2; rm -f "$OUT.new"; exit 1; }
-mv "$OUT.new" "$OUT"
+    echo "}"; } >> "$body"
+  n=$((n+1))
+done
+[ "$n" -gt 0 ] || { echo "owee-bootcfg: no hay entradas BLS en $BOOT/loader/entries" >&2; rm -f "$body"; exit 1; }
+[ -f "$ENV" ] || { owee-env "$ENV" set trial 0; owee-env "$ENV" set confirmed "$first"; }
+{ cat <<'EOC'
+set timeout=3
+load_env -f /boot/owee/grubenv
+if [ "${trial}" = "1" ]; then
+    set trial=0
+    save_env -f /boot/owee/grubenv trial
+    set default=0
+elif [ -n "${confirmed}" ]; then
+    set default="owee-${confirmed}"
+else
+    set default=0
+fi
+EOC
+  cat "$body"; } > "$OUT.new"
+rm -f "$body"; mv "$OUT.new" "$OUT"
 echo "owee-bootcfg: $n entradas escritas en $OUT"
