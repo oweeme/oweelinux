@@ -1,6 +1,6 @@
-# Prototipo ostree (F3a, F3b, F3c) — resultado
+# Prototipo ostree (F3a, F3b, F3c, F3d) — resultado
 
-Fecha: 2026-10-11. **Estado: F3a, F3b y F3c superadas.** Un Debian 13 mínimo arranca desde un
+Fecha: 2026-10-11. **Estado: F3a, F3b, F3c y F3d superadas.** Un Debian 13 mínimo arranca desde un
 despliegue ostree en QEMU/KVM con UEFI, con `/usr` de solo lectura.
 
 ## Qué se probó (`tools/ostree-proto/boot-test.sh`, 4/4 pasa)
@@ -71,6 +71,24 @@ Una sola sesión de QEMU con 5 arranques:
 - Un sistema colgado sin reiniciar (p. ej. pantalla negra con systemd arriba) no lo detectaría; haría falta un temporizador *watchdog*.
 - Un mismo despliegue confirmado y luego desplegado otra vez conserva el mismo `<commit>.<serie>`; hay que revisar qué pasa si se reutiliza una serie.
 
-## Pendiente (siguientes sub-fases)
-- F3c-bis: probar la rotura de initramfs y el *watchdog*.
-- F3d corte de energía repetido durante `pull` y durante el cambio de despliegue.
+## F3d — corte de energía (`tools/ostree-proto/powerloss-test.py`, 60/60 sin fallos)
+Un único disco persistente; en cada iteración la VM arranca (eso comprueba el corte anterior) y se
+vuelve a cortar con SIGKILL en un momento aleatorio:
+- 41 cortes en mitad de `owee-update` (20 de ellos antes de que terminara el pull/despliegue), 13 en mitad del **propio arranque**, 6 tras terminar la actualización.
+- Tras cada corte: arrancó en un despliegue válido, `/usr` de solo lectura, ≥1 despliegue; una versión nueva sana se confirmó sola.
+- `ostree fsck` del repo cada 5 iteraciones: sin errores. `e2fsck -fn` final tras apagado limpio: rc=0, 0 problemas.
+- Una versión nueva que no llega a confirmarse antes del corte se descarta y el sistema vuelve a la última confirmada (diseño de F3c).
+
+### Hallazgos de F3d
+1. **La primera tanda "falló" por un defecto de mi generador de versiones, no del sistema:** `--tree=dir=` copia los permisos de las carpetas del overlay y `mktemp -d` crea la raíz con 0700 → `/` quedó 0700 en el commit y los servicios no podían recorrerla; todas esas versiones arrancaron `degraded`. **`owee-health` las rechazó siempre y el sistema volvió a la versión buena**: validación inesperada del rollback automático. Lección: tras `commit --tree=dir`, comprobar `ostree ls ... /` (debe ser `d00755`).
+2. El script debe esperar a que una versión sana se confirme antes de ejecutar comandos pesados, o el reinicio de un rechazo confunde la prueba.
+3. Los sockets de la consola serie deben ir con ruta relativa (límite de ~108 caracteres).
+
+### Limitaciones de la prueba de corte
+- `kill -9` de QEMU conserva todo lo que el invitado ya escribió: prueba consistencia ante cortes en cualquier punto, **no** la pérdida de la caché volátil del disco ni el reordenamiento de escrituras de un disco real. Habría que complementarla con hardware real (cortar la corriente de verdad) o con un dispositivo de bloques que descarte escrituras sin vaciar.
+- La actualización de prueba cambia un solo archivo (rápida): una actualización grande tiene más ventana de riesgo.
+- Falta el caso de rotura de initramfs/kernel y el *watchdog* (F3c-bis).
+
+## Pendiente
+- F3c-bis: rotura de initramfs y *watchdog*.
+- F3h: imagen real con Plasma (descarga en curso).

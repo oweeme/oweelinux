@@ -1,0 +1,56 @@
+# Paquetes de la imagen real (F3h). Basado en livebuild-profile/config/package-lists/oweelinux.list.chroot,
+# SIN lo propio del medio live/instalador (live-boot, calamares, grub, shim...) y SIN el stack de
+# desarrollo (irá en cajas, no en la imagen). Se instala con --no-install-recommends: lo que
+# haga falta de las "recomendaciones" se añade aquí de forma explícita.
+systemd-sysv
+dbus
+dbus-user-session
+linux-image-amd64
+ostree
+ostree-boot
+dracut-core
+kmod
+e2fsprogs
+# escritorio
+plasma-desktop
+sddm
+sddm-theme-breeze
+kwin-x11
+xserver-xorg-core
+xserver-xorg-input-libinput
+x11-xserver-utils
+xauth
+libgl1-mesa-dri
+plasma-nm
+plasma-pa
+systemsettings
+kscreen
+kdialog
+dolphin
+konsole
+kate
+gwenview
+ark
+okular
+kcalc
+falkon
+kde-spectacle
+# red, audio, energía
+network-manager
+wpasupplicant
+pipewire-audio
+upower
+power-profiles-daemon
+zram-tools
+# apps y gestor de software (Flatpak; el sistema no usa apt)
+flatpak
+plasma-discover
+plasma-discover-backend-flatpak
+# fuentes
+fonts-noto-core
+fonts-noto-color-emoji
+# utilidades
+git
+curl
+jq
+zsh

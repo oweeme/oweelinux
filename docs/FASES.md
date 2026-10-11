@@ -2,7 +2,7 @@
 
 Estado: **plan propuesto** (aún sin aprobar fase por fase).
 Decisiones base: Debian 13 · imagen inmutable con **ostree** · apps por Flatpak ·
-herramientas de desarrollo en cajas (Podman/distrobox) · shell propio (labwc + Quickshell)
+herramientas de desarrollo en cajas (Podman/distrobox) · shell propio (labwc + Python/GTK4; ver F6)
 como **segunda sesión** junto a Plasma · licencia GPLv3.
 
 **Regla de oro del plan:** cada fase termina con una **prueba que se puede repetir**.
@@ -17,7 +17,7 @@ real. Los números de fase (F0…F9) son nombres, no el orden: este es el orden.
 | Prioridad | Qué | Por qué en este lugar | Hito |
 |---|---|---|---|
 | ✅ 1 | F0 base · F3a arranque ostree · F3b actualizar · F3c rollback | Hecho y probado en QEMU | |
-| **2** | **F3d corte de energía** (incl. F3c-bis: initramfs roto y *watchdog*) | Es la puerta de F3: sin ella no se puede confiar en la base | |
+| ✅ 2 | **F3d corte de energía** (60/60 sin fallos; falta F3c-bis: initramfs roto y *watchdog*) | Es la puerta de F3: sin ella no se puede confiar en la base | |
 | **3** | **F3h imagen real**: Debian + Plasma + red + audio sobre ostree, que arranca hasta el login gráfico en QEMU | Hoy solo hay un Debian mínimo sin pantalla. Esto es lo que lo hace *funcional* | **M1: sistema funcional (VM)** |
 | 4 | F3e/F3f Nvidia y Secure Boot en la imagen real | La imagen real los necesita antes de tocar hardware | |
 | 5 | F5 instalar en disco real (primero un script, luego Calamares) | Sin instalación no se puede usar fuera de la VM | **M2: instalable** |
@@ -100,7 +100,8 @@ Si F3d falla (hay corrupción), se detiene todo hasta resolverlo.
 
 **Verificación:** instalación completa en VM **y** en hardware real; actualizar desde un espejo local con la red externa cortada; un usuario no técnico completa instalación + actualización sin terminal.
 
-## F6 — Shell "OweeLinux Lite" (labwc + Quickshell)
+## F6 — Shell "OweeLinux Lite" (labwc + Python/GTK4)
+> Cambio (2026-10-11): **Quickshell no está en Debian 13**; habría que compilarlo y mantenerlo en la imagen. Todo lo de la ruta Python sí está empaquetado: `python3-gi` 3.50, GTK 4.18, libadwaita 1.7, `gtk4-layer-shell` 1.0.4 (con typelib para Python), `labwc` 0.8.3, `waybar` 0.12, `fuzzel`, `mako`, `gjs` 1.82. Medido aquí: una ventana mínima con reloj en Python+GTK3 = 44 MB Rss / 26 MB Pss; un panel real con bandeja, red, batería y popovers **no está medido**. Decisión por datos: prototipar el panel en Python/GTK4 y compararlo con Waybar con las mismas funciones.
 - [ ] **Puerta de entrada (go/no-go):** labwc funciona con la Nvidia Pascal del Dell G3. Si no, se evalúa alternativa antes de escribir nada
 - [ ] Panel, lanzador, ajustes rápidos, notificaciones, bloqueo, panel de estado del sistema
 - [ ] Segunda sesión en SDDM; Plasma sigue disponible

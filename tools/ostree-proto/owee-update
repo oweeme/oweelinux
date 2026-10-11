@@ -4,7 +4,8 @@
 set -eu
 cur() { ostree admin status | sed -n '1,3p' | sed -n 's/^[* ] oweelinux \([0-9a-f]*\)\..*/\1/p' | head -1; }
 before=$(cur)
-ostree admin upgrade "$@"
+# OWEE_REF=owee:rama fija la rama a la que cambiar (lo usan las pruebas de corte de energía).
+if [ -n "${OWEE_REF:-}" ]; then ostree admin switch "$OWEE_REF"; else ostree admin upgrade "$@"; fi
 owee-bootcfg
 if [ "$(cur)" != "$before" ]; then
   owee-env /boot/owee/grubenv set trial 1
