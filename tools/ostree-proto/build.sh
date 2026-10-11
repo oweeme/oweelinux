@@ -20,4 +20,4 @@ else
 fi
 ostree admin deploy --sysroot=sysroot --os=oweelinux \
   --karg="root=LABEL=oweeroot rw console=ttyS0 quiet" owee:$BRANCH
-"$HERE/make-disk.sh" sysroot disk.img
+"$HERE/make-disk.sh" sysroot disk.img "${DISK_MIB:-2300}"

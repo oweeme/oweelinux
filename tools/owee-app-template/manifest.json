@@ -1,0 +1,8 @@
+{
+  "id": "org.oweelinux.HolaMundo",
+  "name": "Hola mundo",
+  "version": "0.1.0",
+  "entry": "app.py",
+  "runtime": "python-gtk4",
+  "permissions": []
+}

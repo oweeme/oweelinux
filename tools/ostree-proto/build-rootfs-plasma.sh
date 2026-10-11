@@ -11,5 +11,6 @@ INCLUDE=$(grep -v -e '^#' -e '^$' "$HERE/packages-plasma.txt" | paste -sd, -)
 rm -rf "$OUT"
 mmdebstrap --mode=root --variant=minbase \
   --aptopt='Acquire::http::Proxy "http://127.0.0.1:3142"' \
+  --aptopt='Acquire::Retries "8"' --aptopt='Acquire::http::Timeout "60"' \
   --include="$INCLUDE" trixie "$OUT" http://deb.debian.org/debian
 echo "rootfs listo: $OUT ($(du -sh "$OUT" | cut -f1))"

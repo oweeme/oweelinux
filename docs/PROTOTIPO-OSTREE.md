@@ -1,4 +1,4 @@
-# Prototipo ostree (F3a, F3b, F3c, F3d) — resultado
+# Prototipo ostree (F3a–F3d) e imagen real con Plasma (F3h) — resultado
 
 Fecha: 2026-10-11. **Estado: F3a, F3b, F3c y F3d superadas.** Un Debian 13 mínimo arranca desde un
 despliegue ostree en QEMU/KVM con UEFI, con `/usr` de solo lectura.
@@ -89,6 +89,25 @@ vuelve a cortar con SIGKILL en un momento aleatorio:
 - La actualización de prueba cambia un solo archivo (rápida): una actualización grande tiene más ventana de riesgo.
 - Falta el caso de rotura de initramfs/kernel y el *watchdog* (F3c-bis).
 
+## F3h — imagen real: Debian 13 + Plasma sobre ostree (`tools/ostree-proto/gui-boot-test.py`)
+**Resultado: arranca hasta el escritorio de Plasma en QEMU** (captura: `docs/img/f3h-plasma-ostree.png`).
+- Rootfs de **1.092 paquetes / 2,5 GB** (`packages-plasma.txt`, `build-rootfs-plasma.sh`); commit ostree de 2,4 GB; disco UEFI de 5,6 GB.
+- En la VM (KVM, 2 CPU, 3 GB, gráficos por software): consola serie a los 18 s, **SDDM a los 19 s, `plasmashell` a los 24 s**, `systemctl --failed` vacío, `/usr` de solo lectura, versión confirmada. Son tiempos de una VM, **no comparables con hardware real**.
+- Es Plasma "de fábrica": **sin el branding de OweeLinux** (fondos, esquema de color, SDDM, GRUB), que aún vive solo en `livebuild-profile/`.
+
+### Hallazgos de F3h
+1. **La red decide el calendario:** descargar los 838 paquetes del escritorio a ~40-60 KB/s lleva horas. Una caché `apt-cacher-ng` en el pod (volumen persistente) convirtió la reconstrucción en 10 minutos. Un corte de red tumbó el primer intento: `Acquire::Retries` alto.
+2. **`/var` vacío rompe servicios:** los paquetes dejan directorios en `/var` (p. ej. `/var/lib/sddm`). Se guarda una copia de fábrica en `/usr/share/factory/var` y `systemd-tmpfiles` la restaura (`owee-factory.conf`). Limitación: solo copia si el directorio no existe; un paquete nuevo que añada subdirectorios en una actualización necesitará reglas más finas.
+3. **`/home` es un enlace a `var/home`** que no existe en la imagen: `useradd -m` falla en el montaje; el directorio personal se crea al arrancar con `tmpfiles`.
+4. Los scripts de preparación deben ser **reintentables** (`prepare-rootfs.sh` ya lo es: no rehace el initramfs ni vuelve a mover `/etc`).
+5. El usuario `oweeuser` **sin contraseña** con inicio automático de SDDM (`overlay-test-user.sh`) es **solo para pruebas en VM**, y solo se aplica con `OWEE_TEST_USER=1`.
+
+### Qué NO está verificado todavía en la imagen real
+- Actualización, rollback automático y corte de energía **solo se probaron en el prototipo mínimo**; hay que repetirlos con esta imagen (las pruebas existen: `update-test.sh`, `rollback-test.sh`, `powerloss-test.py`).
+- Nvidia, Secure Boot, red real (WiFi), audio, Bluetooth, suspensión y gráficos con GPU: no se pueden probar en la VM.
+- Sesión Wayland (solo se arrancó X11); instalación en disco real; tamaño de las actualizaciones reales (el prototipo cambiaba un archivo).
+
 ## Pendiente
 - F3c-bis: rotura de initramfs y *watchdog*.
-- F3h: imagen real con Plasma (descarga en curso).
+- Repetir actualización, rollback y corte de energía sobre la imagen Plasma.
+- Aplicar el branding de OweeLinux a la imagen.

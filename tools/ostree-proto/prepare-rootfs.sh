@@ -10,14 +10,22 @@ echo "kernel: $KVER"
 # 1. Kernel + initramfs (hecho con dracut, que es lo que ostree-boot espera)
 #    dentro de /usr/lib/modules/<kver>/, no en /boot.
 mkdir -p "$R/proc" "$R/sys" "$R/dev"
-install -m0644 "$R/boot/vmlinuz-$KVER" "$R/usr/lib/modules/$KVER/vmlinuz"
-chroot "$R" dracut --force --no-hostonly --add ostree --kver "$KVER" \
-    "/usr/lib/modules/$KVER/initramfs.img"
+if [ ! -f "$R/usr/lib/modules/$KVER/initramfs.img" ]; then   # reintentable: no repetir si ya está hecho
+  install -m0644 "$R/boot/vmlinuz-$KVER" "$R/usr/lib/modules/$KVER/vmlinuz"
+  chroot "$R" dracut --force --no-hostonly --add ostree --kver "$KVER" \
+      "/usr/lib/modules/$KVER/initramfs.img"
+fi
 rm -rf "$R"/boot/* "$R"/var/lib/initramfs-tools
 
 # 2. /var no va en el commit: se guarda la base de dpkg como registro y se vacía.
 mkdir -p "$R/usr/share/owee"
 [ -d "$R/var/lib/dpkg" ] && mv "$R/var/lib/dpkg" "$R/usr/share/owee/dpkg-db"
+# Los paquetes dejan directorios en /var (p. ej. /var/lib/sddm). Como /var del sistema real nace
+# vacío y es persistente, se guarda una copia "de fábrica" y systemd-tmpfiles la restaura si falta.
+rm -rf "$R"/var/cache/* "$R"/var/lib/apt/lists/*
+rm -rf "$R/usr/share/factory/var"; mkdir -p "$R/usr/share/factory"; cp -a "$R/var" "$R/usr/share/factory/var"
+mkdir -p "$R/usr/lib/tmpfiles.d"
+printf 'C /var/lib - - - - /usr/share/factory/var/lib\nC /var/spool - - - - /usr/share/factory/var/spool\nC /var/log - - - - /usr/share/factory/var/log\n' > "$R/usr/lib/tmpfiles.d/owee-factory.conf"
 rm -rf "$R"/var/* "$R"/tmp/* "$R"/run/*
 
 # 3. Enlaces estándar de ostree: lo escribible vive bajo /var.
@@ -51,9 +59,14 @@ ln -sf /usr/lib/systemd/system/systemd-networkd.service \
    "$R/etc/systemd/system/multi-user.target.wants/systemd-networkd.service"
 printf '[remote "owee"]\nurl=http://10.0.2.2:8000/pub\ngpg-verify=false\n' > "$R/etc/ostree/remotes.d/owee.conf"
 
+# 4a. SOLO PRUEBAS: usuario sin contraseña con inicio de sesión automático (OWEE_TEST_USER=1).
+[ "${OWEE_TEST_USER:-0}" = 1 ] && "$(dirname "$0")/overlay-test-user.sh" "$R"
+
 # 4c. Piezas propias: herramientas, servicio de salud, directorios de /var.
 "$(dirname "$0")/overlay-owee.sh" "$R"
 
 # 5. ostree espera la configuración en /usr/etc (el /etc de fábrica).
-rm -rf "$R/usr/etc"; mv "$R/etc" "$R/usr/etc"; mkdir "$R/etc"
+if [ -z "$(ls -A "$R/etc")" ] && [ -d "$R/usr/etc" ]; then echo "(/etc ya estaba en /usr/etc)"; else
+  rm -rf "$R/usr/etc"; mv "$R/etc" "$R/usr/etc"; mkdir "$R/etc"
+fi
 echo "rootfs listo para ostree commit"

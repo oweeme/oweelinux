@@ -18,7 +18,7 @@ real. Los números de fase (F0…F9) son nombres, no el orden: este es el orden.
 |---|---|---|---|
 | ✅ 1 | F0 base · F3a arranque ostree · F3b actualizar · F3c rollback | Hecho y probado en QEMU | |
 | ✅ 2 | **F3d corte de energía** (60/60 sin fallos; falta F3c-bis: initramfs roto y *watchdog*) | Es la puerta de F3: sin ella no se puede confiar en la base | |
-| **3** | **F3h imagen real**: Debian + Plasma + red + audio sobre ostree, que arranca hasta el login gráfico en QEMU | Hoy solo hay un Debian mínimo sin pantalla. Esto es lo que lo hace *funcional* | **M1: sistema funcional (VM)** |
+| ✅ 3 (parcial) | **F3h imagen real**: Debian + Plasma + red + audio sobre ostree, que arranca hasta el login gráfico en QEMU | Hoy solo hay un Debian mínimo sin pantalla. Esto es lo que lo hace *funcional* | **M1: arranca (hecho); faltan las pruebas de F3 sobre esta imagen** |
 | 4 | F3e/F3f Nvidia y Secure Boot en la imagen real | La imagen real los necesita antes de tocar hardware | |
 | 5 | F5 instalar en disco real (primero un script, luego Calamares) | Sin instalación no se puede usar fuera de la VM | **M2: instalable** |
 | 6 | F4 Flatpak, cajas de desarrollo, Quadlet | Lo que lo vuelve útil a diario | **M3: usable a diario** |
@@ -86,6 +86,7 @@ Si F3d falla (hay corrupción), se detiene todo hasta resolverlo.
 - [ ] **Quadlet**: servicios como contenedores Podman rootless gestionados por systemd (`~/.config/containers/systemd/*.container`; los predeterminados de la imagen en `/usr/share/containers/systemd/`)
 - [ ] `owee dev new <proyecto>`; Python con `uv`/`venv`
 - [ ] Banco `owee bench`: tiempo hasta la primera ventana (frío y caliente)
+- [ ] **Matriz de lenguajes** (ver `docs/INTERFAZ.md`): Python, Rust, Go, JS/TS/Vue, PHP, Ada, Dart/Flutter y C/C++ — un "hola mundo" por cada uno que compile, ejecute y (si es gráfico) abra una ventana, sin modificar la imagen
 
 **Verificación:**
 - Instalar y desinstalar 10 apps deja `ostree admin diff` **vacío**.
@@ -102,6 +103,9 @@ Si F3d falla (hay corrupción), se detiene todo hasta resolverlo.
 
 ## F6 — Shell "OweeLinux Lite" (labwc + Python/GTK4)
 > Cambio (2026-10-11): **Quickshell no está en Debian 13**; habría que compilarlo y mantenerlo en la imagen. Todo lo de la ruta Python sí está empaquetado: `python3-gi` 3.50, GTK 4.18, libadwaita 1.7, `gtk4-layer-shell` 1.0.4 (con typelib para Python), `labwc` 0.8.3, `waybar` 0.12, `fuzzel`, `mako`, `gjs` 1.82. Medido aquí: una ventana mínima con reloj en Python+GTK3 = 44 MB Rss / 26 MB Pss; un panel real con bandeja, red, batería y popovers **no está medido**. Decisión por datos: prototipar el panel en Python/GTK4 y compararlo con Waybar con las mismas funciones.
+
+> **Decisión (2026-10-11): la plataforma del shell y de las apps de usuario es GTK4 + libadwaita + `gtk4-layer-shell`, con Python (PyGObject) como lenguaje principal y GJS (JavaScript) como alternativa sobre las mismas librerías.** Un solo conjunto de herramientas para el shell y para las apps que creen los usuarios; no se mantiene un segundo toolkit (Quickshell/Qt) en paralelo. Se reabre solo si Quickshell llega a Debian y el diseño exige animaciones que GTK4 no pueda dar.
+> Riesgos a probar pronto: (1) el render GTK4 en la Nvidia Pascal del Dell G3 (si falla, `GSK_RENDERER=cairo`); (2) la coherencia visual con las apps de KDE (colores/fuentes comunes en GTK y Qt); (3) RSS/Pss reales del panel con todas sus funciones.
 - [ ] **Puerta de entrada (go/no-go):** labwc funciona con la Nvidia Pascal del Dell G3. Si no, se evalúa alternativa antes de escribir nada
 - [ ] Panel, lanzador, ajustes rápidos, notificaciones, bloqueo, panel de estado del sistema
 - [ ] Segunda sesión en SDDM; Plasma sigue disponible
