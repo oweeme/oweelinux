@@ -1,0 +1,5 @@
+#!/bin/sh
+# Actualiza el sistema (ostree) y regenera el arranque. Embrión de `owee update`.
+set -eu
+ostree admin upgrade "$@"
+owee-bootcfg

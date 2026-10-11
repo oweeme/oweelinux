@@ -1,0 +1,20 @@
+# Entorno de desarrollo de OweeLinux (Debian 13 / Trixie, igual que la distro).
+# Sirve para compilar, empaquetar y probar piezas. NO sirve para probar una
+# sesión gráfica (usar QEMU o un compositor anidado) ni para correr
+# live-build sin privilegios (ver README.md de esta carpeta).
+FROM docker.io/library/debian:trixie
+
+ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates git curl jq xz-utils zstd rsync sudo less \
+        build-essential pkg-config cmake meson ninja-build \
+        live-build debootstrap mmdebstrap squashfs-tools xorriso \
+        ostree flatpak-builder reprepro e2fsprogs dracut-core kmod \
+        shellcheck python3 python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+# Usuario no-root con el mismo uid que el host (rootless: uid 1000 -> root del
+# contenedor se mapea a tu usuario, así los archivos del repo quedan tuyos).
+WORKDIR /work
+CMD ["sleep", "infinity"]

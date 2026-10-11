@@ -1,0 +1,26 @@
+#!/bin/sh
+# Genera el menú de GRUB (/boot/owee/grub.cfg) a partir de las entradas BLS de ostree.
+# Debe ejecutarse tras CUALQUIER cambio de despliegues (upgrade, rollback, deploy): ostree
+# alterna entre boot.0 y boot.1, así que una configuración fija deja de funcionar.
+# Uso: owee-bootcfg [DIR_BOOT]   (por defecto /boot). La entrada más nueva va primero.
+set -eu
+BOOT=${1:-/boot}
+OUT=$BOOT/owee/grub.cfg
+mkdir -p "$BOOT/owee"
+n=0
+{
+  echo "set timeout=3"
+  echo "set default=0"
+  for e in $(ls -1 "$BOOT"/loader/entries/ostree-*.conf | sort -r -V); do
+    title=$(sed -n 's/^title //p' "$e"); linux=$(sed -n 's/^linux //p' "$e")
+    initrd=$(sed -n 's/^initrd //p' "$e"); opts=$(sed -n 's/^options //p' "$e")
+    echo "menuentry '$title' {"
+    echo "    linux /boot$linux $opts"
+    echo "    initrd /boot$initrd"
+    echo "}"
+    n=$((n+1))
+  done
+} > "$OUT.new"
+[ "$n" -gt 0 ] || { echo "owee-bootcfg: no hay entradas BLS en $BOOT/loader/entries" >&2; rm -f "$OUT.new"; exit 1; }
+mv "$OUT.new" "$OUT"
+echo "owee-bootcfg: $n entradas escritas en $OUT"
