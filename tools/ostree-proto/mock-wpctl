@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+# `wpctl` FALSO para pruebas (mismo formato de salida que el de WirePlumber): guarda volumen y silencio en /tmp.
+# Se usa porque en la VM de pruebas el WirePlumber real acepta `set-volume` pero no cambia el volumen de una salida virtual.
+import os, sys
+S, M = "/tmp/mock-vol", "/tmp/mock-mute"
+a = sys.argv[1:]
+if not os.path.exists(S): open(S, "w").write("0.40"); os.chmod(S, 0o666)   # legible/escribible por cualquier usuario de la prueba
+if a[:1] == ["get-volume"]:
+    print("Volume: " + open(S).read().strip() + (" [MUTED]" if os.path.exists(M) else ""))
+elif a[:1] == ["set-volume"] and len(a) >= 3:
+    v = a[2]; v = float(v[:-1]) / 100 if v.endswith("%") else float(v); open(S, "w").write(f"{v:.2f}")
+elif a[:1] == ["set-mute"]:
+    os.remove(M) if os.path.exists(M) else open(M, "w").close()

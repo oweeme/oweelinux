@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Panel superior de OweeLinux Lite — PROTOTIPO de riesgos (v0.0): Python + GTK4 + gtk4-layer-shell.
-Muestra: botón de lanzador (maqueta), reloj y fecha centrados, red (NetworkManager) y batería (UPower).
+Muestra: botón de lanzador (maqueta), reloj y fecha centrados y los WIDGETS (scripts: volumen, red, batería, los del usuario...).
 Regla de diseño (docs/ESCRITORIO.md): llamadas D-Bus asíncronas; el panel nunca se bloquea esperando a un servicio.
 Al arrancar escribe en /tmp/owee-panel.log su memoria (Rss/Pss) para medirla."""
 import os, sys, time
@@ -15,13 +15,6 @@ import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 import json, re
 from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
-try:
-    gi.require_version("NM", "1.0"); from gi.repository import NM
-except Exception: NM = None
-try:
-    gi.require_version("UPowerGlib", "1.0"); from gi.repository import UPowerGlib
-except Exception: UPowerGlib = None
-
 CSS = b"""
 window.owee-panel { background: rgba(16,32,25,0.92); color: #EFF0F1; border-radius: 12px; }
 .owee-panel label { padding: 0 10px; }
@@ -64,7 +57,7 @@ class ScriptWidget:
         self.path, self.name = path, os.path.splitext(os.path.basename(path))[0]
         self.data = {}; self.pending = None
         self.label = Gtk.Label(label=self.name + "…")
-        self.btn = Gtk.MenuButton(has_frame=False, child=self.label); self.btn.add_css_class("owee-widget")
+        self.btn = Gtk.MenuButton(has_frame=False, child=self.label); self.btn.add_css_class("owee-widget"); self.btn.set_visible(False)   # visible al llegar el primer dato
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.on_popup_toggled)
         click = Gtk.GestureClick(); click.connect("released", lambda *a: self.click()); self.btn.add_controller(click)
         box.append(self.btn)
@@ -84,12 +77,15 @@ class ScriptWidget:
     def done(self, p, res):
         try:
             ok, out, _ = p.communicate_utf8_finish(res); d = json.loads(out.strip().splitlines()[-1]); self.data = d
+            self.btn.set_visible(not d.get("hidden")); 
+            if d.get("hidden"): return
             self.label.set_text(str(d.get("text", ""))); self.label.set_tooltip_text(d.get("tooltip"))
             self.label.remove_css_class("warn")
             if d.get("class"): self.label.add_css_class(d["class"])
-            self.btn.set_popover(self.pop if d.get("popup") else None)
+            has = bool(d.get("popup"))                      # reasignar la ventanita en cada refresco la CERRABA (bug visto con refrescos de 3 s)
+            if has != getattr(self, "has_popup", None): self.has_popup = has; self.btn.set_popover(self.pop if has else None)
         except Exception as e:
-            self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text("el widget falló: %s" % e)
+            self.btn.set_visible(True); self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text("el widget falló: %s" % e)
 
     def click(self):
         cmd = self.data.get("on_click")
@@ -122,13 +118,15 @@ class ScriptWidget:
         self.pending = GLib.timeout_add(250, lambda: (setattr(self, "pending", None), self.act(cmd, [round(value)]), False)[2])
 
 def load_widgets(box):
-    ws = []
+    """Carga los scripts de las carpetas de widgets. Si el usuario deja un archivo con el MISMO nombre que uno del sistema, gana el del
+    usuario (así se cambia un widget del sistema sin tocar la imagen). Se ordenan por nombre: usa prefijos numéricos (10-, 20-...)."""
+    found = {}
     for d in WIDGET_DIRS:
         if os.path.isdir(d):
-            for f in sorted(os.listdir(d)):
+            for f in os.listdir(d):
                 p = os.path.join(d, f)
-                if os.path.isfile(p) and os.access(p, os.X_OK): ws.append(ScriptWidget(p, box))
-    return ws
+                if os.path.isfile(p) and os.access(p, os.X_OK): found[f] = p
+    return [ScriptWidget(found[f], box) for f in sorted(found)]
 
 class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
@@ -147,9 +145,7 @@ class Panel(Gtk.Application):
         self.clock = Gtk.Label(); bar.set_center_widget(self.clock)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
         self.widgets = load_widgets(right)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
-        self.net = Gtk.Label(label="red…"); self.bat = Gtk.Label(label="…"); right.append(self.net); right.append(self.bat)
         self.tick(); GLib.timeout_add_seconds(1, self.tick)
-        self.setup_net(); self.setup_power()
         win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), False)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
@@ -164,24 +160,6 @@ class Panel(Gtk.Application):
 
     def tick(self):
         self.clock.set_text(GLib.DateTime.new_now_local().format("%H:%M  %d %b")); return True
-
-    def setup_net(self):                                   # asíncrono: nunca bloquea el panel
-        if NM is None: self.net.set_text("sin NM"); return
-        def ready(_src, res):
-            try: self.nm = NM.Client.new_finish(res)
-            except Exception as e: self.net.set_text("error NM"); print("NM:", e, flush=True); return
-            self.nm.connect("notify::primary-connection", lambda *a: self.show_net()); self.show_net()
-        NM.Client.new_async(None, ready)
-
-    def show_net(self):
-        c = self.nm.get_primary_connection(); self.net.set_text(c.get_id() if c else "sin red")
-
-    def setup_power(self):
-        if UPowerGlib is None: self.bat.set_text("sin UPower"); return
-        try:
-            self.up = UPowerGlib.Client.new(); dev = self.up.get_display_device()
-            self.bat.set_text(f"{dev.props.percentage:.0f}%" if dev.props.is_present else "CA")
-        except Exception as e: self.bat.set_text("CA"); print("UPower:", e, flush=True)
 
 if __name__ == "__main__":
     t0 = time.time(); mem("tras importar"); Panel().run(sys.argv)

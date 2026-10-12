@@ -63,6 +63,20 @@ Ejemplos: `counter.js` (**JavaScript**, cuenta clics), `brillo.py` (**Python**, 
 no hay iconos ni menús contextuales; **el estilo del resaltado costó dos intentos** porque `Gtk.MenuButton` tiene un nodo interno (`menubutton > button`).
 Para que la ventanita reciba teclado, el panel usa `keyboard-interactivity: on-demand` de `layer-shell`.
 
+## Widgets del sistema (probado)
+Vienen con la imagen en `/usr/share/owee/widgets/` y son **widgets de script normales**: se leen, se copian y se cambian igual que los de ejemplo
+(los de demostración están en `widgets-ejemplos/`). Para modificar uno basta copiarlo a `~/.config/owee/widgets/` con el **mismo nombre**: el del usuario gana.
+| Widget | Fuente | Clic |
+|---|---|---|
+| `10-red.py` | NetworkManager (`nmcli`) | estado de la conexión |
+| `20-volumen.py` | WirePlumber (`wpctl`) | deslizante de volumen y botón silenciar; sin audio se oculta |
+| `30-bateria.py` | `/sys/class/power_supply` | porcentaje y estado; sin batería se oculta |
+- `{"hidden": true}` en la salida oculta el widget (equipo sin batería o sin audio).
+- Prueba: `tools/ostree-proto/system-widgets-test.py` (VM, ratón y teclado virtuales). El `wpctl` es **simulado** (`mock-wpctl`) porque en la VM el WirePlumber real
+  acepta `set-volume` pero no cambia una salida virtual; la lectura con el real se validó en un equipo físico. La batería se simula con `OWEE_POWER_SUPPLY_DIR`.
+- Dos errores que encontró la prueba: el refresco de 3 s **cerraba la ventanita abierta** (arreglado: no se reasigna el popover si ya tiene uno), y el mock escribía su
+  archivo como root sin permiso para el usuario (fallo de la prueba, no del widget). Memoria del panel con los tres widgets: 40 MB Pss.
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que
