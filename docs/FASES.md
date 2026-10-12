@@ -165,6 +165,8 @@ Ideas, de menos a más esfuerzo (todas por medir antes de adoptarlas):
 **Regla de diseño que sale de este caso:** ningún componente de la interfaz puede bloquearse esperando a otro servicio. Las llamadas D-Bus del shell y del bloqueo son **asíncronas y con tiempo límite**; el bloqueo de pantalla **no depende** de red, audio ni energía (solo del compositor y de PAM).
 **Prueba de inyección de fallos:** con la pantalla bloqueada, matar/reiniciar los servicios de red, audio y energía (y cortar la red) y comprobar que la contraseña se acepta y la sesión se desbloquea en menos de 2 s.
 
+**Resultados de las primeras mediciones: `docs/RESILIENCIA.md`** (no reproducen el cuelgue del autor; `earlyoom` y los límites de cgroup evitan la degradación por presión gradual de memoria; el bloqueo de KDE aguanta la caída de red/energía/audio).
+
 **Verificación (en la VM, repetible):** con un proceso que consume más memoria de la disponible (y otro que
 satura CPU y otro disco), medir la latencia de respuesta del shell y de una consola; criterios a fijar con
 mediciones, p. ej. *el escritorio responde en < 2 s y el proceso desbocado es limitado o terminado en < 30 s,

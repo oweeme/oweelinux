@@ -19,7 +19,7 @@ class Vm:
                "-chardev", "socket,id=ser0,path=ser.sock,server=on,wait=off", "-serial", "chardev:ser0",
                "-monitor", "unix:mon.sock,server,nowait",
                "-drive", f"if=pflash,format=raw,readonly=on,file={CODE}", "-drive", f"if=pflash,format=raw,file={vars_fd}",
-               "-drive", f"file={disk},format=raw,if=virtio", "-device", "virtio-keyboard-pci", "-device", "virtio-tablet-pci"]
+               "-drive", f"file={disk},format=raw,if=virtio" + os.environ.get("QEMU_DRIVE_OPTS", ""), "-device", "virtio-keyboard-pci", "-device", "virtio-tablet-pci"]
         self.p = subprocess.Popen(cmd, stdout=self.log, stderr=self.log)
         self.ser = self._connect("ser.sock"); self.mon = self._connect("mon.sock")
         threading.Thread(target=self._rd, daemon=True).start()
