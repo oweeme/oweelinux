@@ -5,7 +5,11 @@
 set -euo pipefail
 source "$(dirname "$0")/lib-bulk.sh"
 W=${1:?uso: $0 DIR_TRABAJO [N]}; N=${2:-40}; cd "$W"
-BASE=$(ostree log --repo=repo oweelinux/proto/x86_64 | awk '/^commit/{c=$2} /release 2 /{print c; exit}')
+# BASE_REF=rama usa esa rama como base (p. ej. good/new, que ya incluye la última comprobación de salud);
+# si no, la release 2 de la rama principal.
+if [ -n "${BASE_REF:-}" ]; then BASE=$(ostree rev-parse --repo=repo "$BASE_REF")
+else BASE=$(ostree log --repo=repo oweelinux/proto/x86_64 | awk '/^commit/{c=$2} /release 2 /{print c; exit}')
+fi
 [ -n "$BASE" ] || { echo "no encuentro la release 2 en repo/" >&2; exit 1; }
 for k in $(seq 1 "$N"); do
   OVL=$(mktemp -d); mkdir -p "$OVL/usr/share/owee"; echo $((100+k)) > "$OVL/usr/share/owee/release"
@@ -17,7 +21,7 @@ for k in $(seq 1 "$N"); do
   ostree commit --repo=repo --branch="steps/step$k" --tree=ref="$BASE" --tree=dir="$OVL" \
     --no-xattrs --subject="step $k" >/dev/null
   rm -rf "$OVL"
-  ostree pull-local --repo=pub repo "steps/step$k" >/dev/null
+  ostree pull-local --repo="${OUT_PUB:-pub}" repo "steps/step$k" >/dev/null
 done
-ostree summary --repo=pub -u
+ostree summary --repo="${OUT_PUB:-pub}" -u
 echo "publicadas $N versiones step (base release 2 = ${BASE:0:12})"

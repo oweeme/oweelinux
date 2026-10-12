@@ -20,7 +20,7 @@ st() { say "echo MARK_$1=\$(owee-status | tr '\\n' ' ')" 1; }
 (sleep "$BW"
  st B1_STATUS
  say 'echo hola-usuario > /home/dato.txt; sync' 1
- say 'owee-update 2>&1 | tail -2; echo MARK_B1_UPDATE_RC=${PIPESTATUS[0]}' "${UPDATE_WAIT:-45}"
+ say "OWEE_REF=${REF_GOOD:-} "'owee-update 2>&1 | tail -2; echo MARK_B1_UPDATE_RC=${PIPESTATUS[0]}' "${UPDATE_WAIT:-45}"
  say 'echo MARK_B1_TRIAL=$(owee-env /boot/owee/grubenv get trial)' 1
  say 'systemctl reboot' $((BW+HW))
  st B2_STATUS
@@ -29,7 +29,7 @@ st() { say "echo MARK_$1=\$(owee-status | tr '\\n' ' ')" 1; }
  st B3_STATUS
  say 'echo MARK_B3_DATO=$(cat /home/dato.txt)' 1
  ln -sfn "$ABC" "$STAGE/pub"
- say 'owee-update 2>&1 | tail -2; echo MARK_B3_UPDATE_RC=${PIPESTATUS[0]}' "${UPDATE_WAIT:-45}"
+ say "OWEE_REF=${REF_BAD:-} "'owee-update 2>&1 | tail -2; echo MARK_B3_UPDATE_RC=${PIPESTATUS[0]}' "${UPDATE_WAIT:-45}"
  say 'echo MARK_B3_TRIAL=$(owee-env /boot/owee/grubenv get trial)' 1
  say 'systemctl reboot' $((BW+90+BW))
  st B5_STATUS

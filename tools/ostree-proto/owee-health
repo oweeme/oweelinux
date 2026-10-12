@@ -1,18 +1,27 @@
 #!/bin/sh
-# Comprobación de salud tras arrancar. Solo actúa en un arranque "a prueba" (versión
-# distinta de la confirmada): si systemd llega a "running" la confirma; si no, reinicia y
-# GRUB (que ya gastó el intento) vuelve a la versión confirmada.
+# Comprobación de salud tras arrancar. Solo actúa en un arranque "a prueba" (versión distinta de la
+# confirmada) y la confirma en DOS fases:
+#   1. systemd llega a "running" (si no, se rechaza y se reinicia);
+#   2. el sistema AGUANTA OWEE_HEALTH_STABLE segundos (60 por defecto) y sigue "running".
+# La fase 2 es necesaria: una versión que se cuelga un instante después de llegar a "running" se
+# confirmaba antes de colgarse y quedaba como la versión buena, con la máquina en bucle de reinicios
+# del watchdog (bug real visto en pruebas). Si el sistema se cuelga o se reinicia durante la espera,
+# no se confirma: GRUB (que ya gastó el intento) vuelve a la última versión confirmada.
 id=$(owee-id < /proc/cmdline)
 confirmed=$(owee-env /boot/owee/grubenv get confirmed)
 [ "$id" = "$confirmed" ] && exit 0
 mkdir -p /var/lib/owee
 log() { echo "$(date -u +%FT%TZ) $*" >> /var/lib/owee/health.log; }
-state=$(timeout 90 systemctl is-system-running --wait 2>/dev/null || true)
-if [ "$state" = running ]; then
-  log "estado=running version=$id: confirmada"
-  owee-confirm
-else
-  log "estado=$state version=$id: rechazada, vuelve a $confirmed"
-  echo "owee-health: estado='$state' en la versión $id: reiniciando para volver a $confirmed" | tee /dev/kmsg
+reject() {
+  log "estado=$1 version=$id: rechazada, vuelve a $confirmed"
+  echo "owee-health: estado='$1' en la versión $id: reiniciando para volver a $confirmed" | tee /dev/kmsg
   sleep 2; systemctl reboot
-fi
+  exit 0
+}
+state=$(timeout 90 systemctl is-system-running --wait 2>/dev/null || true)
+[ "$state" = running ] || reject "$state"
+sleep "${OWEE_HEALTH_STABLE:-60}"
+state=$(timeout 30 systemctl is-system-running 2>/dev/null || true)
+[ "$state" = running ] || reject "tras-espera:$state"
+log "estado=running version=$id: confirmada tras ${OWEE_HEALTH_STABLE:-60}s estable"
+owee-confirm

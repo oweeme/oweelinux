@@ -31,7 +31,7 @@ class Vm:
                "-chardev", f"socket,id=ser0,path={sock_path},server=on,wait=off", "-serial", "chardev:ser0",
                "-drive", f"if=pflash,format=raw,readonly=on,file={OVMF_CODE}",
                "-drive", f"if=pflash,format=raw,file={vars_fd}",
-               "-drive", f"file={disk},format=raw,if=virtio"]
+               "-drive", f"file={disk},format=raw,if=virtio"] + os.environ.get("QEMU_EXTRA", "").split()
         self.p = subprocess.Popen(cmd, stdout=self.log, stderr=self.log)
         self.buf = b""; self.lock = threading.Lock(); self.sock = None
         for _ in range(100):

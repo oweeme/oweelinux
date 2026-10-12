@@ -113,11 +113,33 @@ versiones de la prueba de cortes, ~400 archivos + 12 MB. VM de 3 GB / 2 CPU.
 - La tanda 1 se pidió con 60 iteraciones y solo había 40 versiones: de la 41 a la 60 no se probó nada (ver corrección arriba); **solo cuentan las iteraciones 1-40**.
 - Límites que siguen: `kill -9` de QEMU no simula la pérdida de la caché del disco; las actualizaciones de prueba (≤150 MB) son menores que las reales (cientos de MB o más); solo sesión X11 y gráficos por software.
 
+### F3c-bis — fallos tempranos de arranque (`earlyfail-test.py`, 3/3 sobre la imagen Plasma)
+Desde la release 1 confirmada, se actualiza a una versión defectuosa y el sistema debe volver **solo**, sin bucle:
+| Escenario | Qué falla | Mecanismo de rescate | Tiempo | Menús GRUB |
+|---|---|---|---|---|
+| `initrd` | initramfs corrupto | el kernel no monta la raíz → *panic* → reinicio (`panic=5`) | 45 s | 2 |
+| `neverready` | un servicio bloquea el arranque para siempre | `owee-health` espera 90 s, rechaza y reinicia | 140 s | 2 |
+| `hang` | el sistema se cuelga del todo (CPUs acaparadas con prioridad de tiempo real) | *watchdog* de systemd (`RuntimeWatchdogSec=30s`; en la VM, dispositivo `i6300esb`) | 88 s | 2 |
+Cada uno con evidencia de que la versión rota llegó a intentar arrancar (mensaje del kernel o marca que escribe en `/var`).
+
+**Tres defectos reales encontrados y corregidos:**
+1. **`owee-health.service` arrancaba tras `multi-user.target`**, que espera a todo lo que enlaza (incluido un servicio que nunca termina): con una versión bloqueante la comprobación **nunca llegaba a ejecutarse**. Ahora arranca desde `basic.target` y sin dependencias por defecto.
+2. **Confirmación demasiado temprana.** Una versión que llega a `running` y se cuelga un instante después se confirmaba antes de colgarse; quedaba como "la buena" y el watchdog solo producía un **bucle de reinicios** (8 en 5 minutos). `owee-health` confirma ahora en dos fases: `running` **y** aguantar `OWEE_HEALTH_STABLE` segundos (60 por defecto; 20 en las pruebas) sin degradarse.
+3. **El script de prueba** tomaba el prompt que el shell reimprime *antes* de reiniciarse como si fuera el arranque nuevo (los comandos acababan escritos en el menú de GRUB). Hay que esperar el menú de GRUB y recién después un prompt nuevo.
+
+Efecto a explicar al usuario: si reinicia a mano dentro de esa ventana de estabilidad tras una actualización, la versión nueva aún no está confirmada y el sistema vuelve a la anterior (seguro, pero puede confundir).
+
+**Regresión tras el cambio de salud:** `rollback-test.sh` **12/12** otra vez (releases buena y rota nuevas, con ~150 MB y la nueva comprobación). La regresión de cortes de energía con versiones nuevas queda **en curso** (ver "Pendiente").
+
+**Experimentos que descartaron causas** (conviene recordarlos): el driver `i6300esb` ya está en el initramfs y carga a ~2 s; systemd arma el watchdog a ~3,4 s con la configuración en `/etc`; armado a mano y con la CPU acaparada, la VM se reinicia a los ~55 s. Con `sched_rt_runtime_us` por defecto (95 %) la CPU **no** se acapara del todo y el watchdog no actúa: el escenario `hang` lo desactiva (`-1`).
+
+**Límites que siguen:** el watchdog solo protege **después** de que systemd arranque; un cuelgue en el initramfs, antes de eso, no está cubierto (solo los fallos que acaban en *panic* o en el modo de emergencia con `rd.emergency=reboot`). Un sistema que se cuelga **después de confirmarse** reinicia en bucle la versión confirmada (inevitable con esta política). En hardware real hay que usar el driver de watchdog de la placa (`iTCO_wdt`, `sp5100_tco`...), no `i6300esb`.
+
 ### Qué NO está verificado todavía en la imagen real
 - Nvidia, Secure Boot, red real (WiFi), audio, Bluetooth, suspensión y gráficos con GPU: no se pueden probar en la VM.
 - Sesión Wayland (solo se arrancó X11); instalación en disco real; tamaño de las actualizaciones reales (el prototipo cambiaba un archivo).
 
 ## Pendiente
-- F3c-bis: rotura de initramfs y *watchdog*.
+- Regresión de cortes de energía con las versiones nuevas (comprobación en dos fases): en curso.
 - Repetir actualización, rollback y corte de energía sobre la imagen Plasma.
 - Aplicar el branding de OweeLinux a la imagen.

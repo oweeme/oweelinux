@@ -1,10 +1,16 @@
 [Unit]
 Description=OweeLinux: comprobación de salud tras actualizar
-After=multi-user.target
+# Debe arrancar TEMPRANO y sin esperar a multi-user.target: si una versión nueva bloquea el arranque
+# (un servicio que nunca termina), ese objetivo nunca se alcanza y una comprobación posterior no
+# llegaría a ejecutarse jamás (bug real visto en pruebas).
+DefaultDependencies=no
+After=basic.target
+Before=shutdown.target
+Conflicts=shutdown.target
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/owee-health
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
