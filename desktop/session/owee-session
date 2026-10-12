@@ -2,6 +2,8 @@
 # Arranque de la sesión "OweeLinux Lite": prepara el entorno y entrega el control al compositor (labwc).
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite XDG_SESSION_DESKTOP=owee-lite
 export QT_QPA_PLATFORM=wayland MOZ_ENABLE_WAYLAND=1
+# En una máquina virtual no hay GPU: gráficos por software (en hardware real NO se tocan)
+if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
 # Ajustes opcionales de la máquina (p. ej. en una VM: WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo)
 # set -a: las variables del archivo se EXPORTAN (con un simple `source` quedaban solo en el shell y no llegaban a labwc ni al panel)
 if [ -f /etc/owee/lite.env ]; then set -a; . /etc/owee/lite.env; set +a; fi
