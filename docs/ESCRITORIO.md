@@ -149,3 +149,26 @@ autenticación, inactividad) ≤ 120 MB; **todo el espacio de usuario de la sesi
 4. Python: importar con pereza, sin sondeos (señales de GIO), medir con `-X importtime`.
 5. Panel en Waybar (−15 MB) o compilado (Rust + gtk4-rs): ganancia pequeña, **no es la prioridad**.
 6. Renderizador: con GPU real hay que **medir** `ngl` frente a `cairo`; en la VM el GL por software cuesta ~87 MB por ventana.
+
+## ¿Qué lenguaje con GTK? Medición de Python, JavaScript (GJS), Rust y C (2026-10-12)
+Una ventana mínima con una etiqueta (GTK4, `cairo`), a los 6 s, en la sesión Lite de la VM (gráficos por software, **una sola
+ejecución**). Fuentes en `tools/bench/toolkit/lang/`. JavaScript es **GJS** (el motor de GNOME), **sin Node**.
+| Lenguaje | Rss | Pss | USS (privada) | Coste sobre GTK4 puro |
+|---|---|---|---|---|
+| **C** (referencia: lo que cuesta GTK4 solo) | 27 | 16 | **13** | — |
+| **Rust** (`gtk4-rs` 0.9) | 27 | 17 | **13** | ≈ 0 (binario de 477 KB) |
+| **JavaScript** (GJS 1.82) | 47 | 36 | **32** | +19 MB |
+| **Python** (PyGObject) | 51 | 39 | **36** | +23 MB |
+Arranque en la VM: `python3 -c pass` 37 ms; **`import` de GTK4 en Python 869 ms**; `gjs -c 1` 55 ms (sin GTK); C/Rust: inmediato.
+
+**Lectura:**
+- **GTK4 en sí cuesta ~13 MB; el lenguaje interpretado añade ~20 MB por proceso.** Rust no añade nada.
+- **GJS no ahorra memoria frente a Python** (−4 MB) y no trae el ecosistema de npm: solo tiene sentido si el público prefiere JavaScript.
+- Rust ahorraría **~23 MB por proceso siempre activo** (el panel pasaría de ~42 a ~20 MB) y evitaría ~0,8 s de arranque; cuesta **compilar** para cada cambio (la compilación de `gtk4-rs` tardó 4 min 55 s la primera vez) y los usuarios no pueden retocar un widget sin recompilar.
+- **El arranque importa para lo que se abre a menudo**: un lanzador en Python tardaría ~0,9 s en abrirse (VM; en hardware real, menos). Debe vivir **dentro del proceso residente del panel** o ser compilado.
+
+**Decisión:**
+1. **Ahora: Python + GTK4 para todo.** Es lo que antes se puede usar y lo que más gente sabe modificar. Con 150 MB de espacio de usuario en total el consumo ya es bajo.
+2. **Después, solo donde dé resultado y se haya medido en hardware real:** reescribir en **Rust + `gtk4-rs`** lo que está **siempre activo** o se abre muy a menudo (panel, demonio de notificaciones, lanzador). Python/GJS quedan para herramientas a demanda, apps y extensiones de los usuarios.
+3. **JavaScript sin Node (GJS): permitido como opción para apps de usuarios** (plantilla), no como lenguaje del shell. **Node/Electron: no.**
+4. Si algún día los widgets de usuario deben convivir con un panel en Rust, hará falta un mecanismo de extensiones (p. ej. un lenguaje de *scripting* embebido); **no se ha evaluado**.
