@@ -26,7 +26,7 @@ PROMPT = re.compile(rb"root@oweelinux-proto:[^\r\n]*# ")
 class Vm:
     def __init__(self, disk, vars_fd, sock_path, log):
         self.log = open(log, "ab")
-        cmd = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-m", "1536", "-machine", "q35",
+        cmd = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-smp", os.environ.get("QEMU_SMP", "1"), "-m", os.environ.get("QEMU_MEM", "1536"), "-machine", "q35",
                "-display", "none", "-monitor", "none", "-nic", "user",
                "-chardev", f"socket,id=ser0,path={sock_path},server=on,wait=off", "-serial", "chardev:ser0",
                "-drive", f"if=pflash,format=raw,readonly=on,file={OVMF_CODE}",
@@ -87,6 +87,10 @@ def main():
     ap.add_argument("-n", type=int, default=30); ap.add_argument("--seed", type=int)
     ap.add_argument("--workdir", default=None)
     a = ap.parse_args()
+    missing = [k for k in range(1, a.n + 1) if not os.path.exists(os.path.join(a.pub, "refs", "heads", "steps", f"step{k}"))]
+    if missing:   # una versión inexistente haría fallar `owee-update` al instante y la iteración no probaría nada
+        sys.exit(f"ERROR: faltan {len(missing)} versiones step en {a.pub} (p. ej. step{missing[0]}). "
+                 f"Publica más con publish-steps.sh o baja -n.")
     seed = a.seed if a.seed is not None else random.randrange(1 << 30)
     rnd = random.Random(seed)
     work = a.workdir or tempfile.mkdtemp(prefix="powerloss-")
@@ -137,18 +141,21 @@ def main():
                         time.sleep(3)
                     if not confirmed_ok: problems.append("una versión sana no llegó a confirmarse (rechazada)")
                 if k % 5 == 0 and not problems:
-                    fs = vm.run(r"ostree fsck --repo=/sysroot/ostree/repo --quiet >/tmp/fsck.txt 2>&1; echo MARK_FSCK=$?", "FSCK", 240)
+                    fs = vm.run(r"ostree fsck --repo=/sysroot/ostree/repo --quiet >/tmp/fsck.txt 2>&1; echo MARK_FSCK=$?", "FSCK", 600)
                     if fs != "0": problems.append(f"ostree fsck rc={fs}")
                 if problems:
                     fails.append((k, "; ".join(problems))); print(f"[{k:3d}] FALLA: {problems}  estado={st}", flush=True); break
                 if mode == "complete":
                     r = vm.run(f"OWEE_REF=owee:steps/step{k} owee-update >/tmp/u.log 2>&1; echo MARK_UP=$?", "UP", 120)
                     stats["complete"] += 1
+                    if r != "0": fails.append((k, f"owee-update terminó con rc={r}")); print(f"[{k:3d}] FALLA: owee-update rc={r}", flush=True); break
                     print(f"[{k:3d}] ok (arranque {boot_s:4.1f}s, release {rel}, despliegues {dep}) -> actualización completa rc={r}, corte", flush=True)
                 else:
                     vm.send(f"OWEE_REF=owee:steps/step{k} owee-update >/tmp/u.log 2>&1; echo MARK_UP=$?")
                     d = min(0.1 + rnd.expovariate(1 / 1.5), 8.0); time.sleep(d)   # sesgo hacia el principio: ahí está el trabajo de pull+despliegue
-                    done = re.search(rb"[\r\n]MARK_UP=\d", vm.text()) is not None
+                    mdone = re.search(rb"[\r\n]MARK_UP=(\d+)", vm.text()); done = mdone is not None
+                    if done and mdone.group(1) != b"0":
+                        fails.append((k, f"owee-update terminó con rc={mdone.group(1).decode()}")); print(f"[{k:3d}] FALLA: owee-update rc={mdone.group(1).decode()}", flush=True); break
                     stats["update"] += 1; stats["update_alcanzo_a_terminar"] += done
                     print(f"[{k:3d}] ok (arranque {boot_s:4.1f}s, release {rel}, despliegues {dep}) -> corte a los {d:.1f}s de actualizar" + (" (ya había terminado)" if done else " (A MITAD)"), flush=True)
             finally:

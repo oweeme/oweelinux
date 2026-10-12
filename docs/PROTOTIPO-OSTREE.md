@@ -71,10 +71,10 @@ Una sola sesión de QEMU con 5 arranques:
 - Un sistema colgado sin reiniciar (p. ej. pantalla negra con systemd arriba) no lo detectaría; haría falta un temporizador *watchdog*.
 - Un mismo despliegue confirmado y luego desplegado otra vez conserva el mismo `<commit>.<serie>`; hay que revisar qué pasa si se reutiliza una serie.
 
-## F3d — corte de energía (`tools/ostree-proto/powerloss-test.py`, 60/60 sin fallos)
+## F3d — corte de energía (`tools/ostree-proto/powerloss-test.py`, 40 iteraciones válidas sin fallos)
 Un único disco persistente; en cada iteración la VM arranca (eso comprueba el corte anterior) y se
 vuelve a cortar con SIGKILL en un momento aleatorio:
-- 41 cortes en mitad de `owee-update` (20 de ellos antes de que terminara el pull/despliegue), 13 en mitad del **propio arranque**, 6 tras terminar la actualización.
+- **Corrección (2026-10-12):** esta tanda pidió 60 iteraciones pero solo existían 40 versiones `step`; desde la 41 `owee-update` fallaba al instante y esas iteraciones **no probaban nada** (el script no lo detectaba). Cifras válidas, iteraciones 1-40: 19 cortes en mitad de `owee-update`, 8 justo tras terminar, 5 con actualización completa y 8 en mitad del **propio arranque**. El script ahora aborta si faltan versiones y falla si `owee-update` devuelve error.
 - Tras cada corte: arrancó en un despliegue válido, `/usr` de solo lectura, ≥1 despliegue; una versión nueva sana se confirmó sola.
 - `ostree fsck` del repo cada 5 iteraciones: sin errores. `e2fsck -fn` final tras apagado limpio: rc=0, 0 problemas.
 - Una versión nueva que no llega a confirmarse antes del corte se descarta y el sistema vuelve a la última confirmada (diseño de F3c).
@@ -102,8 +102,18 @@ vuelve a cortar con SIGKILL en un momento aleatorio:
 4. Los scripts de preparación deben ser **reintentables** (`prepare-rootfs.sh` ya lo es: no rehace el initramfs ni vuelve a mover `/etc`).
 5. El usuario `oweeuser` **sin contraseña** con inicio automático de SDDM (`overlay-test-user.sh`) es **solo para pruebas en VM**, y solo se aplica con `OWEE_TEST_USER=1`.
 
+### Actualizar, rollback y corte de energía sobre la imagen Plasma (2026-10-12)
+Actualizaciones realistas: cada release añade ~3.000 archivos pequeños + 15 de 10 MB (~150 MB); las
+versiones de la prueba de cortes, ~400 archivos + 12 MB. VM de 3 GB / 2 CPU.
+- **`rollback-test.sh`: 12/12.** Release 2 (buena) arranca a prueba y se confirma sola; rollback manual vuelve a la 1 con `/home` intacto; la release 3 (servicio roto) arranca, `owee-health` la rechaza y el sistema vuelve solo a la 1 (1 rechazo, sin bucle).
+- **`powerloss-test.py`, dos tandas válidas de 40 iteraciones (semillas 20261012 y 777), 0 fallos:**
+  - Tanda 1 (iteraciones 1-40): 31 cortes en mitad de `owee-update`, 5 con la actualización completa, 4 en mitad del arranque.
+  - Tanda 2: 30 cortes en mitad de `owee-update`, 8 actualizaciones completas (todas `rc=0`), 2 en mitad del arranque.
+  - **Total: 61 cortes a mitad de una actualización, 13 actualizaciones completas, 6 cortes en el arranque.** Tras cada corte arrancó en un despliegue válido con `/usr` de solo lectura; las versiones nuevas sanas se confirmaron solas (`ostree fsck` cada 5 iteraciones sin errores; `e2fsck -fn` final de ambas tandas con rc=0).
+- La tanda 1 se pidió con 60 iteraciones y solo había 40 versiones: de la 41 a la 60 no se probó nada (ver corrección arriba); **solo cuentan las iteraciones 1-40**.
+- Límites que siguen: `kill -9` de QEMU no simula la pérdida de la caché del disco; las actualizaciones de prueba (≤150 MB) son menores que las reales (cientos de MB o más); solo sesión X11 y gráficos por software.
+
 ### Qué NO está verificado todavía en la imagen real
-- Actualización, rollback automático y corte de energía **solo se probaron en el prototipo mínimo**; hay que repetirlos con esta imagen (las pruebas existen: `update-test.sh`, `rollback-test.sh`, `powerloss-test.py`).
 - Nvidia, Secure Boot, red real (WiFi), audio, Bluetooth, suspensión y gráficos con GPU: no se pueden probar en la VM.
 - Sesión Wayland (solo se arrancó X11); instalación en disco real; tamaño de las actualizaciones reales (el prototipo cambiaba un archivo).
 

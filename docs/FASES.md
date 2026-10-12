@@ -17,8 +17,8 @@ real. Los números de fase (F0…F9) son nombres, no el orden: este es el orden.
 | Prioridad | Qué | Por qué en este lugar | Hito |
 |---|---|---|---|
 | ✅ 1 | F0 base · F3a arranque ostree · F3b actualizar · F3c rollback | Hecho y probado en QEMU | |
-| ✅ 2 | **F3d corte de energía** (60/60 sin fallos; falta F3c-bis: initramfs roto y *watchdog*) | Es la puerta de F3: sin ella no se puede confiar en la base | |
-| ✅ 3 (parcial) | **F3h imagen real**: Debian + Plasma + red + audio sobre ostree, que arranca hasta el login gráfico en QEMU | Hoy solo hay un Debian mínimo sin pantalla. Esto es lo que lo hace *funcional* | **M1: arranca (hecho); faltan las pruebas de F3 sobre esta imagen** |
+| ✅ 2 | **F3d corte de energía** (40 iteraciones válidas sin fallos en el prototipo; falta F3c-bis: initramfs roto y *watchdog*) | Es la puerta de F3: sin ella no se puede confiar en la base | |
+| ✅ 3 | **F3h imagen real**: Debian + Plasma + red + audio sobre ostree, que arranca hasta el login gráfico en QEMU | Hoy solo hay un Debian mínimo sin pantalla. Esto es lo que lo hace *funcional* | **M1 ✅ (en VM)**: arranca hasta Plasma desde ostree; actualizar, rollback automático y corte de energía verificados sobre esta imagen |
 | 4 | F3e/F3f Nvidia y Secure Boot en la imagen real | La imagen real los necesita antes de tocar hardware | |
 | 5 | F5 instalar en disco real (primero un script, luego Calamares) | Sin instalación no se puede usar fuera de la VM | **M2: instalable** |
 | 6 | F4 Flatpak, cajas de desarrollo, Quadlet | Lo que lo vuelve útil a diario | **M3: usable a diario** |

@@ -14,7 +14,7 @@ say() { printf '%s\r' "$1"; sleep "${2:-1}"; }
 (sleep "${BOOT_WAIT:-50}"
  say 'echo MARK_REL_BEFORE=$(cat /usr/share/owee/release)'
  say 'echo MARK_DEPLOYS_BEFORE=$(ostree admin status | grep -c "ostree/\|oweelinux ")'
- say 'owee-update 2>&1 | tail -4; echo MARK_UPGRADE_RC=${PIPESTATUS[0]}' 45
+ say 'owee-update 2>&1 | tail -4; echo MARK_UPGRADE_RC=${PIPESTATUS[0]}' "${UPDATE_WAIT:-45}"
  say 'echo MARK_STAGED=$(ostree admin status | grep -c -i "staged")'
  say 'systemctl reboot' "${BOOT_WAIT:-50}"
  say 'echo MARK_REL_AFTER=$(cat /usr/share/owee/release)'
@@ -22,7 +22,7 @@ say() { printf '%s\r' "$1"; sleep "${2:-1}"; }
  say 'echo MARK_BOOTED_FIRST=$(ostree admin status | sed -n 1p | grep -c "^\\*")'
  say 'ostree admin status' 2
  say 'poweroff' 10) |
-timeout 400 qemu-system-x86_64 -enable-kvm -cpu host -m 1536 -nographic -snapshot \
+timeout 400 qemu-system-x86_64 -enable-kvm -cpu host -smp "${QEMU_SMP:-1}" -m "${QEMU_MEM:-1536}" -nographic -snapshot \
   -machine q35 -nic user \
   -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd \
   -drive if=pflash,format=raw,file="$VARS" \
