@@ -90,6 +90,13 @@ si la app muere, el icono desaparece solo; todas las llamadas D-Bus son asíncro
 Pendiente: dibujar el menú `com.canonical.dbusmenu` y los iconos propios de OweeLinux. Prueba: `tools/ostree-proto/tray-test.py` con la app falsa `mock-sni.py`
 (6/6: aparece, Activate, ContextMenu, desaparece; panel 40 MB Pss). Código: `desktop/shell/owee_tray.py`.
 
+## Iconos propios y menú de sesión (probado)
+Tema de iconos **Owee** (línea redondeada, dibujos originales) generado por `desktop/theme/icons/gen_icons.py` (se instala en `/usr/share/icons/Owee`;
+el color del trazo es un parámetro, así que el modo claro es otra pasada del generador). Los widgets piden iconos con `"icon": "owee-volume-high"` en su JSON;
+el panel solo muestra el número junto al icono. El botón de sesión (a la derecha) ofrece Bloquear, Cerrar sesión, Reiniciar y Apagar; los dos últimos piden un segundo clic.
+Lección: la imagen **no traía el cargador de SVG** (`librsvg2-common`), así que ningún icono SVG se dibujaba (tampoco los de KDE); ahora está en `packages-plasma.txt`.
+Prueba: `tools/ostree-proto/image-lite-test.py` sobre la imagen completa (capturas `imagen-sesion*.png`). El panel sube a ~47 MB Pss con los iconos.
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que

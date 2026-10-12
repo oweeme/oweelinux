@@ -59,6 +59,9 @@ try:
     n = sh("pgrep -c -u oweeuser konsole", "K", 30) or ""
     check("Intro lanza la primera coincidencia (konsole)", n.strip("|").strip().isdigit() and int(n.strip("|").strip()) > 0, n.strip("|"))
     vm.screenshot(os.path.join(out, "imagen-app.png"))
+    q.click(1255, 24); time.sleep(2); vm.screenshot(os.path.join(out, "imagen-sesion.png"))
+    q.click(1200, 157); time.sleep(2); vm.screenshot(os.path.join(out, "imagen-sesion-confirmar.png"))   # primer clic en Reiniciar: pide confirmación (NO reinicia)
+    n2 = sh("systemctl is-system-running; uptime -s | cut -c1-5", "UP", 30) or ""; print("estado tras el primer clic:", n2)
     print("memoria del panel:", sh("pid=$(pgrep -f owee_panel.py | tail -1); awk '/^(Pss|Rss):/{printf \"%s=%dMB \", $1, $2/1024}' /proc/$pid/smaps_rollup", "M"))
 finally:
     vm.kill(); http.kill()

@@ -13,6 +13,7 @@ srv = "/home/oweeme/.cache/oweelinux/vm/ssrv"; os.makedirs(srv, exist_ok=True)
 shutil.copy(os.path.join(repo, "desktop/shell/owee_panel.py"), srv)
 for f in os.listdir(os.path.join(repo, "desktop/widgets/sistema")): shutil.copy(os.path.join(repo, "desktop/widgets/sistema", f), srv)
 shutil.copy(os.path.join(here, "mock-wpctl"), srv)
+subprocess.run(["python3", os.path.join(repo, "desktop/theme/icons/gen_icons.py"), srv + "/icons"], check=True, stdout=subprocess.DEVNULL); subprocess.run(["tar", "czf", srv + "/owee-icons.tgz", "-C", srv + "/icons", "Owee"], check=True)
 http = subprocess.Popen(["python3", "-m", "http.server", "8006", "--bind", "127.0.0.1", "--directory", srv], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 W = "/home/oweeme/.cache/oweelinux/vm/litediag"; os.makedirs(W, exist_ok=True); os.chdir(W)
 for f in ("ser.sock", "mon.sock", "qmp.sock"):
@@ -48,6 +49,7 @@ try:
     vm.run("mkdir -p /etc/owee /etc/systemd/user /tmp/ps/BAT0; ln -sfn /dev/null /etc/systemd/user/waybar.service; ln -sfn /dev/null /etc/systemd/user/mako.service; "
            "printf '17\\n' > /tmp/ps/BAT0/capacity; printf 'Discharging\\n' > /tmp/ps/BAT0/status; chmod -R a+rX /tmp/ps; "
            "curl -s http://10.0.2.2:8006/owee_panel.py -o /tmp/owee_panel.py; D=/var/home/oweeuser/.config/owee/widgets; install -d -o oweeuser -g oweeuser /var/home/oweeuser/.config /var/home/oweeuser/.config/owee $D; "
+           "curl -s http://10.0.2.2:8006/owee-icons.tgz | tar xz -C /tmp && install -d -o oweeuser -g oweeuser /var/home/oweeuser/.local /var/home/oweeuser/.local/share /var/home/oweeuser/.local/share/icons && cp -r /tmp/Owee /var/home/oweeuser/.local/share/icons/ && chown -R oweeuser:oweeuser /var/home/oweeuser/.local; "
            "for f in 10-red.py 20-volumen.py 30-bateria.py; do curl -s http://10.0.2.2:8006/$f -o $D/$f; done; chown -R oweeuser:oweeuser $D; chmod +x $D/*; "
            "printf 'WLR_RENDERER=pixman\\nWLR_NO_HARDWARE_CURSORS=1\\nGSK_RENDERER=cairo\\n' > /etc/environment; "
            "printf 'PANEL=python\\nOWEE_PANEL_PATH=/tmp/owee_panel.py\\nexport OWEE_DEBUG_LAYOUT=1 OWEE_POWER_SUPPLY_DIR=/tmp/ps PATH=/tmp/mockbin:$PATH\\n' > /etc/owee/panel.conf; "
@@ -59,8 +61,8 @@ try:
     print("wpctl falso:", sh("PATH=/tmp/mockbin:$PATH wpctl get-volume @DEFAULT_AUDIO_SINK@", "AU", 30))
     time.sleep(8)
     W_ENV = U + "OWEE_POWER_SUPPLY_DIR=/tmp/ps PATH=/tmp/mockbin:$PATH:/usr/bin:/bin "
-    for w, quiero in (("10-red.py", "cable"), ("20-volumen.py", "vol 40%"), ("30-bateria.py", "bat 17%")):
-        t = sh(f"{W_ENV} python3 /var/home/oweeuser/.config/owee/widgets/{w} | python3 -c \"import sys,json; print(json.load(sys.stdin).get('text'))\"", "W", 30) or ""
+    for w, quiero in (("10-red.py", "owee-network-wired"), ("20-volumen.py", "owee-volume-high 40%"), ("30-bateria.py", "owee-battery-20 17%")):
+        t = sh(f"{W_ENV} python3 /var/home/oweeuser/.config/owee/widgets/{w} | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('icon'), d.get('text'))\"", "W", 30) or ""
         check(f"widget {w}: texto esperado '{quiero}'", quiero in t, t.strip("|"))
     lay = sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-300", "L") or "{}"
     coords = json.loads(lay.rstrip("|") or "{}"); print("posiciones:", coords, flush=True)

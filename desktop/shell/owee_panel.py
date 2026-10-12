@@ -30,6 +30,9 @@ popover calendar:selected { background: #2A9D8F; color: #102019; }
 popover calendar.view, popover calendar button { color: #EFF0F1; background: transparent; }
 button.owee-tray { background: transparent; background-image: none; border: none; box-shadow: none; padding: 2px 4px; min-height: 0; min-width: 0; }
 button.owee-tray:hover { background: rgba(42,157,143,0.35); }
+button.owee-row { background: transparent; background-image: none; color: #EFF0F1; border: none; box-shadow: none; border-radius: 8px; padding: 6px 10px; min-width: 200px; }
+button.owee-row:hover { background: rgba(42,157,143,0.35); }
+button.owee-row label.warn { color: #F06548; padding: 0; }
 menubutton.launcher > button { background: #2A9D8F; background-image: none; color: #102019; border: none; box-shadow: none; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; min-height: 0; }
 popover entry { background: #102019; color: #EFF0F1; border: 1px solid #2b4a3d; border-radius: 8px; box-shadow: none; }
 popover list, popover row { background: transparent; color: #EFF0F1; }
@@ -61,8 +64,9 @@ class ScriptWidget:
     def __init__(self, path, box):
         self.path, self.name = path, os.path.splitext(os.path.basename(path))[0]
         self.data = {}; self.pending = None
-        self.label = Gtk.Label(label=self.name + "…")
-        self.btn = Gtk.MenuButton(has_frame=False, child=self.label); self.btn.add_css_class("owee-widget"); self.btn.set_visible(False)   # visible al llegar el primer dato
+        self.label = Gtk.Label(label=self.name + "…"); self.icon = Gtk.Image(pixel_size=18); self.icon.set_visible(False)
+        inner = Gtk.Box(spacing=0); inner.append(self.icon); inner.append(self.label)
+        self.btn = Gtk.MenuButton(has_frame=False, child=inner); self.btn.add_css_class("owee-widget"); self.btn.set_visible(False)   # visible al llegar el primer dato
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.on_popup_toggled)
         click = Gtk.GestureClick(); click.connect("released", lambda *a: self.click()); self.btn.add_controller(click)
         box.append(self.btn)
@@ -84,13 +88,15 @@ class ScriptWidget:
             ok, out, _ = p.communicate_utf8_finish(res); d = json.loads(out.strip().splitlines()[-1]); self.data = d
             self.btn.set_visible(not d.get("hidden")); 
             if d.get("hidden"): return
-            self.label.set_text(str(d.get("text", ""))); self.label.set_tooltip_text(d.get("tooltip"))
+            self.label.set_text(str(d.get("text", ""))); self.label.set_visible(bool(d.get("text"))); self.btn.set_tooltip_text(d.get("tooltip"))
+            if d.get("icon"): self.icon.set_from_icon_name(d["icon"]); self.icon.set_visible(True)
+            else: self.icon.set_visible(False)
             self.label.remove_css_class("warn")
             if d.get("class"): self.label.add_css_class(d["class"])
             has = bool(d.get("popup"))                      # reasignar la ventanita en cada refresco la CERRABA (bug visto con refrescos de 3 s)
             if has != getattr(self, "has_popup", None): self.has_popup = has; self.btn.set_popover(self.pop if has else None)
         except Exception as e:
-            self.btn.set_visible(True); self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text("el widget falló: %s" % e)
+            self.btn.set_visible(True); self.label.set_visible(True); self.icon.set_visible(False); self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text("el widget falló: %s" % e)
 
     def click(self):
         cmd = self.data.get("on_click")
@@ -138,7 +144,8 @@ class Launcher:
     La lista se construye al ABRIR por primera vez (no al arrancar): no cuesta memoria ni tiempo de sesión si no se usa.
     Escribir filtra; Intro lanza la primera coincidencia; Esc cierra."""
     def __init__(self):
-        self.btn = Gtk.MenuButton(label="OweeLinux", has_frame=False); self.btn.add_css_class("launcher")
+        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-koi", pixel_size=18)); inner.append(Gtk.Label(label="OweeLinux"))
+        self.btn = Gtk.MenuButton(child=inner, has_frame=False); self.btn.add_css_class("launcher")
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False
 
     def toggled(self, pop, _):
@@ -180,10 +187,37 @@ class Launcher:
         try: app.launch([], None)
         except GLib.Error as e: print("[launcher] no se pudo abrir", app.get_id(), e, flush=True)
 
+class PowerMenu:
+    """Botón de sesión: Bloquear, Cerrar sesión, Reiniciar, Apagar (con iconos propios). Reiniciar y Apagar piden un segundo clic para confirmar."""
+    ACTIONS = [("owee-lock", "Bloquear pantalla", ["swaylock", "-f", "-c", "102019"], False),
+               ("owee-logout", "Cerrar sesión", ["labwc", "--exit"], False),
+               ("owee-restart", "Reiniciar", ["systemctl", "reboot"], True),
+               ("owee-power", "Apagar", ["systemctl", "poweroff"], True)]
+    def __init__(self):
+        self.btn = Gtk.MenuButton(child=Gtk.Image(icon_name="owee-power", pixel_size=18), has_frame=False); self.btn.add_css_class("owee-widget")
+        self.btn.set_tooltip_text("Sesión"); pop = Gtk.Popover(); self.btn.set_popover(pop); pop.connect("notify::visible", lambda p, _: self.reset())
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
+        self.rows = []
+        for icon, text, cmd, confirm in self.ACTIONS:
+            if cmd[0] == "swaylock" and not GLib.find_program_in_path("swaylock"): continue
+            lab = Gtk.Label(label=text, xalign=0, hexpand=True); row = Gtk.Box(spacing=10); row.append(Gtk.Image(icon_name=icon, pixel_size=18)); row.append(lab)
+            b = Gtk.Button(child=row, has_frame=False); b.add_css_class("owee-row"); b.connect("clicked", self.clicked, cmd, confirm, lab, text, pop)
+            box.append(b); self.rows.append((lab, text))
+        pop.set_child(box)
+    def reset(self):
+        for lab, text in self.rows: lab.set_text(text); lab.remove_css_class("warn")
+    def clicked(self, b, cmd, confirm, lab, text, pop):
+        if confirm and not lab.has_css_class("warn"):
+            self.reset(); lab.set_text("¿Seguro? Clic para confirmar"); lab.add_css_class("warn"); return
+        pop.popdown()
+        try: Gio.Subprocess.new(cmd, Gio.SubprocessFlags.NONE)
+        except GLib.Error as e: print("[sesión] no se pudo ejecutar", cmd, e, flush=True)
+
 class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
 
     def do_activate(self):
+        Gtk.Settings.get_default().set_property("gtk-icon-theme-name", "Owee")      # iconos propios; el resto cae a breeze/Adwaita/hicolor
         prov = Gtk.CssProvider(); prov.load_from_data(CSS)
         Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         win = Gtk.ApplicationWindow(application=self); win.add_css_class("owee-panel")
@@ -200,7 +234,8 @@ class Panel(Gtk.Application):
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from owee_tray import Tray
             self.tray = Tray(); right.append(self.tray.box)
         except Exception as e: print("[tray] desactivada:", e, flush=True)
-        self.widgets = load_widgets(right)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
+        self.widgets = load_widgets(right)
+        self.power = PowerMenu(); right.append(self.power.btn)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
         self.tick(); GLib.timeout_add_seconds(1, self.tick)
         win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])

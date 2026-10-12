@@ -12,5 +12,6 @@ if not bats: print(json.dumps({"hidden": True})); raise SystemExit
 cap = int(read(bats[0] + "/capacity", "0") or 0); st = read(bats[0] + "/status", "Unknown")
 estado = {"Charging": "cargando", "Discharging": "", "Full": "completa"}.get(st, "")
 low = st == "Discharging" and cap <= 15
-print(json.dumps({"text": f"bat {cap}%" + (f" {estado}" if estado else ""), "class": "warn" if low else "", "tooltip": f"Batería: {cap}% ({st})",
+lvl = min(100, round(cap / 20) * 20)
+print(json.dumps({"icon": f"owee-battery-{lvl}" + ("-charging" if st == "Charging" else ""), "text": f"{cap}%", "class": "warn" if low else "", "tooltip": f"Batería: {cap}% ({st})",
     "popup": {"title": "Batería", "items": [{"type": "label", "text": f"Carga: {cap}%"}, {"type": "label", "text": f"Estado: {st}"}]}}))

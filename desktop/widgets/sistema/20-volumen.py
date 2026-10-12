@@ -14,7 +14,7 @@ try:
 except Exception:
     print(json.dumps({"hidden": True})); sys.exit(0)
 vol = round(float(r.stdout.split()[1]) * 100); muted = "[MUTED]" in r.stdout
-print(json.dumps({"text": "silencio" if muted else f"vol {vol}%", "class": "warn" if muted else "", "tooltip": "Volumen",
+print(json.dumps({"icon": "owee-volume-muted" if muted else "owee-volume-low" if vol < 40 else "owee-volume-high", "text": "" if muted else f"{vol}%", "class": "warn" if muted else "", "tooltip": "Silenciado" if muted else f"Volumen {vol}%",
     "popup": {"title": "Volumen", "items": [
         {"type": "slider", "min": 0, "max": 100, "value": vol, "command": [me, "set"]},
         {"type": "button", "text": "Activar sonido" if muted else "Silenciar", "command": [me, "mute"]}]}}))
