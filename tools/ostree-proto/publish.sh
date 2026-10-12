@@ -12,6 +12,7 @@
 #   hang     = un servicio que acapara todas las CPUs con prioridad de tiempo real y deja el sistema
 #              colgado; solo lo rescata el temporizador de vigilancia (watchdog) de systemd
 # BRANCH=rama publica en otra rama (por defecto oweelinux/proto/x86_64).
+# OWEE_SIGN_KEY=huella OWEE_GNUPGHOME=dir firma el commit con GPG (la imagen de prueba exige firma).
 set -euo pipefail
 source "$(dirname "$0")/lib-bulk.sh"
 ROOTFS=${1:?uso: $0 ROOTFS DIR_TRABAJO RELEASE [ROTURA]}; WORK=${2:?}; REL=${3:?}; BREAK=${4:-}
@@ -51,7 +52,8 @@ mkdir -p "$ROOTFS/usr/share/owee"
 rm -f "$ROOTFS/usr/share/owee/release"   # nuevo inodo: en la copia con enlaces duros, escribir en sitio alteraría el rootfs original
 echo "$REL" > "$ROOTFS/usr/share/owee/release"
 [ -d repo ] || ostree init --repo=repo --mode=bare
-ostree commit --repo=repo --branch=$BRANCH --tree=dir="$ROOTFS" --no-xattrs \
+SIGN=(); [ -n "${OWEE_SIGN_KEY:-}" ] && SIGN=(--gpg-sign="$OWEE_SIGN_KEY" --gpg-homedir="${OWEE_GNUPGHOME:?}")
+ostree commit --repo=repo --branch=$BRANCH --tree=dir="$ROOTFS" --no-xattrs "${SIGN[@]}" \
   --subject="release $REL ($(date -u +%F\ %T))" | tail -1
 [ -d pub ] || ostree init --repo=pub --mode=archive
 ostree pull-local --repo=pub repo $BRANCH | tail -1

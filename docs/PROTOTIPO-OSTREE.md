@@ -137,6 +137,41 @@ Efecto a explicar al usuario: si reinicia a mano dentro de esa ventana de estabi
 
 **Límites que siguen:** el watchdog solo protege **después** de que systemd arranque; un cuelgue en el initramfs, antes de eso, no está cubierto (solo los fallos que acaban en *panic* o en el modo de emergencia con `rd.emergency=reboot`). Un sistema que se cuelga **después de confirmarse** reinicia en bucle la versión confirmada (inevitable con esta política). En hardware real hay que usar el driver de watchdog de la placa (`iTCO_wdt`, `sp5100_tco`...), no `i6300esb`.
 
+### Firmware y firma de actualizaciones sobre la imagen completa (2026-10-12)
+Imagen completa de pruebas: Debian 13 + Plasma + **firmware** + branding B1 + **firma de actualizaciones**
+(`tools/ostree-proto/build-image-full.sh`).
+
+**Firmware (prioridad 4a):** componente `non-free-firmware` de Debian; conjunto razonable de ~113 MB de descarga
+(`packages-plasma.txt`): WiFi (iwlwifi, realtek, atheros, mediatek, brcm80211), `firmware-misc-nonfree`, GPU AMD e Intel,
+microcódigo de AMD e Intel. Quedó en la imagen: **440 MB, 1.790 archivos** en `/usr/lib/firmware` (iwlwifi 81 archivos,
+amdgpu, i915, intel-ucode, amd-ucode...). Initramfs de 60 MB. Imagen de disco de 6,5 GB (antes 5,6 GB).
+**No verificado:** que un dispositivo concreto cargue su firmware; solo se puede probar en hardware real.
+La laptop de desarrollo actual tiene una **Intel Wireless 7260** y un **HD Graphics 620**.
+
+**Firma (prioridad 4b):** `gpg-verify=true` en el remoto `owee`; la clave pública va en
+`/usr/share/ostree/trusted.gpg.d/owee-test.gpg`; los commits se firman con `--gpg-sign`. La clave de la imagen es
+**de PRUEBA** (`gen-test-keys.sh`; la privada no está en el repositorio). `signing-test.py`, **9/9**:
+| Caso | Resultado |
+|---|---|
+| Rama sin firma | rechazada: "GPG verification enabled, but no signatures found" |
+| Firmada con otra clave (B) | rechazada: la firma no se puede comprobar con la clave de confianza |
+| Firmada con la clave de confianza pero con un objeto corrompido | rechazada: "Corrupted file object; checksum expected=…" |
+| Tras cada rechazo | el sistema no cambia (1 despliegue, release 1) |
+| Firmada con la clave de confianza | aceptada, arranca y se confirma |
+**Lección del método:** la primera prueba de "objeto corrompido" no rechazó nada porque se corrompió **añadiendo** bytes al
+final de un flujo comprimido (se ignoran); hay que dañar el medio de un objeto.
+
+**Regresión tras añadir firmware y firma** (el firmware cambia el initramfs y la actualización ahora exige firma):
+- `rollback-test.sh` **12/12** (releases buena y rota firmadas, ~150 MB cada una).
+- `earlyfail-test.py` **3/3**: initramfs roto (51 s), servicio bloqueante (138 s), cuelgue total con watchdog (78 s).
+- `powerloss-test.py` **20/20 sin fallos** (semilla 99; 17 cortes a mitad de actualización, 2 actualizaciones completas, 1 corte durante el arranque); `e2fsck` final limpio.
+
+**Límites que siguen:**
+- **HTTPS** y un sitio donde alojar las actualizaciones: hoy van por HTTP a `10.0.2.2` (el anfitrión de la VM).
+- **Ataque de degradación:** la firma impide versiones falsas, pero no que alguien sirva una versión **antigua** firmada. Hace falta firmar también el *summary* con fecha o fijar una versión mínima.
+- La **clave de producción** debe generarla el autor, con contraseña y fuera de línea; rotación y revocación sin definir.
+- Los tiempos de la prueba de cortes siguen sin simular la pérdida de la caché de un disco real.
+
 ### Qué NO está verificado todavía en la imagen real
 - Nvidia, Secure Boot, red real (WiFi), audio, Bluetooth, suspensión y gráficos con GPU: no se pueden probar en la VM.
 - Sesión Wayland (solo se arrancó X11); instalación en disco real; tamaño de las actualizaciones reales (el prototipo cambiaba un archivo).

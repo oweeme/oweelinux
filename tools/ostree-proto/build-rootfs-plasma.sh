@@ -9,7 +9,7 @@ pgrep -x apt-cacher-ng >/dev/null || { mkdir -p /run/apt-cacher-ng; chown apt-ca
   /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng ForeGround=0 PidFile=/run/apt-cacher-ng/pid SocketPath=/run/apt-cacher-ng/socket >/dev/null 2>&1; sleep 2; }
 INCLUDE=$(grep -v -e '^#' -e '^$' "$HERE/packages-plasma.txt" | paste -sd, -)
 rm -rf "$OUT"
-mmdebstrap --mode=root --variant=minbase \
+mmdebstrap --mode=root --variant=minbase --components="main non-free-firmware" \
   --aptopt='Acquire::http::Proxy "http://127.0.0.1:3142"' \
   --aptopt='Acquire::Retries "8"' --aptopt='Acquire::http::Timeout "60"' \
   --include="$INCLUDE" trixie "$OUT" http://deb.debian.org/debian

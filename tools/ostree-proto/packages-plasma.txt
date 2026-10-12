@@ -49,6 +49,18 @@ plasma-discover-backend-flatpak
 # fuentes
 fonts-noto-core
 fonts-noto-color-emoji
+# firmware y microcódigo (componente non-free-firmware de Debian): WiFi, GPU, CPU. Conjunto razonable, ~113 MB.
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-mediatek
+firmware-brcm80211
+firmware-misc-nonfree
+firmware-amd-graphics
+firmware-intel-graphics
+firmware-linux-free
+amd64-microcode
+intel-microcode
 # utilidades
 git
 curl

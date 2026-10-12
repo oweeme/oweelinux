@@ -16,6 +16,13 @@ if [ -n "${OWEE_HEALTH_STABLE:-}" ]; then
   mkdir -p "$R/usr/lib/systemd/system/owee-health.service.d"
   printf '[Service]\nEnvironment=OWEE_HEALTH_STABLE=%s\n' "$OWEE_HEALTH_STABLE" > "$R/usr/lib/systemd/system/owee-health.service.d/stable.conf"
 fi
+# Verificación de firma de las actualizaciones: la clave pública va en la imagen y el remoto exige firma.
+# (Clave de PRUEBA; la de producción la genera el autor y vive fuera de línea.) OWEE_VERIFY=0 la desactiva.
+if [ -f "$HERE/keys/owee-test.gpg" ] && [ "${OWEE_VERIFY:-1}" = 1 ]; then
+  mkdir -p "$R/usr/share/ostree/trusted.gpg.d" "$ETC/ostree/remotes.d"
+  install -m0644 "$HERE/keys/owee-test.gpg" "$R/usr/share/ostree/trusted.gpg.d/owee-test.gpg"
+  printf '[remote "owee"]\nurl=http://10.0.2.2:8000/pub\ngpg-verify=true\n' > "$ETC/ostree/remotes.d/owee.conf"
+fi
 # Watchdog: si el sistema se cuelga del todo, systemd deja de avisar al temporizador y la máquina
 # se reinicia sola; GRUB (que ya gastó el intento a prueba) vuelve a la versión confirmada.
 mkdir -p "$R/usr/lib/systemd/system.conf.d"
