@@ -110,3 +110,42 @@ asíncrono) y batería (UPower); la diferencia en el total queda dentro del ruid
 
 **Decisión provisional:** el panel en Python/GTK4 **pasa** la puerta de memoria y de integración; se mantiene como camino principal con Waybar de respaldo
 (`docs/FASES.md`, 4c ✅). Siguiente: v0.1 (sesión usable con piezas existentes), medir de nuevo con bandeja y volumen, y probar en hardware real.
+
+## ¿GTK o Qt en Python? Decisión y presupuesto de memoria (2026-10-12)
+Medido en la sesión Lite de la VM (gráficos por software, **una sola ejecución**; scripts en `tools/bench/toolkit/`).
+Ventana mínima con una etiqueta, a los 6 s. USS = memoria **privada** del proceso (lo que se libera al cerrarlo).
+| Caso | Rss | Pss | USS |
+|---|---|---|---|
+| GTK4 (PyGObject, `cairo`) solo | 51 | 39 | 36 |
+| Qt6 (PySide6) solo | 56 | 45 | 40 |
+| GTK4 con Konsole (Qt) abierta | 51 | 39 | 36 |
+| Qt6 con Konsole (Qt) abierta (comparte bibliotecas) | 57 | 40 | **31** |
+| 2.º GTK4 con otro GTK4 ya cargado (comparte bibliotecas) | 51 | 30 | **20** |
+**Lectura:** la memoria **no decide** entre GTK y Qt: ±10 MB. Compartir bibliotecas ayuda al toolkit que ya está cargado
+(Qt con apps de KDE: −9 MB; GTK con otro GTK: −16 MB). La mitad del costo es Python y el motor de ventanas, no el toolkit.
+
+**Dónde se va la memoria de la sesión Lite** (Waybar, procesos agrupados por nombre, Pss): waybar 27, labwc 21,
+xdg-desktop-portal 15, systemd 13, sddm 11 + sddm-helper 9, NetworkManager 8, wireplumber 6, udisksd 6, pipewire 6, resto < 3 cada
+uno. **Todo el espacio de usuario ≈ 150 MB**. El `used` de `free` (428 MB) incluye además kernel (Slab 47, vmalloc 26…) y archivos
+mapeados en caché (Mapped 94 MB), que se pueden recuperar: **para comparar sesiones, el Pss de los procesos es la cifra honesta**.
+
+**Decisión:**
+1. **Shell (panel, lanzador, OSD, cambiador de ventanas, esquinas): GTK4 + Python.** Es la única combinación con soporte
+   de *layer-shell* usable desde Python hoy (`gtk4-layer-shell`, con `LD_PRELOAD`). En Qt, `layer-shell-qt` está en Debian pero es
+   C++ y no trae enlaces para Python *(verificar si el plugin de integración basta para un panel anclado)*.
+2. **Apps de los usuarios: GTK4/libadwaita o Qt6/PySide6, a elección.** Plantilla oficial de cada una: GTK4 (coherente con el
+   shell) y Qt6 (aspecto nativo junto a las apps de KDE). Evitar PyQt6 (GPL/comercial); PySide6 es LGPL.
+3. **Las apps de KDE (Dolphin, Kate, Konsole, Okular…) siguen siendo Qt** y conviven con el shell en GTK; medido: no se molestan.
+4. Tener GTK en el panel **abarata las apps GTK** (−16 MB cada una al compartir bibliotecas).
+
+**Presupuesto de memoria (objetivos a vigilar en CI, no promesas):** panel ≤ 50 MB de Pss; sesión (compositor, panel, notificaciones,
+autenticación, inactividad) ≤ 120 MB; **todo el espacio de usuario de la sesión Lite ≤ 200 MB** (hoy ≈ 150).
+
+**Palancas para gastar menos, de mayor a menor efecto:**
+1. No usar Plasma: ≈ −440 MB (medido).
+2. Dieta de servicios (F2): SDDM + ayudante (20 MB) → un gestor de entrada Wayland más pequeño; portales y udisks bajo demanda (~20 MB).
+3. **Un solo proceso largo** con varios elementos pequeños (calendario, ajustes rápidos como *popovers* del panel) y procesos **a demanda** para lo pesado
+   (lanzador con cuadrícula, ajustes, vista general): cada proceso GTK abierto cuesta 20-36 MB mientras vive.
+4. Python: importar con pereza, sin sondeos (señales de GIO), medir con `-X importtime`.
+5. Panel en Waybar (−15 MB) o compilado (Rust + gtk4-rs): ganancia pequeña, **no es la prioridad**.
+6. Renderizador: con GPU real hay que **medir** `ngl` frente a `cairo`; en la VM el GL por software cuesta ~87 MB por ventana.
