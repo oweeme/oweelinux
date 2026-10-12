@@ -13,7 +13,8 @@ if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exi
     os.execv(sys.executable, [sys.executable] + sys.argv)
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
-from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk
+import json, re
+from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
 try:
     gi.require_version("NM", "1.0"); from gi.repository import NM
 except Exception: NM = None
@@ -24,6 +25,7 @@ except Exception: UPowerGlib = None
 CSS = b"""
 window.owee-panel { background: rgba(16,32,25,0.92); color: #EFF0F1; border-radius: 12px; }
 .owee-panel label { padding: 0 10px; }
+.owee-panel label.warn { color: #F06548; }
 button.launcher { background: #2A9D8F; color: #102019; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; }
 """
 
@@ -35,6 +37,44 @@ def mem(tag):
             if k in ("Rss", "Pss"): d[k] = int(v.split()[0]) / 1024
     except OSError: return
     print(f"[mem] {tag}: Rss={d.get('Rss',0):.0f} MB Pss={d.get('Pss',0):.0f} MB", flush=True)
+
+WIDGET_DIRS = ["/usr/share/owee/widgets", os.path.expanduser("~/.config/owee/widgets")]
+
+class ScriptWidget:
+    """Widget hecho con un script en CUALQUIER lenguaje (Python, JavaScript/GJS, shell...): ejecutable que imprime una línea
+    JSON {"text","tooltip","class"}. Se ejecuta de forma asíncrona cada N segundos (comentario `owee-interval: N`), con límite
+    de 5 s; un fallo no afecta al panel (se muestra "⚠ nombre")."""
+    def __init__(self, path, box):
+        self.path, self.name = path, os.path.splitext(os.path.basename(path))[0]
+        self.label = Gtk.Label(label=self.name + "…"); box.append(self.label)
+        m = re.search(r"owee-interval:\s*(\d+)", open(path, errors="replace").read(2000)); self.interval = max(1, int(m.group(1))) if m else 5
+        self.run(); GLib.timeout_add_seconds(self.interval, self.run)
+
+    def run(self):
+        try:
+            # `timeout` mata el script Y sus procesos hijos a los 5 s (matar solo el script dejaba huérfano a un `sleep`)
+            p = Gio.Subprocess.new(["timeout", "-k", "1", "5", self.path], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE)
+        except GLib.Error as e:
+            self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text(str(e)); return True
+        p.communicate_utf8_async(None, None, self.done); return True
+
+    def done(self, p, res):
+        try:
+            ok, out, _ = p.communicate_utf8_finish(res); d = json.loads(out.strip().splitlines()[-1])
+            self.label.set_text(str(d.get("text", ""))); self.label.set_tooltip_text(d.get("tooltip"))
+            for c in ("warn",): self.label.remove_css_class(c)
+            if d.get("class"): self.label.add_css_class(d["class"])
+        except Exception as e:
+            self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text("el widget falló: %s" % e)
+
+def load_widgets(box):
+    ws = []
+    for d in WIDGET_DIRS:
+        if os.path.isdir(d):
+            for f in sorted(os.listdir(d)):
+                p = os.path.join(d, f)
+                if os.path.isfile(p) and os.access(p, os.X_OK): ws.append(ScriptWidget(p, box))
+    return ws
 
 class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
@@ -51,6 +91,7 @@ class Panel(Gtk.Application):
         bar.set_start_widget(Gtk.Button(label="OweeLinux", css_classes=["launcher"]))
         self.clock = Gtk.Label(); bar.set_center_widget(self.clock)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
+        self.widgets = load_widgets(right)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
         self.net = Gtk.Label(label="red…"); self.bat = Gtk.Label(label="…"); right.append(self.net); right.append(self.bat)
         self.tick(); GLib.timeout_add_seconds(1, self.tick)
         self.setup_net(); self.setup_power()
