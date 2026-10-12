@@ -8,7 +8,8 @@ Detalles de lenguajes y memoria: `docs/ESCRITORIO.md` ("¿Qué lenguaje con GTK?
 | Nivel | Qué es | Lenguajes | Cuesta (memoria) | Estado |
 |---|---|---|---|---|
 | **1. Widgets de script** | Un ejecutable que imprime una línea JSON; el panel la muestra | **Python, JavaScript (GJS), shell o cualquier otro** | ≈ 0 residente (el script solo vive un instante) | **Prototipo probado** |
-| **2. Widgets nativos** | Código dentro del proceso del panel (popovers, ventanas propias) | Python (dentro del panel) | pocos MB | Por diseñar |
+| **2. Widgets con clic y ventanita** | El mismo script, pero su JSON pide un clic y/o una ventanita que el **panel dibuja** | Python, JavaScript, shell… | ≈ 0 residente | **Prototipo probado** |
+| **2b. Widgets nativos** | Código propio dentro del proceso del panel (ventanas a medida) | Python (dentro del panel) | pocos MB | Por diseñar |
 | **3. Apps** | Programas completos, con `.kapp`/`owee-app` y permisos | Python+GTK4, JavaScript+GJS, Python+Qt6, Rust… | 20-40 MB por app abierta | Plantilla Python en `tools/owee-app-template/` |
 
 ## Nivel 1: widgets de script (probado)
@@ -35,6 +36,32 @@ Ejemplos: `desktop/widgets/load.py` (Python) y `desktop/widgets/utc.js` (JavaScr
 - Cambiar un widget = **editar el archivo**; sin compilar y sin reiniciar el panel.
 Limitaciones conocidas: hoy un widget no puede abrir ventanas ni recibir clics; el JSON no admite iconos; el panel ejecuta los
 widgets con los permisos del usuario (un widget es código del usuario, **no está aislado**): la seguridad por permisos llega con el nivel 3.
+
+## Nivel 2: clic y ventanitas (probado)
+El script añade campos a su JSON; **el panel dibuja la interfaz** (así no cuesta memoria ni exige cargar un toolkit en el script):
+```json
+{"text": "brillo 50%",
+ "on_click": ["gjs", "/ruta/script.js", "inc"],               // se ejecuta al hacer clic y el widget se actualiza
+ "popup": {"title": "Brillo", "items": [                      // ventanita que se abre al hacer clic
+    {"type": "label",     "text": "..."},
+    {"type": "button",    "text": "Poner al 50 %", "command": ["/ruta/script.py", "set", "50"]},
+    {"type": "slider",    "min": 0, "max": 100, "value": 50, "command": ["/ruta/script.py", "set"]},   // el valor se añade al final
+    {"type": "calendar"}, {"type": "separator"} ]}}
+```
+Cuando el usuario actúa, el panel vuelve a llamar al script con los argumentos del `command`; el script hace el trabajo y el panel se actualiza.
+Los deslizadores esperan 250 ms antes de llamar (no lanzan un proceso por cada píxel). El estilo de las ventanitas es el de OweeLinux.
+Ejemplos: `counter.js` (**JavaScript**, cuenta clics), `brillo.py` (**Python**, deslizante) y `calendario.py` (**Python**, calendario).
+
+**Comprobado en la VM** (`tools/ostree-proto/interaction-test.py`, ratón y teclado virtuales de QEMU, capturas en `docs/img/lite/interaccion-*.png`):
+| Prueba | Resultado |
+|---|---|
+| (A) 3 clics sobre un widget de **JavaScript** | el archivo de estado vale 3 y el panel muestra `clics 3` |
+| (B) clic sobre un widget de **Python**: la ventanita se abre y el deslizante responde al teclado | el valor cambió (50 → 53; de 10 pulsaciones se aplicaron 3: **no se investigó por qué**) |
+| (C) clic sobre el calendario | se abre el calendario del mes (captura) |
+| El panel sigue vivo y su memoria | sí; 40 MB de Pss con 5 widgets |
+**Límites:** la prueba (B) comprueba que el control responde, no una cifra exacta; los widgets no pueden abrir ventanas propias (eso sería el nivel 2b);
+no hay iconos ni menús contextuales; **el estilo del resaltado costó dos intentos** porque `Gtk.MenuButton` tiene un nodo interno (`menubutton > button`).
+Para que la ventanita reciba teclado, el panel usa `keyboard-interactivity: on-demand` de `layer-shell`.
 
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
