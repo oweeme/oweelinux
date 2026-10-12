@@ -19,6 +19,7 @@ real. Los números de fase (F0…F9) son nombres, no el orden: este es el orden.
 | ✅ 1 | F0 base · F3a arranque ostree · F3b actualizar · F3c rollback | Hecho y probado en QEMU | |
 | ✅ 2 | **F3d corte de energía** (40 iteraciones válidas sin fallos en el prototipo; F3c-bis hecho: initramfs roto, servicio bloqueante y cuelgue total rescatados solos) | Es la puerta de F3: sin ella no se puede confiar en la base | |
 | ✅ 3 | **F3h imagen real**: Debian + Plasma + red + audio sobre ostree, que arranca hasta el login gráfico en QEMU | Hoy solo hay un Debian mínimo sin pantalla. Esto es lo que lo hace *funcional* | **M1 ✅ (en VM)**: arranca hasta Plasma desde ostree; actualizar, rollback automático y corte de energía verificados sobre esta imagen |
+| **3b** | **R: resiliencia de la sesión ante procesos desbocados** (ver F-R abajo) | Es un dolor real y reciente del autor: una compilación grande dejó una máquina colgada 10+ minutos y obligó a reiniciar sin guardar. No depende del hardware: se prueba en la VM | |
 | 4 | F3e/F3f Nvidia y Secure Boot en la imagen real | La imagen real los necesita antes de tocar hardware | |
 | 5 | F5 instalar en disco real (primero un script, luego Calamares) | Sin instalación no se puede usar fuera de la VM | **M2: instalable** |
 | 6 | F4 Flatpak, cajas de desarrollo, Quadlet | Lo que lo vuelve útil a diario | **M3: usable a diario** |
@@ -137,6 +138,37 @@ Poner a "dormir" las apps de fondo que no se usan para liberar RAM y CPU:
 - Requiere cooperación del shell: marcar la ventana como dormida (para que el compositor no la dé por colgada) y excepciones configurables.
 
 **Verificación:** con 10 apps abiertas y 2 en uso, RAM usada antes/después; tiempo de *despertar* medido (ms); pruebas negativas: una app con música, una descarga y un `cargo build` **no** se congelan; cero pérdida de datos tras 100 ciclos dormir/despertar.
+
+## F-R — Resiliencia de la sesión: un proceso no puede colgar el escritorio
+Motivación (caso real, 2026-10-12): en otra máquina con Deepin, una compilación de Java/Android dejó el
+sistema inservible más de 10 minutos (pantalla de bloqueo sin respuesta). Causa probable —**sin
+confirmar**— : agotamiento de memoria con *thrashing* (RAM y swap saturadas), aunque también puede ser
+E/S de disco saturada o CPU. El objetivo no es "nunca se cuelga" (hay fallos de hardware o del
+kernel), sino que **un proceso de usuario desbocado no pueda dejar el escritorio sin respuesta**.
+
+**Evidencia del registro (journal del arranque anterior, aportado por el autor):**
+- **Corrección (2026-10-12):** `journalctl` avisaba *"You are currently not seeing messages from other users and the system"*: el usuario no está en los grupos `adm`/`systemd-journal`, así que **los mensajes del kernel y de NetworkManager no eran visibles**. "Sin entradas" en esas consultas **no significa que no pasara nada**; hay que repetirlas con `sudo`. Lo que sigue en pie: **el sistema NO estaba totalmente colgado** (los eventos de sesión y de `sudo` sí eran visibles): se pudo cambiar a una consola de texto (`dde-lock`: *session left/resumed* a las 21:59-22:00) y usar `sudo` (22:00:50, verificación correcta en 4 s). El reinicio terminó limpio (MariaDB, nginx y contenedores se apagaron bien).
+- Lo atascado fue la **pantalla de bloqueo / sesión gráfica** (`dde-lock`), que no aceptaba la contraseña. Causa exacta: **desconocida** (el bloqueo mostró a las 21:45:08 actualizaciones de los iconos de red y un aviso de dispositivo WiFi no encontrado; puede ser coincidencia).
+- **Ventana 21:40-21:59 (segundo registro):** a las **21:45:08** (la hora en que el autor vio el cuelgue) el servicio de red de la sesión (`/org/deepin/dde/Network1`) **desapareció**: decenas de errores "can not find hook object" en el mismo segundo, y el bloqueo (`dde-lock`) se quejó de no encontrar el dispositivo WiFi. A las 21:52:51-52 el plan de energía intentó apagar la pantalla por inactividad y falló ("Set wm blackscreen failed"). Nada de kernel (ni OOM ni GPU). **Hipótesis (sin confirmar):** el bloqueo se quedó esperando una llamada D-Bus **síncrona** a un servicio que ya no respondía y su interfaz se congeló; el origen del corte de red (¿el WiFi se reinició con la descarga de la compilación?) está por determinar.
+- Conclusión provisional: además de limitar a los procesos desbocados, la sesión necesita un **bloqueo de pantalla sencillo y robusto** y una **vía de recuperación sin reiniciar** (consola de texto + `loginctl unlock-sessions`).
+
+Ideas, de menos a más esfuerzo (todas por medir antes de adoptarlas):
+- **Matar pronto al culpable** en vez de esperar al OOM del kernel: `earlyoom` o `systemd-oomd` (PSI).
+- **Proteger la sesión**: el compositor, el shell y el bloqueo de pantalla con `OOMScoreAdjust` muy bajo y `MemoryLow`; las compilaciones en su propia *slice*.
+- **Compilar acotado**: `owee dev build` (o la caja de desarrollo) ejecuta con `systemd-run --user --scope` con `MemoryMax`/`MemoryHigh`, `CPUWeight` y `IOWeight` bajos.
+- **zram** (ya previsto) y ajustes del kernel contra el thrashing (p. ej. `lru_gen min_ttl_ms` de MGLRU; *verificar que el kernel 6.12 de Debian lo trae*).
+- **Salida de emergencia siempre disponible**: una consola de texto (Ctrl+Alt+F3), SSH opcional y Magic SysRq habilitado de forma útil (sincronizar, remontar solo lectura, reiniciar) con una guía de una página. Receta para una pantalla de bloqueo que no responde: desde la consola, `loginctl unlock-sessions` *(verificar que el bloqueo elegido lo respeta)*; un comando `owee` que lo haga.
+- **Bloqueo de pantalla simple**: usar el protocolo estándar `ext-session-lock` con un bloqueador pequeño y probado (p. ej. `swaylock` o `gtklock`) y autenticación PAM sin servicios intermedios; probar qué pasa si el bloqueador muere *(se espera que la sesión siga bloqueada y se recupere relanzándolo desde una consola; verificar)*.
+- **Diagnóstico al alcance del usuario**: el primer usuario se crea dentro de `systemd-journal` (y `adm`) para poder leer los registros del sistema **sin `sudo`**, y un comando `owee doctor` resume el último arranque (OOM, tareas bloqueadas, reinicios del GPU/WiFi, unidades caídas, apagado sucio, reinicios por watchdog) en una línea de tiempo. Hoy esto se hace a mano y se puede pasar por alto, como ocurrió aquí.
+- **Que reiniciar no destruya trabajo**: autoguardado y "historial local" en oweecode; instantáneas periódicas de las carpetas de proyecto (sin depender de que el usuario haga *commit*).
+
+**Regla de diseño que sale de este caso:** ningún componente de la interfaz puede bloquearse esperando a otro servicio. Las llamadas D-Bus del shell y del bloqueo son **asíncronas y con tiempo límite**; el bloqueo de pantalla **no depende** de red, audio ni energía (solo del compositor y de PAM).
+**Prueba de inyección de fallos:** con la pantalla bloqueada, matar/reiniciar los servicios de red, audio y energía (y cortar la red) y comprobar que la contraseña se acepta y la sesión se desbloquea en menos de 2 s.
+
+**Verificación (en la VM, repetible):** con un proceso que consume más memoria de la disponible (y otro que
+satura CPU y otro disco), medir la latencia de respuesta del shell y de una consola; criterios a fijar con
+mediciones, p. ej. *el escritorio responde en < 2 s y el proceso desbocado es limitado o terminado en < 30 s,
+sin reiniciar*. Comparar con la imagen sin protecciones para tener la línea base del problema.
 
 ## Tipos de verificación usados
 1. **Automática (CI):** build, arranque en QEMU, ciclo de actualización, rollback, cortes de energía.

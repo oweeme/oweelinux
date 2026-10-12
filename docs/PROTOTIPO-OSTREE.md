@@ -129,7 +129,9 @@ Cada uno con evidencia de que la versión rota llegó a intentar arrancar (mensa
 
 Efecto a explicar al usuario: si reinicia a mano dentro de esa ventana de estabilidad tras una actualización, la versión nueva aún no está confirmada y el sistema vuelve a la anterior (seguro, pero puede confundir).
 
-**Regresión tras el cambio de salud:** `rollback-test.sh` **12/12** otra vez (releases buena y rota nuevas, con ~150 MB y la nueva comprobación). La regresión de cortes de energía con versiones nuevas queda **en curso** (ver "Pendiente").
+**Regresión tras el cambio de salud (2026-10-12):**
+- `rollback-test.sh` **12/12** otra vez, con releases buena y rota nuevas (~150 MB) que ya llevan la comprobación en dos fases.
+- `powerloss-test.py`, **40 iteraciones válidas, 0 fallos** (semilla 4242; las 40 versiones `step` regeneradas desde la release nueva): **28 cortes a mitad de `owee-update` (ninguno llegó a terminar antes del corte), 4 con actualización completa, 8 en mitad del arranque**; `e2fsck -fn` final rc=0. Las versiones nuevas sanas **sí se confirmaron** con la espera de estabilidad (se vieron confirmadas las releases 112 y 128), así que el cambio no rompió el flujo.
 
 **Experimentos que descartaron causas** (conviene recordarlos): el driver `i6300esb` ya está en el initramfs y carga a ~2 s; systemd arma el watchdog a ~3,4 s con la configuración en `/etc`; armado a mano y con la CPU acaparada, la VM se reinicia a los ~55 s. Con `sched_rt_runtime_us` por defecto (95 %) la CPU **no** se acapara del todo y el watchdog no actúa: el escenario `hang` lo desactiva (`-1`).
 
@@ -140,6 +142,5 @@ Efecto a explicar al usuario: si reinicia a mano dentro de esa ventana de estabi
 - Sesión Wayland (solo se arrancó X11); instalación en disco real; tamaño de las actualizaciones reales (el prototipo cambiaba un archivo).
 
 ## Pendiente
-- Regresión de cortes de energía con las versiones nuevas (comprobación en dos fases): en curso.
 - Repetir actualización, rollback y corte de energía sobre la imagen Plasma.
 - Aplicar el branding de OweeLinux a la imagen.
