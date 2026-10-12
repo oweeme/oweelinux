@@ -77,6 +77,12 @@ Vienen con la imagen en `/usr/share/owee/widgets/` y son **widgets de script nor
 - Dos errores que encontró la prueba: el refresco de 3 s **cerraba la ventanita abierta** (arreglado: no se reasigna el popover si ya tiene uno), y el mock escribía su
   archivo como root sin permiso para el usuario (fallo de la prueba, no del widget). Memoria del panel con los tres widgets: 40 MB Pss.
 
+## Lanzador de aplicaciones (probado)
+El botón «OweeLinux» del panel abre una ventanita con búsqueda y la lista de apps instaladas (archivos `.desktop`, ordenadas por nombre, con icono).
+Escribir filtra (nombre, nombre genérico y palabras clave), **Intro lanza la primera coincidencia**, clic lanza la elegida, Esc cierra.
+La lista se construye al abrir por primera vez, no al arrancar: no cuesta memoria si no se usa. Panel con el lanzador: 39 MB Pss.
+Prueba: `tools/ostree-proto/launcher-test.py` (ratón y teclado virtuales; captura en `docs/img/lite/lanzador-busqueda.png`).
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que

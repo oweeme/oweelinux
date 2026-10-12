@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Panel superior de OweeLinux Lite — PROTOTIPO de riesgos (v0.0): Python + GTK4 + gtk4-layer-shell.
-Muestra: botón de lanzador (maqueta), reloj y fecha centrados y los WIDGETS (scripts: volumen, red, batería, los del usuario...).
+Muestra: lanzador de aplicaciones (búsqueda), reloj y fecha centrados y los WIDGETS (scripts: volumen, red, batería, los del usuario...).
 Regla de diseño (docs/ESCRITORIO.md): llamadas D-Bus asíncronas; el panel nunca se bloquea esperando a un servicio.
 Al arrancar escribe en /tmp/owee-panel.log su memoria (Rss/Pss) para medirla."""
 import os, sys, time
@@ -28,7 +28,10 @@ popover scale trough { background: #2b4a3d; } popover scale highlight { backgrou
 popover calendar { background: transparent; color: #EFF0F1; border-color: #2b4a3d; }
 popover calendar:selected { background: #2A9D8F; color: #102019; }
 popover calendar.view, popover calendar button { color: #EFF0F1; background: transparent; }
-button.launcher { background: #2A9D8F; color: #102019; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; }
+menubutton.launcher > button { background: #2A9D8F; background-image: none; color: #102019; border: none; box-shadow: none; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; min-height: 0; }
+popover entry { background: #102019; color: #EFF0F1; border: 1px solid #2b4a3d; border-radius: 8px; box-shadow: none; }
+popover list, popover row { background: transparent; color: #EFF0F1; }
+popover row { border-radius: 8px; padding: 4px 6px; } popover row:hover, popover row:selected { background: rgba(42,157,143,0.35); }
 """
 
 def mem(tag):
@@ -128,6 +131,53 @@ def load_widgets(box):
                 if os.path.isfile(p) and os.access(p, os.X_OK): found[f] = p
     return [ScriptWidget(found[f], box) for f in sorted(found)]
 
+class Launcher:
+    """Lanzador de aplicaciones: botón del panel con ventanita de búsqueda + lista de las apps instaladas (archivos .desktop).
+    La lista se construye al ABRIR por primera vez (no al arrancar): no cuesta memoria ni tiempo de sesión si no se usa.
+    Escribir filtra; Intro lanza la primera coincidencia; Esc cierra."""
+    def __init__(self):
+        self.btn = Gtk.MenuButton(label="OweeLinux", has_frame=False); self.btn.add_css_class("launcher")
+        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False
+
+    def toggled(self, pop, _):
+        if not pop.get_visible(): return
+        if not self.built: self.build()
+        self.entry.set_text(""); self.list.invalidate_filter(); self.entry.grab_focus()
+
+    def build(self):
+        self.built = True
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
+        self.entry = Gtk.SearchEntry(placeholder_text="Buscar aplicación…"); box.append(self.entry)
+        self.list = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=True)
+        self.list.set_filter_func(self.visible_row); self.list.connect("row-activated", lambda l, r: self.launch(r.app))
+        for a in sorted((a for a in Gio.AppInfo.get_all() if a.should_show()), key=lambda a: a.get_name().lower()):
+            row = Gtk.ListBoxRow(); row.app = a; row.key = (a.get_name() + " " + (a.get_generic_name() or "") + " " + (a.get_keywords() and " ".join(a.get_keywords()) or "")).lower()
+            h = Gtk.Box(spacing=10)
+            img = Gtk.Image.new_from_gicon(a.get_icon()) if a.get_icon() else Gtk.Image(); img.set_pixel_size(24)
+            h.append(img); h.append(Gtk.Label(label=a.get_name(), xalign=0)); row.set_child(h); self.list.append(row)
+        sw = Gtk.ScrolledWindow(min_content_height=320, min_content_width=300, child=self.list); box.append(sw)
+        self.entry.connect("search-changed", lambda e: (self.list.invalidate_filter(), self.select_first()))
+        self.entry.connect("activate", lambda e: self.activate_first())
+        self.pop.set_child(box)
+
+    def visible_row(self, row): return self.entry.get_text().lower() in row.key
+    def first(self):
+        i = 0
+        while (r := self.list.get_row_at_index(i)):
+            if r.get_child_visible() and self.visible_row(r): return r
+            i += 1
+    def select_first(self):
+        r = self.first()
+        if r: self.list.select_row(r)
+    def activate_first(self):
+        r = self.first()
+        if r: self.launch(r.app)
+
+    def launch(self, app):
+        self.pop.popdown()
+        try: app.launch([], None)
+        except GLib.Error as e: print("[launcher] no se pudo abrir", app.get_id(), e, flush=True)
+
 class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
 
@@ -141,7 +191,7 @@ class Panel(Gtk.Application):
         LS.auto_exclusive_zone_enable(win); win.set_default_size(-1, 30)
         LS.set_keyboard_mode(win, LS.KeyboardMode.ON_DEMAND)         # que las ventanitas (popovers) reciban teclado al hacer clic
         bar = Gtk.CenterBox(); win.set_child(bar)
-        bar.set_start_widget(Gtk.Button(label="OweeLinux", css_classes=["launcher"]))
+        self.launcher = Launcher(); bar.set_start_widget(self.launcher.btn)
         self.clock = Gtk.Label(); bar.set_center_widget(self.clock)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
         self.widgets = load_widgets(right)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
