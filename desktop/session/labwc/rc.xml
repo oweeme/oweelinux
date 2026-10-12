@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <core><gap>4</gap></core>
+  <theme>
+    <name>Owee</name>
+    <cornerRadius>10</cornerRadius>
+    <font place="" name="Noto Sans" size="10"/>
+  </theme>
+  <!-- Botones de ventana: cerrar/maximizar/minimizar a la DERECHA (el icono a la izquierda) -->
+  <titlebar><layout>icon:iconify,max,close</layout><showTitle>yes</showTitle></titlebar>
+  <desktops number="4"/>
+  <keyboard>
+    <default />
+    <keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
+  </keyboard>
+  <mouse><default /></mouse>
+</labwc_config>

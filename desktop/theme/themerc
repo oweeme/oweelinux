@@ -1,0 +1,19 @@
+# Tema de ventanas de labwc con la paleta de OweeLinux (fondo #102019, teal #2A9D8F, coral #F06548, texto #EFF0F1)
+border.width: 1
+padding.height: 4
+window.active.border.color: #2A9D8F
+window.inactive.border.color: #1a3328
+window.active.title.bg.color: #102019
+window.inactive.title.bg.color: #16251f
+window.active.label.text.color: #EFF0F1
+window.inactive.label.text.color: #8fa39a
+window.active.button.unpressed.image.color: #EFF0F1
+window.inactive.button.unpressed.image.color: #8fa39a
+window.active.button.hover.image.color: #F06548
+menu.items.bg.color: #102019
+menu.items.text.color: #EFF0F1
+menu.items.active.bg.color: #2A9D8F
+menu.items.active.text.color: #102019
+osd.bg.color: #102019
+osd.border.color: #2A9D8F
+osd.label.text.color: #EFF0F1

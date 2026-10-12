@@ -1,0 +1,4 @@
+* { font-family: "Noto Sans"; font-size: 13px; }
+window#waybar { background: rgba(16,32,25,0.92); color: #EFF0F1; border-radius: 12px; }
+#custom-owee { background: #2A9D8F; color: #102019; border-radius: 8px; padding: 0 10px; margin: 3px 4px; }
+#clock, #network, #battery, #tray { padding: 0 10px; }

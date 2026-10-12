@@ -1,0 +1,6 @@
+{ "layer": "top", "position": "top", "height": 30, "margin-top": 6, "margin-left": 8, "margin-right": 8,
+  "modules-left": ["custom/owee"], "modules-center": ["clock"], "modules-right": ["tray", "network", "battery"],
+  "custom/owee": { "format": "OweeLinux" },
+  "clock": { "format": "{:%H:%M  %d %b}" },
+  "network": { "format-wifi": "{essid}", "format-ethernet": "red", "format-disconnected": "sin red" },
+  "battery": { "format": "{capacity}%" } }

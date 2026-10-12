@@ -1,0 +1,13 @@
+#!/bin/sh
+# Piezas de la sesión Lite. Se lanza desde /etc/xdg/labwc/autostart.
+# PANEL (python | waybar | none) y OWEE_PANEL_PATH (para iterar sin reconstruir la imagen) se pueden fijar en /etc/owee/panel.conf
+PANEL=python
+[ -f /etc/owee/panel.conf ] && . /etc/owee/panel.conf
+swaybg -c '#102019' -i /usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg -m fill &
+mako &
+case "$PANEL" in
+  python) python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > /tmp/owee-panel.log 2>&1 & ;;
+  waybar) waybar -c /etc/xdg/waybar/config.jsonc -s /etc/xdg/waybar/style.css > /tmp/owee-waybar.log 2>&1 & ;;
+  none) ;;
+esac
+wait

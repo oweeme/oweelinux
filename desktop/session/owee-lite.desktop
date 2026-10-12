@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=OweeLinux Lite (prototipo)
+Comment=Escritorio ligero experimental: labwc + panel en Python/GTK4
+Exec=/usr/libexec/owee/owee-session
+Type=Application
+DesktopNames=OweeLite

@@ -76,3 +76,37 @@ power-profiles-daemon, xdg-desktop-portal (+wlr/gtk).
 - **Medir siempre:** RAM (Pss), latencia de los componentes y tiempo de arranque de cada versión, comparando con Plasma y con Waybar.
 - **Probar con las mismas herramientas de la VM** (capturas, serie, inyección de fallos) en CI.
 - Si Python resulta pesado: mismo GTK4 con **Rust (`gtk4-rs`)** para el panel y Python solo para widgets y extensiones.
+
+## Resultado del prototipo de riesgos v0.0 (2026-10-12)
+Código en `desktop/`; medición con `tools/ostree-proto/lite-spike.py` (capturas en `docs/img/lite/`). VM de 3 GB con gráficos
+**por software**, una sola ejecución por variante, a ~1 minuto de entrar a la sesión. `usada` = `free -m`; Pss = memoria
+repartida entre los procesos que comparten bibliotecas.
+| Sesión | Memoria usada (total) | Procesos propios de la sesión (Pss) |
+|---|---|---|
+| **Plasma** (referencia) | **910 MB** | plasmashell 243, kwin_x11 117, kded6 60, Xorg 49, ksmserver 45, polkit-kde 33, portal 26, kioworker 10 ≈ 586 MB |
+| **Lite + panel en Python/GTK4** | **441 MB** | panel 42 (Rss 56), labwc 22, swaybg 2, mako 1 ≈ 67 MB |
+| **Lite + Waybar** | **453 MB** | waybar 27 (Rss 42), labwc 21, portal 15, swaybg 2, mako 1 ≈ 66 MB |
+El sistema base (kernel, systemd, NetworkManager, SDDM…) pesa ~375 MB en las tres. **Lite ahorra ~460 MB (≈ 50 %) frente a Plasma**
+en esta VM. El panel en Python cuesta **+15 MB** respecto a Waybar (42 frente a 27 MB de Pss), con reloj, red (NetworkManager,
+asíncrono) y batería (UPower); la diferencia en el total queda dentro del ruido de medida.
+
+**Respuestas a los riesgos de la tabla anterior:**
+| Riesgo | Resultado |
+|---|---|
+| ¿Python en el panel pesa demasiado? | **No**: 42 MB de Pss con `GSK_RENDERER=cairo`. **Reevaluar** cuando tenga bandeja, volumen y escritorios. |
+| ¿`layer-shell` funciona con labwc? | **Sí**, pero con Python exige `LD_PRELOAD` de `libgtk4-layer-shell.so.0` (si no, sale como ventana normal). `owee_panel.py` se relanza solo con la variable. |
+| ¿`pywayland` basta para listar ventanas? | **Para listarlas, sí**: con `ext-foreign-toplevel-list-v1` vio Konsole (título y `app_id`) en una sesión limpia. **Para activarlas o cerrarlas, no**: hace falta `wlr-foreign-toplevel-management`, cuyo XML **no está en Debian** (habría que incluirlo en el proyecto). |
+| ¿Botones de ventana a la derecha? | **Sí** (tema y `rc.xml` de labwc; ver capturas). |
+| ¿Esquinas redondeadas (`cornerRadius`)? | **No se aprecian** en las capturas con labwc 0.8.3; por revisar. |
+
+**Hallazgos de integración (todos arreglados o anotados):**
+1. `python3-pywayland` de Debian 13 **no declara** su dependencia `python3-cffi-backend` (sin ella ni importa) y **no trae ningún protocolo**: los enlaces se generan con `python3 -m pywayland.scanner` desde los XML de `wayland-protocols`.
+2. **Debian instala `waybar.service` y `mako.service`** (usuario) que arrancan solos con la sesión gráfica: la sesión Lite los enmascara (`overlay-lite.sh`).
+3. **`source` no exporta variables**: `owee-session` cargaba `/etc/owee/lite.env` sin exportarlas y `GSK_RENDERER=cairo`/`WLR_RENDERER=pixman` nunca llegaban a los procesos → el panel parecía pesar **152 MB** (GL por software) en vez de 42 MB, y labwc 122 MB en vez de 22 MB. Corregido con `set -a`.
+4. En la VM el renderizador GL **por software** de GTK4 cuesta ~87 MB por ventana (127 frente a 40 MB en una ventana mínima). Con GPU real **no se pagaría**: pendiente de medir en hardware, y de elegir el renderizador por defecto.
+5. Para comparar sesiones hay que **detener SDDM y el gestor de usuario** de la sesión anterior; si no, `plasmashell` y `waybar.service` siguen vivos y contaminan la medida.
+
+**Límites:** VM con gráficos por software; una sola ejecución; sin CPU ni latencia; el panel real tendrá más funciones; sin Nvidia.
+
+**Decisión provisional:** el panel en Python/GTK4 **pasa** la puerta de memoria y de integración; se mantiene como camino principal con Waybar de respaldo
+(`docs/FASES.md`, 4c ✅). Siguiente: v0.1 (sesión usable con piezas existentes), medir de nuevo con bandeja y volumen, y probar en hardware real.

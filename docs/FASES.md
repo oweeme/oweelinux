@@ -22,7 +22,7 @@ real. Los números de fase (F0…F9) son nombres, no el orden: este es el orden.
 | **3b** | **R: resiliencia de la sesión ante procesos desbocados** (ver F-R abajo) | Es un dolor real y reciente del autor: una compilación grande dejó una máquina colgada 10+ minutos y obligó a reiniciar sin guardar. No depende del hardware: se prueba en la VM | |
 | ✅ **4a** | **Firmware y microcódigo** en la imagen (WiFi, GPU, CPU): componente `non-free-firmware` de Debian | Sin esto no hay WiFi en muchas laptops (la imagen se construyó solo con `main`). Es una decisión de empaquetado, comprobable sin hardware | |
 | ✅ **4b** (parcial: falta HTTPS y antidegradación) | **Firma de las actualizaciones** (ostree con GPG) y luego HTTPS | Hoy las actualizaciones no se verifican: bloqueante de seguridad antes de cualquier uso fuera de la VM | |
-| **4c** | **Prototipo de riesgos del escritorio "Lite"** (v0.0 de `docs/ESCRITORIO.md`) | Es barato y decide si Python/GTK4 vale para el panel antes de invertir meses | |
+| ✅ **4c** | **Prototipo de riesgos del escritorio "Lite"** (resultado en `docs/ESCRITORIO.md`: Lite ≈ 441 MB frente a 910 MB de Plasma en la VM; panel Python +15 MB sobre Waybar) (v0.0 de `docs/ESCRITORIO.md`) | Es barato y decide si Python/GTK4 vale para el panel antes de invertir meses | |
 | 4 | F3e/F3f Nvidia y Secure Boot en la imagen real | La imagen real los necesita antes de tocar hardware | |
 | 5 | F5 instalar en disco real (primero un script, luego Calamares) | Sin instalación no se puede usar fuera de la VM | **M2: instalable** |
 | 6 | F4 Flatpak, cajas de desarrollo, Quadlet | Lo que lo vuelve útil a diario | **M3: usable a diario** |

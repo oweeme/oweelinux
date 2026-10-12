@@ -13,6 +13,7 @@ date +%T | sed 's/^/[inicio] /'
 "$HERE/build-rootfs-plasma.sh" "$R"; date +%T | sed 's/^/[rootfs] /'
 OWEE_TEST_USER=1 OWEE_HEALTH_STABLE=20 "$HERE/prepare-rootfs.sh" "$R" >/dev/null
 "$HERE/overlay-branding.sh" "$R" /work
+[ -x "$HERE/overlay-lite.sh" ] && "$HERE/overlay-lite.sh" "$R" /work
 rm -rf "$W/repo" "$W/pub" "$W/sysroot" "$W/disk.img"
 "$HERE/publish.sh" "$R" "$W" 1 | tail -1; date +%T | sed 's/^/[publicado] /'
 DISK_MIB=6200 "$HERE/build.sh" "$W" 2>&1 | grep -v -i "block count" | tail -2
