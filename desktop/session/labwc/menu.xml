@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Menú del escritorio de OweeLinux Lite (clic derecho sobre el fondo). Cópialo a ~/.config/labwc/menu.xml para cambiarlo. -->
+<openbox_menu>
+  <menu id="root-menu" label="">
+    <item label="Terminal"><action name="Execute" command="foot"/></item>
+    <item label="Archivos"><action name="Execute" command="dolphin"/></item>
+    <item label="Ajustes"><action name="Execute" command="systemsettings"/></item>
+    <separator/>
+    <item label="Cerrar sesión"><action name="Exit"/></item>
+    <item label="Reiniciar"><action name="Execute" command="systemctl reboot"/></item>
+    <item label="Apagar"><action name="Execute" command="systemctl poweroff"/></item>
+  </menu>
+</openbox_menu>

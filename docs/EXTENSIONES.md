@@ -83,6 +83,13 @@ Escribir filtra (nombre, nombre genérico y palabras clave), **Intro lanza la pr
 La lista se construye al abrir por primera vez, no al arrancar: no cuesta memoria si no se usa. Panel con el lanzador: 39 MB Pss.
 Prueba: `tools/ostree-proto/launcher-test.py` (ratón y teclado virtuales; captura en `docs/img/lite/lanzador-busqueda.png`).
 
+## Bandeja de apps (probado)
+El panel es el anfitrión del protocolo **StatusNotifierItem** (el que usan Qt/KDE, Electron, Telegram...): es dueño de `org.kde.StatusNotifierWatcher` y dibuja
+el icono de cada app (por nombre del tema o por `IconPixmap`). Clic izquierdo → `Activate`, clic derecho → `ContextMenu` (el menú lo dibuja la propia app);
+si la app muere, el icono desaparece solo; todas las llamadas D-Bus son asíncronas con 2 s de límite. Si la bandeja falla, el panel sigue sin ella.
+Pendiente: dibujar el menú `com.canonical.dbusmenu` y los iconos propios de OweeLinux. Prueba: `tools/ostree-proto/tray-test.py` con la app falsa `mock-sni.py`
+(6/6: aparece, Activate, ContextMenu, desaparece; panel 40 MB Pss). Código: `desktop/shell/owee_tray.py`.
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que

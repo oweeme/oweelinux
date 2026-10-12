@@ -28,6 +28,8 @@ popover scale trough { background: #2b4a3d; } popover scale highlight { backgrou
 popover calendar { background: transparent; color: #EFF0F1; border-color: #2b4a3d; }
 popover calendar:selected { background: #2A9D8F; color: #102019; }
 popover calendar.view, popover calendar button { color: #EFF0F1; background: transparent; }
+button.owee-tray { background: transparent; background-image: none; border: none; box-shadow: none; padding: 2px 4px; min-height: 0; min-width: 0; }
+button.owee-tray:hover { background: rgba(42,157,143,0.35); }
 menubutton.launcher > button { background: #2A9D8F; background-image: none; color: #102019; border: none; box-shadow: none; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; min-height: 0; }
 popover entry { background: #102019; color: #EFF0F1; border: 1px solid #2b4a3d; border-radius: 8px; box-shadow: none; }
 popover list, popover row { background: transparent; color: #EFF0F1; }
@@ -194,10 +196,14 @@ class Panel(Gtk.Application):
         self.launcher = Launcher(); bar.set_start_widget(self.launcher.btn)
         self.clock = Gtk.Label(); bar.set_center_widget(self.clock)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
+        try:                                           # la bandeja es opcional: si falla, el panel sigue sin ella
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from owee_tray import Tray
+            self.tray = Tray(); right.append(self.tray.box)
+        except Exception as e: print("[tray] desactivada:", e, flush=True)
         self.widgets = load_widgets(right)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
         self.tick(); GLib.timeout_add_seconds(1, self.tick)
         win.present()
-        if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), False)[1])
+        if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
         GLib.timeout_add_seconds(40, lambda: (mem("40 s tras abrir"), False)[1])
 
@@ -206,6 +212,9 @@ class Panel(Gtk.Application):
         for w in self.widgets:
             ok, r = w.btn.compute_bounds(win)
             if ok: out[w.name] = [int(r.get_x() + 8 + r.get_width() / 2), int(r.get_y() + 6 + r.get_height() / 2)]
+        for k, it in getattr(getattr(self, "tray", None), "items", {}).items():
+            ok, r = it.btn.compute_bounds(win)
+            if ok: out["tray"] = [int(r.get_x() + 8 + r.get_width() / 2), int(r.get_y() + 6 + r.get_height() / 2)]
         print("[layout] " + json.dumps(out), flush=True)
 
     def tick(self):
