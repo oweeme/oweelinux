@@ -99,3 +99,6 @@ slurp
 brightnessctl
 wl-clipboard
 locales
+wtype
+wf-recorder
+wlr-randr

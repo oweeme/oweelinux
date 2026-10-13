@@ -55,3 +55,9 @@ def set_values(items, reload=True):
         else: n.text = str(value)
     ET.indent(tree, space="  "); tmp = USER + ".tmp"; tree.write(tmp, encoding="utf-8", xml_declaration=True); os.replace(tmp, USER)
     if reload: reconfigure()
+
+
+def edit(fn, reload=True):
+    """Edición libre: fn(root) modifica el árbol del rc.xml de usuario (que se crea desde el de sistema si no existe); se guarda con escritura atómica y labwc recarga."""
+    tree = load(); fn(tree.getroot()); ET.indent(tree, space="  "); tmp = USER + ".tmp"; tree.write(tmp, encoding="utf-8", xml_declaration=True); os.replace(tmp, USER)
+    if reload: reconfigure()

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Apunta cuál es el escritorio virtual actual (labwc no lo cuenta a nadie): owee-desktop N|left|right.
+# Lo llaman los atajos de rc.xml junto a GoToDesktop; el panel lee el archivo para resaltar el escritorio activo.
+F="${XDG_RUNTIME_DIR:-/tmp}/owee-desktop"
+N=$(sed -n 's|.*<number>\([0-9]*\)</number>.*|\1|p' "${XDG_CONFIG_HOME:-$HOME/.config}/labwc/rc.xml" /etc/xdg/labwc/rc.xml 2>/dev/null | head -1); [ -n "$N" ] || N=4
+cur=$(cat "$F" 2>/dev/null); [ -n "$cur" ] || cur=1
+case "$1" in
+  left)  cur=$((cur - 1)); [ "$cur" -lt 1 ] && cur=$N ;;
+  right) cur=$((cur + 1)); [ "$cur" -gt "$N" ] && cur=1 ;;
+  ''|*[!0-9]*) ;;
+  *) cur=$1 ;;
+esac
+echo "$cur" > "$F.tmp" && mv "$F.tmp" "$F"

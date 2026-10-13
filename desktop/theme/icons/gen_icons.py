@@ -39,6 +39,7 @@ svg("owee-set-info", '<circle cx="12" cy="12" r="9"/>' + P("M12 11v5.5") + f'<ci
 svg("owee-set-update", P("M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3") + P("M18.5 3v4h-4M5.5 21v-4h4"))
 svg("owee-set-bluetooth", P("M7 7.5l10 9-5 4.5V3l5 4.5-10 9"))
 svg("owee-set-apps", ''.join(f'<rect x="{x}" y="{y}" width="6" height="6" rx="1.6"/>' for x in (4, 14) for y in (4, 14)))
+svg("owee-set-desktops", '<rect x="3" y="5" width="8" height="6" rx="1.6"/><rect x="13" y="5" width="8" height="6" rx="1.6"/><rect x="3" y="13" width="8" height="6" rx="1.6"/>' + '<rect x="13" y="13" width="8" height="6" rx="1.6" fill="%s" stroke="none"/>' % col)
 svg("owee-set-shortcuts", P("M12 3v18M3 12h18") + '<circle cx="12" cy="12" r="2.4"/>')
 svg("owee-set-language", '<circle cx="12" cy="12" r="9"/>' + P("M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"))
 # --- Calculadora (icono de la app y del historial)

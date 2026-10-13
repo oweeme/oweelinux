@@ -15,15 +15,15 @@ HIST = os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local
 DEBUG = os.environ.get("OWEE_CALC_DEBUG")                     # pruebas: anota el último resultado en un archivo
 CSS = """
 window.calc { background: @bg@; color: @fg@; }
-label.expr { font-size: 30pt; font-weight: 500; } label.expr.s24 { font-size: 24pt; } label.expr.s18 { font-size: 18pt; } label.expr.s14 { font-size: 14pt; }
-label.preview { font-size: 15pt; opacity: 0.6; }
+label.expr { font-size: 26pt; font-weight: 500; } label.expr.s24 { font-size: 21pt; } label.expr.s18 { font-size: 16pt; } label.expr.s14 { font-size: 12pt; }
+label.preview { font-size: 13pt; opacity: 0.6; }
 label.prev { font-size: 11pt; opacity: 0.5; }
-button.k { font-size: 17pt; border-radius: 999px; min-height: 52px; padding: 0; border: none; box-shadow: none; background-image: none; background: @key@; color: @fg@; }
+button.k { font-size: 15pt; border-radius: 999px; min-height: 42px; padding: 0; border: none; box-shadow: none; background-image: none; background: @key@; color: @fg@; }
 button.k:hover { background: @keyh@; }
 button.k.op { background: @opbg@; color: @accent@; font-weight: bold; } button.k.op:hover { background: @opbgh@; }
 button.k.eq { background: @accent@; color: @on@; font-weight: bold; } button.k.eq:hover { background: @accenth@; }
 button.k.clr { color: #F06548; font-weight: bold; }
-button.k.sci { font-size: 13pt; min-height: 40px; background: transparent; } button.k.sci:hover { background: @keyh@; }
+button.k.sci { font-size: 12pt; min-height: 34px; background: transparent; } button.k.sci:hover { background: @keyh@; }
 button.tool { background: transparent; background-image: none; border: none; box-shadow: none; color: @fg@; border-radius: 999px; min-width: 40px; min-height: 40px; padding: 0; } button.tool:hover { background: @keyh@; }
 menubutton.tool > button { background: transparent; background-image: none; border: none; box-shadow: none; color: @fg@; border-radius: 999px; min-width: 40px; min-height: 40px; padding: 0; } menubutton.tool > button:hover { background: @keyh@; }
 button.tool.on { background: @opbg@; color: @accent@; }
@@ -49,8 +49,8 @@ class Calc(Gtk.Application):
             self.load_history(); self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None) if owee_config else None
             if self.mon: self.mon.connect("changed", lambda *a: GLib.timeout_add(200, lambda: (self.restyle(), False)[1]))
         except Exception: pass
-        self.win = win = Gtk.ApplicationWindow(application=self, title="Calculadora", icon_name="owee-calc", default_width=360, default_height=640); win.add_css_class("calc")
-        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=10, margin_bottom=14, margin_start=14, margin_end=14); win.set_child(root)
+        self.win = win = Gtk.ApplicationWindow(application=self, title="Calculadora", icon_name="owee-calc", default_width=320, default_height=500); win.add_css_class("calc")
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=8, margin_bottom=12, margin_start=12, margin_end=12); win.set_child(root)
         bar = Gtk.Box(spacing=4); root.append(bar)
         self.sci_btn = Gtk.ToggleButton(label="f(x)", css_classes=["tool"]); self.sci_btn.connect("toggled", self.toggle_sci); bar.append(self.sci_btn)
         self.deg_btn = Gtk.Button(label="DEG", css_classes=["tool"]); self.deg_btn.connect("clicked", self.toggle_deg); bar.append(self.deg_btn)
@@ -66,7 +66,7 @@ class Calc(Gtk.Application):
         self.update(); win.present()
 
     def grid(self, rows, sci):
-        g = Gtk.Grid(row_spacing=8, column_spacing=8, row_homogeneous=True, column_homogeneous=True)
+        g = Gtk.Grid(row_spacing=6, column_spacing=6, row_homogeneous=True, column_homogeneous=True)
         for r, row in enumerate(rows):
             for c, t in enumerate(row):
                 b = Gtk.Button(label=t, css_classes=["k"], focusable=False, focus_on_click=False); b.set_hexpand(True)
@@ -170,12 +170,16 @@ class Calc(Gtk.Application):
         try: os.remove(HIST)
         except OSError: pass
     def fill_history(self):
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
-        if not self.history: box.append(Gtk.Label(label="Todavía no hay operaciones"))
-        for e, r in reversed(self.history[-12:]):
-            b = Gtk.Button(has_frame=False, child=Gtk.Label(label=f"{e} = {r}", xalign=1)); b.connect("clicked", lambda _b, r=r: (self.hpop.popdown(), self.use(r))); box.append(b)
-        clr = Gtk.Button(label="Borrar historial", css_classes=["k"], margin_top=6); clr.connect("clicked", lambda b: (self.clear_history(), self.hpop.popdown())); box.append(clr)
-        sc = Gtk.ScrolledWindow(child=box, min_content_height=min(60 + 36 * len(self.history), 320), min_content_width=260); self.hpop.set_child(sc)
+        """Ventanita del historial: lista (con desplazamiento solo si hay muchas operaciones) y el botón «Borrar» siempre visible debajo."""
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
+        lst = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        if not self.history: lst.append(Gtk.Label(label="Todavía no hay operaciones", margin_top=8, margin_bottom=8))
+        for e, r in reversed(self.history[-30:]):
+            b = Gtk.Button(has_frame=False, child=Gtk.Label(label=f"{e} = {r}", xalign=1)); b.connect("clicked", lambda _b, r=r: (self.hpop.popdown(), self.use(r))); lst.append(b)
+        sc = Gtk.ScrolledWindow(child=lst, propagate_natural_height=True, max_content_height=240, min_content_width=250, hscrollbar_policy=Gtk.PolicyType.NEVER); outer.append(sc)
+        if self.history:
+            clr = Gtk.Button(label="Borrar historial", css_classes=["k"]); clr.connect("clicked", lambda b: (self.clear_history(), self.hpop.popdown())); outer.append(clr)
+        self.hpop.set_child(outer)
     def use(self, r): self.expr = r; self.just_evaluated = False; self.update()
 
 if __name__ == "__main__": sys.exit(Calc().run(sys.argv))

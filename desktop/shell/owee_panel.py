@@ -32,6 +32,10 @@ popover scale trough { background: @line@; } popover scale highlight { backgroun
 popover calendar { background: transparent; color: @fg@; border-color: @line@; }
 popover calendar:selected, popover calendar label:selected, popover calendar .day-number:selected { background: @accent@; color: @on@; border-radius: 6px; }
 popover calendar.view, popover calendar button { color: @fg@; background: transparent; }
+button.owee-desk { background: transparent; background-image: none; border: none; box-shadow: none; color: @fg@; opacity: 0.55; min-width: 0; min-height: 0; padding: 1px 7px; border-radius: 999px; }
+button.owee-desk:hover { opacity: 1; background: @hover@; }
+button.owee-desk.on { opacity: 1; background: @accent@; color: @on@; font-weight: bold; }
+window.owee-corner, window.owee-corner > box { background: rgba(0,0,0,0.01); }
 button.owee-tray { background: transparent; background-image: none; border: none; box-shadow: none; padding: 2px 4px; min-height: 0; min-width: 0; }
 button.owee-tray:hover { background: @hover@; }
 button.owee-row { background: transparent; background-image: none; color: @fg@; border: none; box-shadow: none; border-radius: 8px; padding: 6px 10px; min-width: 200px; }
@@ -271,7 +275,11 @@ class Panel(Gtk.Application):
         LS.auto_exclusive_zone_enable(win); win.set_default_size(-1, 30)
         LS.set_keyboard_mode(win, LS.KeyboardMode.ON_DEMAND)         # que las ventanitas (popovers) reciban teclado al hacer clic
         bar = Gtk.CenterBox(); win.set_child(bar)
-        self.launcher = Launcher(); bar.set_start_widget(self.launcher.btn)
+        self.launcher = Launcher(); left = Gtk.Box(spacing=4); left.append(self.launcher.btn); bar.set_start_widget(left)
+        try:
+            from owee_desktops import DesktopSwitcher, Corners
+            self.desks = DesktopSwitcher(); left.append(self.desks.box); self.corners = Corners(self, self.corner_action); self.corners.set_actions(owee_config.load().get("corners", {}))
+        except Exception as e: print("[escritorios] desactivados:", e, flush=True)
         self.clock = Clock(); bar.set_center_widget(self.clock.btn)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
         try:                                           # la bandeja es opcional: si falla, el panel sigue sin ella
@@ -286,8 +294,21 @@ class Panel(Gtk.Application):
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
         GLib.timeout_add_seconds(40, lambda: (mem("40 s tras abrir"), False)[1])
 
+    def corner_action(self, name):
+        """Acciones de las esquinas activas (Ajustes → Escritorios)."""
+        import owee_desktops
+        if name == "overview": owee_desktops.overview()
+        elif name == "launcher": self.launcher.btn.popup()
+        elif name == "calendar": self.clock.btn.popup()
+        elif name == "next": owee_desktops.go(owee_desktops.current() % owee_desktops.desktop_count() + 1)
+        elif name == "prev": owee_desktops.go((owee_desktops.current() - 2) % owee_desktops.desktop_count() + 1)
+        elif name == "lock": Gio.Subprocess.new(["swaylock", "-f", "-c", "102019"], Gio.SubprocessFlags.NONE)
+        elif name == "capture": Gio.Subprocess.new(["/usr/libexec/owee/apps/capturadora/owee_capture.py"], Gio.SubprocessFlags.NONE)
+
     def apply_settings(self):
-        pal = owee_config.palette(owee_config.load())
+        cfg = owee_config.load()
+        if hasattr(self, "corners"): self.corners.set_actions(cfg.get("corners", {}))
+        pal = owee_config.palette(cfg)
         self.prov.load_from_data(css_for(pal))
         Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])       # iconos propios; el resto cae a breeze/Adwaita/hicolor
 

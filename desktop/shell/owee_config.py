@@ -2,7 +2,7 @@
 {"mode": "dark"|"light", "accent": "#RRGGBB", "wallpaper": "/ruta/imagen", "clock_hours": "24"|"12", "clock_seconds": bool, "clock_date": bool}. Si falta o está dañado se usan los valores de fábrica (nunca falla)."""
 import json, os
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True}
+DEFAULTS = {"mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
 ACCENTS = [("Teal", "#2A9D8F"), ("Coral", "#F06548"), ("Azul", "#3B82C4"), ("Violeta", "#8B6FD6"), ("Dorado", "#D9A441"), ("Verde", "#5BA85B")]
 
 def load():
@@ -14,6 +14,7 @@ def load():
         if len(a) == 7 and a[0] == "#": int(a[1:], 16); d["accent"] = a
         if isinstance(j.get("wallpaper"), str): d["wallpaper"] = j["wallpaper"]
         if str(j.get("clock_hours")) in ("12", "24"): d["clock_hours"] = str(j["clock_hours"])           # reloj del panel (página Fecha y hora)
+        if isinstance(j.get("corners"), dict): d["corners"] = {k: str(v) for k, v in j["corners"].items() if k in ("tl", "tr", "bl", "br")}
         for k in ("clock_seconds", "clock_date"):
             if isinstance(j.get(k), bool): d[k] = j[k]
     except (OSError, ValueError, AttributeError): pass

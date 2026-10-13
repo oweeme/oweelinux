@@ -11,7 +11,7 @@ from gi.repository import Gtk, Gio, GLib, Gdk
 import owee_config
 from ajustes.base import Page
 
-PAGES = ["apariencia", "fondo", "pantalla", "sonido", "teclado", "raton", "energia", "fechahora", "aplicaciones", "atajos", "actualizaciones", "acerca"]
+PAGES = ["apariencia", "fondo", "escritorios", "pantalla", "sonido", "teclado", "raton", "energia", "fechahora", "aplicaciones", "atajos", "actualizaciones", "acerca"]
 GROUPS = ["Personal", "Dispositivos", "Sistema"]
 CSS = b"""
 .swatch { min-width: 34px; min-height: 34px; border-radius: 999px; padding: 0; border: 3px solid transparent; }
