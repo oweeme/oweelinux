@@ -50,6 +50,8 @@ class Teclado(Page):
             b.append(Gtk.Label(label=_("Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio."), xalign=0, wrap=True, css_classes=["dim-label"]))
             for name, text, _langs in av:
                 sw = Gtk.Switch(active=name in on); sw.connect("notify::active", lambda w, _p, n=name: self.toggle_method(n, w.get_active())); b.append(row(text, sw))
+            act = Gtk.Switch(active=metodos.active_by_default()); act.connect("notify::active", lambda w, _p: metodos.write_profile(self.cur[0].split("(")[0] if self.cur and self.cur[0] else "us", metodos.enabled(), active=w.get_active()))
+            b.append(row(_("Escribir con el método activo desde el principio"), act, _("Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee")))
         return scrolled(b)
 
     def toggle_method(self, name, active):

@@ -19,4 +19,9 @@ for es, en in en_cat.items():
     if o: roman[es] = o; script[es] = to_script(o); hits += 1
 json.dump(roman, open(os.path.join(out, "qow.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 json.dump(script, open(os.path.join(out, "qow@owee.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+# Lista de textos de la interfaz SIN traducción (etiquetas cortas): el autor del idioma decide la palabra y la añade a ui_glosario.tsv (columnas en, es, owee)
+pend = [(en_cat[k], k) for k in en_cat if k not in roman and len(k) <= 40 and "{" not in k and "%" not in k and not k.startswith(("[", "`")) and len(k.split()) <= 5 and k.strip() and en_cat[k] != k]
+with open(os.path.join(RAIZ, "docs", "glosario-owee-pendiente.tsv"), "w", encoding="utf-8") as f:
+    f.write("en\tes\towee\n"); f.write("".join(f"{e}\t{k}\t\n" for e, k in sorted(pend, key=lambda x: x[0].lower())))
+print(f"{len(pend)} etiquetas sin traducir → docs/glosario-owee-pendiente.tsv")
 print(f"{hits} de {len(en_cat)} cadenas de la interfaz tienen traducción en el glosario de Owee → {out}/qow.json y qow@owee.json")

@@ -349,5 +349,7 @@
 "Coreano": "Корейская",
 "Ucraniano": "Украинская",
 "Métodos de escritura": "Способы ввода",
-"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "Для набора текста на китайском, японском, корейском или Owee. Переключение между способами — Ctrl + Пробел."
+"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "Для набора текста на китайском, японском, корейском или Owee. Переключение между способами — Ctrl + Пробел.",
+"Escribir con el método activo desde el principio": "Печатать с включённым способом ввода с самого начала",
+"Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Без этого нужно нажать Ctrl + Пробел, чтобы начать ввод с пиньинь, Mozc или Owee"
 }

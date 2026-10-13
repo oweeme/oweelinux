@@ -349,5 +349,7 @@
 "Coreano": "韓国語",
 "Ucraniano": "ウクライナ語",
 "Métodos de escritura": "入力方式",
-"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "中国語・日本語・韓国語・Owee で入力するための設定です。入力方式は Ctrl + スペース で切り替えます。"
+"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "中国語・日本語・韓国語・Owee で入力するための設定です。入力方式は Ctrl + スペース で切り替えます。",
+"Escribir con el método activo desde el principio": "最初から入力方式を有効にして入力する",
+"Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "オフの場合は、Ctrl + スペース を押してからピンイン・Mozc・Owee で入力します"
 }

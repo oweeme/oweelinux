@@ -66,7 +66,7 @@ Name=Modo presentación
 Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --present
 EOD
 # Apps de KDE que OweeLinux reemplaza con las propias: se ocultan del lanzador (siguen instaladas por si otra app las llama)
-for f in org.kde.kcalc.desktop org.kde.spectacle.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
+for f in org.kde.kcalc.desktop org.kde.spectacle.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
 # ---- Idiomas: catálogos de la interfaz, locales del sistema, fuentes y teclados (docs/EXTENSIONES.md → Idiomas)
 install -d "$R/usr/share/owee/i18n"; cp "$D"/i18n/*.json "$R/usr/share/owee/i18n/"
 for l in es_ES en_US pt_BR fr_FR de_DE ru_RU zh_CN ja_JP; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
@@ -92,6 +92,11 @@ if ls "$OWEE_DEBS"/*.deb >/dev/null 2>&1; then
   for p in "$OWEE_DEBS"/*.deb; do dpkg-deb -x "$p" "$R"; done
   chroot "$R" localedef -i qow_BO -f UTF-8 qow_BO.UTF-8 2>/dev/null || echo "(aviso: sin locale qow_BO)"
   python3 "$D/../tools/i18n/build_owee_catalog.py" "$OWEE_SRC" "$R/usr/share/owee/i18n" || echo "(aviso: sin catálogos de Owee)"
+  # Cifras Owee (owee-numerals): la fuente se instala, pero la regla que las impone a TODO el sistema NO (la activa Ajustes → Idioma solo con «Owee (Owee Script)», por usuario)
+  install -Dm0644 "$OWEE_SRC/08_Integracion/linux/fontconfig/60-owee-numerals.conf" "$R/usr/share/owee/fontconfig/60-owee-numerals.conf"
+  rm -f "$R/etc/fonts/conf.d/60-owee-numerals.conf" "$R/usr/etc/fonts/conf.d/60-owee-numerals.conf"
+  # Catálogos de Owee para las apps ya instaladas (KDE, GTK…): LANGUAGE=qow:es / qow@owee:qow:es; lo que el glosario no cubre se ve en español
+  python3 "$OWEE_SRC/08_Integracion/herramientas/gettext_rellenar.py" --origen "$R/usr/share/locale/es/LC_MESSAGES" --salida "$R/usr/share/locale" | head -2 || echo "(aviso: sin catálogos de apps en Owee)"
 else echo "(aviso: sin paquetes de Owee: el idioma Owee no estará disponible)"; fi
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'

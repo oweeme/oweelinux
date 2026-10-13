@@ -8,6 +8,8 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gdk, Gio, GLib
 import calc_engine as eng
+import calc_owee as ow
+import owee_i18n
 from owee_i18n import _
 try: import owee_config
 except Exception: owee_config = None
@@ -25,12 +27,21 @@ button.k.op { background: @opbg@; color: @accent@; font-weight: bold; } button.k
 button.k.eq { background: @accent@; color: @on@; font-weight: bold; } button.k.eq:hover { background: @accenth@; }
 button.k.clr { color: #F06548; font-weight: bold; }
 button.k.sci { font-size: 12pt; min-height: 34px; background: transparent; } button.k.sci:hover { background: @keyh@; }
+button.k label.kname { font-size: 8pt; opacity: 0.75; font-weight: normal; } button.k.owee { min-height: 50px; } button.k label.kmain { font-size: 17pt; }
+label.read { font-size: 10pt; opacity: 0.8; color: @accent@; }
 button.tool { background: transparent; background-image: none; border: none; box-shadow: none; color: @fg@; border-radius: 999px; min-width: 40px; min-height: 40px; padding: 0; } button.tool:hover { background: @keyh@; }
 menubutton.tool > button { background: transparent; background-image: none; border: none; box-shadow: none; color: @fg@; border-radius: 999px; min-width: 40px; min-height: 40px; padding: 0; } menubutton.tool > button:hover { background: @keyh@; }
 button.tool.on { background: @opbg@; color: @accent@; }
 popover > contents { background: @pop@; color: @fg@; border: 1px solid @accent@; border-radius: 12px; }
 popover row { border-radius: 8px; } popover row:hover { background: @keyh@; }
 """
+OWEE = owee_i18n.LANG in ("qow", "qow@owee")                  # idioma Owee: nombres de cifras y operaciones, lectura en voz alta y (con Owee Script) cifras en glifos
+SCRIPT = owee_i18n.LANG == "qow@owee"
+# Disposición del modo Owee (la del proyecto del idioma): 7 8 9 como en un teclado numérico, y bajo cada tecla su nombre
+OWEE_BASIC = [["AC", "(", ")", "÷"], ["7", "8", "9", "×"], ["4", "5", "6", "−"], ["1", "2", "3", "+"], ["0", ".", "⌫", "="]]
+NAMES = {"÷": "faku", "×": "kebu", "−": "dopo", "+": "dapa", "=": "se", ".": "doto"}
+NAMES.update({str(i): n for i, n in enumerate(ow.NOMBRES)})
+def show(t): return ow.glifos(t) if SCRIPT else t            # lo que se ve (el motor y el portapapeles usan siempre cifras normales)
 BASIC = [["AC", "⌫", "%", "÷"], ["7", "8", "9", "×"], ["4", "5", "6", "−"], ["1", "2", "3", "+"], ["±", "0", ".", "="]]
 SCI = [["sin(", "cos(", "tan(", "ln("], ["log(", "√(", "π", "e"], ["^", "(", ")", "!"]]
 
@@ -61,8 +72,9 @@ class Calc(Gtk.Application):
         self.prev = Gtk.Label(xalign=1, css_classes=["prev"], ellipsize=3); disp.append(self.prev)
         self.expr_l = Gtk.Label(xalign=1, css_classes=["expr"], ellipsize=1, selectable=False); disp.append(self.expr_l)
         self.preview = Gtk.Label(xalign=1, css_classes=["preview"]); disp.append(self.preview)
+        self.read_l = Gtk.Label(xalign=1, css_classes=["read"], ellipsize=3, visible=OWEE); disp.append(self.read_l)            # lectura en Owee (solo idioma Owee)
         self.sci_grid = self.grid(SCI, True); self.sci_rev = Gtk.Revealer(child=self.sci_grid, transition_type=Gtk.RevealerTransitionType.SLIDE_UP); root.append(self.sci_rev)
-        root.append(self.grid(BASIC, False))
+        root.append(self.grid(OWEE_BASIC if OWEE else BASIC, False))
         ctl = Gtk.EventControllerKey(); ctl.set_propagation_phase(Gtk.PropagationPhase.CAPTURE); ctl.connect("key-pressed", self.on_key); win.add_controller(ctl)       # captura: Intro no debe activar el botón con foco
         self.update(); win.present()
 
@@ -70,7 +82,13 @@ class Calc(Gtk.Application):
         g = Gtk.Grid(row_spacing=6, column_spacing=6, row_homogeneous=True, column_homogeneous=True)
         for r, row in enumerate(rows):
             for c, t in enumerate(row):
-                b = Gtk.Button(label=t, css_classes=["k"], focusable=False, focus_on_click=False); b.set_hexpand(True)
+                b = Gtk.Button(css_classes=["k"], focusable=False, focus_on_click=False); b.set_hexpand(True)
+                if OWEE and not sci:
+                    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER); b.add_css_class("owee")
+                    box.append(Gtk.Label(label=show(t) if t.isdigit() else t, css_classes=["kmain"]))
+                    if t in NAMES: box.append(Gtk.Label(label=NAMES[t], css_classes=["kname"]))
+                    b.set_child(box)
+                else: b.set_label(show(t) if (SCRIPT and t.isdigit()) else t)
                 if sci: b.add_css_class("sci")
                 elif t in "÷×−+": b.add_css_class("op")
                 elif t == "%": b.add_css_class("op")
@@ -120,18 +138,21 @@ class Calc(Gtk.Application):
         if not self.expr: return
         res, err = eng.calc(self.expr, self.degrees)
         if err: self.preview.set_text(err); return
-        self.prev.set_text(self.expr + " ="); self.add_history(self.expr, res); self.expr = res.replace("e+", "×10^").replace("e-", "×10^−") if "e" in res else res
+        self.prev.set_text(show(self.expr) + " ="); self.add_history(self.expr, res); self.expr = res.replace("e+", "×10^").replace("e-", "×10^−") if "e" in res else res
         self.just_evaluated = True; self.update()
         if DEBUG: open(DEBUG, "w").write(res)
 
     def update(self):
-        self.expr_l.set_text(self.expr or "0"); n = len(self.expr)
+        self.expr_l.set_text(show(self.expr or "0")); n = len(self.expr)
         self.expr_l.set_css_classes(["expr"] + ([] if n <= 10 else ["s24"] if n <= 16 else ["s18"] if n <= 26 else ["s14"]))   # letra más pequeña cuando crece, como en el móvil
         text = ""
         if not self.just_evaluated and self.expr and self.expr[-1] not in "÷×−+^(.":
             res, err = eng.calc(self.expr, self.degrees)
             if res and res != self.expr: text = res
-        self.preview.set_text(text)
+        self.preview.set_text(show(text))
+        if OWEE:                                                                            # lectura: del resultado si ya se calculó, si no de lo que se escribe
+            lectura = ow.leer_valor(self.expr) if self.just_evaluated else (ow.leer_expr(self.expr) if self.expr else "")
+            self.read_l.set_text(lectura or "")
         if DEBUG: open(DEBUG + ".expr", "w").write(self.expr)
 
     def toggle_sci(self, b): self.sci_rev.set_reveal_child(b.get_active()); (b.add_css_class if b.get_active() else b.remove_css_class)("on")
@@ -176,7 +197,7 @@ class Calc(Gtk.Application):
         lst = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         if not self.history: lst.append(Gtk.Label(label=_("Todavía no hay operaciones"), margin_top=8, margin_bottom=8))
         for e, r in reversed(self.history[-30:]):
-            b = Gtk.Button(has_frame=False, child=Gtk.Label(label=f"{e} = {r}", xalign=1)); b.connect("clicked", lambda _b, r=r: (self.hpop.popdown(), self.use(r))); lst.append(b)
+            b = Gtk.Button(has_frame=False, child=Gtk.Label(label=f"{show(e)} = {show(r)}", xalign=1)); b.connect("clicked", lambda _b, r=r: (self.hpop.popdown(), self.use(r))); lst.append(b)
         sc = Gtk.ScrolledWindow(child=lst, propagate_natural_height=True, max_content_height=240, min_content_width=250, hscrollbar_policy=Gtk.PolicyType.NEVER); outer.append(sc)
         if self.history:
             clr = Gtk.Button(label=_("Borrar historial"), css_classes=["k"]); clr.connect("clicked", lambda b: (self.clear_history(), self.hpop.popdown())); outer.append(clr)

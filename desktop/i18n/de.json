@@ -349,5 +349,7 @@
 "Coreano": "Koreanisch",
 "Ucraniano": "Ukrainisch",
 "Métodos de escritura": "Eingabemethoden",
-"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "Zum Schreiben auf Chinesisch, Japanisch, Koreanisch oder Owee. Zwischen den Methoden wechselt man mit Strg + Leertaste."
+"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "Zum Schreiben auf Chinesisch, Japanisch, Koreanisch oder Owee. Zwischen den Methoden wechselt man mit Strg + Leertaste.",
+"Escribir con el método activo desde el principio": "Mit aktiver Eingabemethode von Anfang an schreiben",
+"Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Ohne dies muss man Strg + Leertaste drücken, um mit Pinyin, Mozc oder Owee zu schreiben"
 }

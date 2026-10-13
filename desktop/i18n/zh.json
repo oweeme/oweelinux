@@ -349,5 +349,7 @@
 "Coreano": "韩语",
 "Ucraniano": "乌克兰语",
 "Métodos de escritura": "输入法",
-"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "用于输入中文、日文、韩文或 Owee。用 Ctrl + 空格 在输入法之间切换。"
+"Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "用于输入中文、日文、韩文或 Owee。用 Ctrl + 空格 在输入法之间切换。",
+"Escribir con el método activo desde el principio": "从一开始就使用输入法输入",
+"Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "不开启时，需要按 Ctrl + 空格 才能开始用拼音、Mozc 或 Owee 输入"
 }

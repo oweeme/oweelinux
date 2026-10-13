@@ -12,6 +12,21 @@ import owee_i18n
 from owee_i18n import _
 from .base import Page, page_box, scrolled, heading, row, dropdown, run, config_home
 from . import teclado, metodos
+import shutil
+
+NUM_RULE_SRC = ["/usr/share/owee/fontconfig/60-owee-numerals.conf", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "i18n", "60-owee-numerals.conf")]
+NUM_RULE = os.path.join(config_home(), "fontconfig", "conf.d", "60-owee-numerals.conf")
+ACTIVE_LANGS = ("zh", "ja", "qow", "qow@owee")             # idiomas cuyo método de escritura se activa desde el principio (como el pinyin en un equipo chino)
+
+def set_numerals(on):
+    """Cifras Owee Script (0-9) en todas las apps SOLO con el idioma «Owee (Owee Script)»: regla de fontconfig del usuario (se lee al abrir cada app). En otros idiomas se quita."""
+    if on:
+        src = next((p for p in NUM_RULE_SRC if os.path.exists(p)), None)
+        if src and any(os.path.exists(p) for p in ("/usr/share/fonts/truetype/owee-numerals/OweeNumerals-Regular.ttf",)):
+            os.makedirs(os.path.dirname(NUM_RULE), exist_ok=True); shutil.copyfile(src, NUM_RULE)
+    else:
+        try: os.remove(NUM_RULE)
+        except OSError: pass
 
 LAYOUT_FOR = {"es": "latam", "en": "us", "pt": "br", "fr": "fr", "de": "de", "ru": "us,ru", "zh": "us", "ja": "jp", "qow": "us", "qow@owee": "us"}
 
@@ -50,7 +65,8 @@ class Idioma(Page):
         env = teclado.read_env()
         if env.get("XKB_DEFAULT_LAYOUT", "us") in ("us", "latam", "es", "br", "pt", "fr", "de", "it", "gb", "jp", "ru", "us,ru"):
             teclado.write_env({"XKB_DEFAULT_LAYOUT": lay, "XKB_DEFAULT_VARIANT": "", "XKB_DEFAULT_OPTIONS": "grp:alt_shift_toggle" if "," in lay else ""})
-        metodos.write_profile(lay, methods)
+        metodos.write_profile(lay, methods, active=code in ACTIVE_LANGS and len(methods) > 0)
+        set_numerals(code == "qow@owee")
         self.app.change(lang=code)                                    # el panel vigila settings.json y se reinicia con el idioma nuevo
         self.note.set_text(_("Idioma cambiado. Reiniciando esta ventana…"))
         from . import rcxml; rcxml.reconfigure()

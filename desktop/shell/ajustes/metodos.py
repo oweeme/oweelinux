@@ -21,10 +21,18 @@ def read_items():
     items = [(int(m.group(1)), m.group(2).strip()) for m in re.finditer(r"\[Groups/0/Items/(\d+)\]\s*\nName=([^\n]+)", txt)]
     return [n for _i, n in sorted(items)]
 
-def write_profile(layout, methods):
+CONFIG = os.path.join(config_home(), "fcitx5", "config")
+
+def active_by_default():
+    """¿El método de escritura está activo desde el principio (sin pulsar Ctrl + Espacio)?"""
+    try: return "ActiveByDefault=True" in open(CONFIG).read()
+    except OSError: return False
+
+def write_profile(layout, methods, active=None):
     """Escribe el perfil: primero el teclado normal con la distribución actual y luego los métodos pedidos. Fcitx5 NO relee el perfil en marcha (`fcitx5-remote -r` solo recarga la
     configuración) y al salir reescribe el archivo con lo que tiene en memoria: por eso primero se le pide salir, luego se escribe el perfil y por último se vuelve a lanzar."""
     from gi.repository import Gio, GLib
+    if active is None: active = active_by_default()
     first = "keyboard-" + (layout or "us").split(",")[0]
     names = [first] + [m for m in methods if m != first]
     out = f"[Groups/0]\nName=Default\nDefault Layout={(layout or 'us').split(',')[0]}\nDefaultIM={first}\n\n"
@@ -32,8 +40,9 @@ def write_profile(layout, methods):
     out += "[GroupOrder]\n0=Default\n"
     def write_and_start(*_a):
         os.makedirs(os.path.dirname(PROFILE), exist_ok=True); tmp = PROFILE + ".tmp"; open(tmp, "w").write(out); os.replace(tmp, PROFILE)
+        tmp = CONFIG + ".tmp"; open(tmp, "w").write("[Behavior]\nActiveByDefault=" + ("True" if active and len(names) > 1 else "False") + "\n"); os.replace(tmp, CONFIG)
         if have("fcitx5"):
-            try: Gio.Subprocess.new(["fcitx5", "-d"], Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE)
+            try: Gio.Subprocess.new(["env", "FCITX_NO_WAYLAND_DIAGNOSE=1", "fcitx5", "-d"], Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE)
             except GLib.Error: pass
         return False
     def running():

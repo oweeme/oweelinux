@@ -19,6 +19,20 @@ Se toma del proyecto del idioma (<https://github.com/oweeme/owee>, del mismo aut
 `fonts-owee`, `fcitx5-owee` y `owee-locale`; `tools/i18n/build_owee_catalog.py` genera `qow.json` y `qow@owee.json` a partir de su **glosario de interfaz** (`ui_glosario.tsv`).
 Una cadena solo se traduce si coincide **entera** con el glosario: hoy 27 de 351; el resto se ve en español. No se inventa vocabulario: para ampliar Owee hay que aprobar términos en el proyecto del idioma.
 
+## Escribir en Owee (como el pinyin en chino)
+Con un idioma que tiene método de escritura (chino, japonés, Owee) Ajustes activa el método **desde el principio** (`ActiveByDefault` de Fcitx5): se escribe en romano y se ve en Owee Script, sin pulsar Ctrl + Espacio
+(Ctrl + Espacio sigue alternando con el teclado normal). Las apps GTK y Qt usan el protocolo nativo de Wayland, así que **no** se fijan `GTK_IM_MODULE` ni `QT_IM_MODULE` (con ellas Fcitx5 muestra «Wayland Diagnose»).
+Fcitx5 no relee su perfil en marcha: Ajustes le pide salir, espera, escribe el perfil y lo vuelve a lanzar. **Teclado → Métodos de escritura** activa o quita cada método y el modo «activo desde el principio».
+
+## Calculadora y cifras en Owee
+Con el idioma **Owee** la Calculadora usa la disposición del proyecto del idioma (7 8 9 arriba) con el nombre bajo cada tecla (cho, be, du, ga, fo, sa, ku, mu, na, she; faku, kebu, dopo, dapa, se, doto) y una **lectura en voz alta**
+del número o la operación («ga tanu ga» = 33); con «Owee (Owee Script)» las cifras salen en glifos. `calc_owee.py` es un port de `calculadora.js` del proyecto del idioma (comprobado igual en 226 números).
+Con «Owee (Owee Script)» Ajustes también activa por usuario la regla de **cifras Owee** (fuente `owee-numerals`, `~/.config/fontconfig/conf.d/60-owee-numerals.conf`): reloj, calendario y apps muestran sus números en Owee; en cualquier otro idioma se quita.
+
+## Apps ajenas en Owee
+`gettext_rellenar.py` (del proyecto del idioma) genera, al construir la imagen, catálogos `qow` y `qow@owee` para las apps instaladas a partir del glosario (`/usr/share/locale/qow*/`): con el idioma Owee las apps de KDE/GTK muestran en Owee lo que el glosario cubre y el resto en español.
+**Glosario:** `docs/glosario-owee-pendiente.tsv` lista las etiquetas de la interfaz de OweeLinux que aún no tienen palabra en Owee (columnas en, es, owee); al aprobarlas en `ui_glosario.tsv` del proyecto del idioma, aparecen en la siguiente construcción.
+
 ## Añadir o corregir un idioma
 1. `owee_i18n.LANGS`: añade `(código, nombre en su idioma, locale)`; `overlay-lite.sh`: añade el locale a la lista de `localedef`; `owee-session`: una línea en el `case`.
 2. Traducciones: `tools/i18n/tr/t*.py` (una tupla por texto; el orden de idiomas está en `tools/i18n/build_catalogs.py`) y `python3 tools/i18n/build_catalogs.py`.
