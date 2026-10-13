@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+# Aplica la configuración de pantalla guardada por Ajustes (~/.config/owee/display.json) al iniciar sesión: resolución, escala y rotación de cada monitor.
+import json, os, subprocess
+p = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "display.json")
+try: d = json.load(open(p))
+except (OSError, ValueError): raise SystemExit(0)
+for name, c in d.items():
+    subprocess.run(["wlr-randr", "--output", name, "--mode", c["mode"], "--scale", str(c["scale"]), "--transform", c["transform"]], timeout=10, check=False)

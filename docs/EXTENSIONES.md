@@ -97,14 +97,27 @@ el panel solo muestra el número junto al icono. El botón de sesión (a la dere
 Lección: la imagen **no traía el cargador de SVG** (`librsvg2-common`), así que ningún icono SVG se dibujaba (tampoco los de KDE); ahora está en `packages-plasma.txt`.
 Prueba: `tools/ostree-proto/image-lite-test.py` sobre la imagen completa (capturas `imagen-sesion*.png`). El panel sube a ~47 MB Pss con los iconos.
 
-## Ajustes de OweeLinux (probado, v0.1)
-App propia `owee_settings.py` (Python + GTK4, sin libadwaita) con **Apariencia** (modo claro/oscuro y 6 colores de acento) y **Fondo de pantalla** (miniaturas de las carpetas
-de fondos + «Elegir otra imagen…»). Escribe `~/.config/owee/settings.json` (se puede editar a mano; si falta o está dañado se usan los valores de fábrica).
-- El **panel vigila ese archivo** y cambia al instante (colores, texto sobre el acento claro/oscuro, y el tema de iconos `Owee` ↔ `Owee-Light`), sin reiniciar.
-- El fondo lo cambia `owee-wallpaper` (reinicia `swaybg`); al iniciar sesión se usa el elegido.
-- Apps GTK: `gtk-application-prefer-dark-theme` en `~/.config/gtk-{3,4}.0/settings.ini`; apps Qt/KDE: esquema Breeze/BreezeDark con `kwriteconfig` si existe (tomado al abrir la app de nuevo; **este último paso no está probado**).
-- Pendiente: color de acento en apps ajenas, tema de las ventanas de labwc (hoy fijo), tipografía propia, apariencia automática por hora, más ajustes (pantalla, teclado, red).
-Prueba: `tools/ostree-proto/settings-test.py` (clics reales en la VM: modo, acento, fondo; capturas `ajustes-*.png`).
+## Ajustes de OweeLinux (v0.2, probado en VM)
+Central de configuración propia (reemplaza a «Preferencias del sistema» de KDE, que en Lite funcionaba a medias): `desktop/shell/owee_settings.py` + un módulo por página en `desktop/shell/ajustes/`
+(contrato en `ajustes/base.py`; si una página falla al cargar, las demás siguen). Todo se aplica **con herramientas del sistema, sin bloquear la ventana** (órdenes asíncronas con tiempo límite) y se puede buscar por texto.
+| Página | Qué controla | Cómo |
+|---|---|---|
+| Apariencia | modo claro/oscuro, 6 acentos | `settings.json` (el panel cambia al instante); GTK `settings.ini`; Qt/KDE: esquema Breeze copiado a `kdeglobals` (las apps abiertas después lo toman) |
+| Fondo de pantalla | miniaturas + «Elegir otra imagen…» | `owee-wallpaper` (swaybg) |
+| Pantalla | resolución, escala, rotación, brillo | `wlr-randr` con **confirmación de 10 s y vuelta atrás automática**; guardado en `display.json` y aplicado al iniciar sesión (`owee-apply-display`); `brightnessctl` |
+| Sonido | salida/entrada por defecto, volumen, silencio | `wpctl` |
+| Teclado | distribución (hasta 2, Alt+Mayús), repetición | `~/.config/labwc/environment` + `labwc --reconfigure` (instantáneo) |
+| Ratón y touchpad | velocidad, aceleración, desplazamiento natural, tocar para clic, zurdos | `<libinput>` del `rc.xml` de usuario (parte de una copia del de sistema, conserva comentarios y atajos) |
+| Energía | perfil de rendimiento, bloqueo y suspensión por inactividad | `powerprofilesctl`; `power.json` → `owee-idle` (swayidle) |
+| Fecha y hora | reloj del panel (24/12 h, segundos, fecha), zona horaria | `settings.json`; `timedatectl` (pide permisos) |
+| Aplicaciones | app por defecto de cada tipo de archivo | Gio (`mimeapps.list`) |
+| Atajos de teclado | lista de atajos activos | solo lectura (se edita `rc.xml`) |
+| Actualizaciones | versión, estado «a prueba/estable», instalar y volver atrás | `owee-status`, `pkexec owee-update/owee-rollback` |
+| Acerca de | versión, equipo, memoria, kernel | `/proc`, `os-release` |
+Pruebas con clics reales: `tools/ostree-proto/ajustes-test.py` (13 comprobaciones: volumen, silencio, cambio de salida, teclado latam, desplazamiento natural, bloqueo a 1 min con swayidle,
+escala 150 % aplicada, **vuelta atrás automática**, y «Mantener» guardado). Capturas en `docs/img/lite/aj/`.
+**No probado / pendiente:** instalar actualizaciones y volver atrás desde la app (necesitan polkit: se arranca un agente de contraseña, falta la política y probarlo), zona horaria (polkit),
+brillo (la VM no tiene luz regulable), suspensión, Bluetooth, WiFi/red como página propia (hoy desde el widget del panel), usuarios y cuentas, impresoras, inicio automático de apps, tipografía.
 
 ## Lista de WiFi (probada con `nmcli` simulado)
 El widget de red muestra las 8 redes más fuertes (una por nombre), marca la conectada, las guardadas y las que piden clave. Conectar se lanza **aparte** (tarda más que el límite de 5 s del panel).

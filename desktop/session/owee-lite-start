@@ -5,6 +5,9 @@ PANEL=python
 [ -f /etc/owee/panel.conf ] && . /etc/owee/panel.conf
 /usr/libexec/owee/owee-wallpaper &
 mako &
+/usr/libexec/owee/owee-apply-display &           # resolución y escala guardadas en Ajustes
+/usr/libexec/owee/owee-idle &                    # bloqueo y suspensión por inactividad (Ajustes → Energía)
+for a in /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1; do [ -x "$a" ] && { "$a" & break; }; done   # ventana de contraseña para tareas de administrador
 case "$PANEL" in
   python) python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > /tmp/owee-panel.log 2>&1 & ;;
   waybar) waybar -c /etc/xdg/waybar/config.jsonc -s /etc/xdg/waybar/style.css > /tmp/owee-waybar.log 2>&1 & ;;

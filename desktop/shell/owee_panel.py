@@ -244,7 +244,9 @@ class Clock:
     def today(self): self.cal.select_day(GLib.DateTime.new_now_local())
 
     def tick(self):
-        n = GLib.DateTime.new_now_local(); self.label.set_text(f"{n.format('%H:%M')}   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}")
+        n = GLib.DateTime.new_now_local(); c = owee_config.load()                       # (lectura pequeña y rápida; así el cambio de formato se ve al instante)
+        hm = n.format("%I:%M" + (":%S" if c.get("clock_seconds") else "") + " %p") if str(c.get("clock_hours", "24")) == "12" else n.format("%H:%M" + (":%S" if c.get("clock_seconds") else ""))
+        self.label.set_text(hm + (f"   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}" if c.get("clock_date", True) else ""))
         if self.pop.get_visible():
             self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(f"{DIAS[n.get_day_of_week() - 1].capitalize()}, {n.get_day_of_month()} de {MESES[n.get_month() - 1]} de {n.get_year()}")
         return True

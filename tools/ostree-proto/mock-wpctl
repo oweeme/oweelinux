@@ -1,13 +1,46 @@
 #!/usr/bin/env python3
-# `wpctl` FALSO para pruebas (mismo formato de salida que el de WirePlumber): guarda volumen y silencio en /tmp.
+# `wpctl` FALSO para pruebas (mismo formato de salida que el de WirePlumber): guarda volúmenes, silencio y dispositivo por defecto en /tmp.
 # Se usa porque en la VM de pruebas el WirePlumber real acepta `set-volume` pero no cambia el volumen de una salida virtual.
 import os, sys
-S, M = "/tmp/mock-vol", "/tmp/mock-mute"
+T = "/tmp"
+def f(n): return os.path.join(T, "mock-" + n)
+def rw(n, default):
+    if not os.path.exists(f(n)): open(f(n), "w").write(default); os.chmod(f(n), 0o666)
+    return open(f(n)).read().strip()
+def put(n, v): open(f(n), "w").write(v); os.chmod(f(n), 0o666)
 a = sys.argv[1:]
-if not os.path.exists(S): open(S, "w").write("0.40"); os.chmod(S, 0o666)   # legible/escribible por cualquier usuario de la prueba
+kind = lambda t: "source" if "SOURCE" in t else "sink"            # @DEFAULT_AUDIO_SOURCE@ → micrófono; el resto → salida
+rw("vol", "0.40"); rw("source-vol", "0.80"); rw("default-sink", "47"); rw("default-source", "50")
 if a[:1] == ["get-volume"]:
-    print("Volume: " + open(S).read().strip() + (" [MUTED]" if os.path.exists(M) else ""))
+    k = kind(a[1]); print("Volume: " + rw("vol" if k == "sink" else "source-vol", "0") + (" [MUTED]" if os.path.exists(f("mute" if k == "sink" else "source-mute")) else ""))
 elif a[:1] == ["set-volume"] and len(a) >= 3:
-    v = a[2]; v = float(v[:-1]) / 100 if v.endswith("%") else float(v); open(S, "w").write(f"{v:.2f}")
+    v = a[2]; v = float(v[:-1]) / 100 if v.endswith("%") else float(v); put("vol" if kind(a[1]) == "sink" else "source-vol", f"{v:.2f}")
 elif a[:1] == ["set-mute"]:
-    os.remove(M) if os.path.exists(M) else open(M, "w").close()
+    n = "mute" if kind(a[1]) == "sink" else "source-mute"; want = a[2] if len(a) > 2 else "toggle"
+    on = os.path.exists(f(n)); on = (not on) if want == "toggle" else want == "1"
+    (put(n, "") if on else (os.path.exists(f(n)) and os.remove(f(n))))
+elif a[:1] == ["set-default"]:
+    i = a[1]; put("default-sink" if i in ("47", "48") else "default-source", i)
+elif a[:1] == ["status"]:
+    ds, dsrc = rw("default-sink", "47"), rw("default-source", "50")
+    star = lambda i, d: "*" if i == d else " "
+    print(f"""PipeWire 'pipewire-0' [1.4.2, owee@test, cookie:1]
+ └─ Clients:
+        32. WirePlumber                         [1.4.2, owee, pid:900]
+
+Audio
+ ├─ Devices:
+ │      45. Audio interno                       [alsa]
+ │
+ ├─ Sinks:
+ │  {star("47", ds)}   47. Altavoces internos                    [vol: {rw("vol", "0.40")}]
+ │  {star("48", ds)}   48. Auriculares USB                       [vol: 1.00]
+ │
+ ├─ Sink endpoints:
+ │
+ ├─ Sources:
+ │  {star("50", dsrc)}   50. Micrófono interno                    [vol: {rw("source-vol", "0.80")}]
+ │  {star("51", dsrc)}   51. Micrófono USB                        [vol: 1.00]
+ │
+ └─ Streams:
+""")
