@@ -68,7 +68,7 @@ Vienen con la imagen en `/usr/share/owee/widgets/` y son **widgets de script nor
 (los de demostración están en `widgets-ejemplos/`). Para modificar uno basta copiarlo a `~/.config/owee/widgets/` con el **mismo nombre**: el del usuario gana.
 | Widget | Fuente | Clic |
 |---|---|---|
-| `10-red.py` | NetworkManager (`nmcli`) | estado de la conexión |
+| `10-red.py` | NetworkManager (`nmcli`) | datos de la conexión, interruptor WiFi y **lista de redes** (abiertas y guardadas con un clic; con clave: campo de contraseña + Intro) |
 | `20-volumen.py` | WirePlumber (`wpctl`) | deslizante de volumen y botón silenciar; sin audio se oculta |
 | `30-bateria.py` | `/sys/class/power_supply` | porcentaje y estado; sin batería se oculta |
 - `{"hidden": true}` en la salida oculta el widget (equipo sin batería o sin audio).
@@ -105,6 +105,11 @@ de fondos + «Elegir otra imagen…»). Escribe `~/.config/owee/settings.json` (
 - Apps GTK: `gtk-application-prefer-dark-theme` en `~/.config/gtk-{3,4}.0/settings.ini`; apps Qt/KDE: esquema Breeze/BreezeDark con `kwriteconfig` si existe (tomado al abrir la app de nuevo; **este último paso no está probado**).
 - Pendiente: color de acento en apps ajenas, tema de las ventanas de labwc (hoy fijo), tipografía propia, apariencia automática por hora, más ajustes (pantalla, teclado, red).
 Prueba: `tools/ostree-proto/settings-test.py` (clics reales en la VM: modo, acento, fondo; capturas `ajustes-*.png`).
+
+## Lista de WiFi (probada con `nmcli` simulado)
+El widget de red muestra las 8 redes más fuertes (una por nombre), marca la conectada, las guardadas y las que piden clave. Conectar se lanza **aparte** (tarda más que el límite de 5 s del panel).
+Nuevo tipo de elemento de ventanita: `{"type":"entry","password":true,"command":[...]}` (al pulsar Intro se llama al comando con el texto como último argumento).
+Prueba: `tools/ostree-proto/wifi-test.py` con `mock-nmcli` (la VM no tiene WiFi): clic en red abierta, red guardada, red con clave y apagar WiFi; **no está probado con una tarjeta WiFi real**.
 
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.

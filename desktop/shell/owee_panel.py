@@ -27,6 +27,7 @@ label.clock-big { font-size: 26pt; font-weight: bold; padding: 0; }
 popover label.clock-big { color: @fg@; }
 popover label.heading { color: @accent@; font-weight: bold; }
 popover button { background: @accent@; color: @on@; border: none; border-radius: 8px; box-shadow: none; }
+popover passwordentry, popover text { background: @entry@; color: @fg@; } popover passwordentry { border: 1px solid @line@; border-radius: 8px; padding: 2px 6px; }
 popover scale trough { background: @line@; } popover scale highlight { background: @accent@; } popover scale slider { background: @fg@; }
 popover calendar { background: transparent; color: @fg@; border-color: @line@; }
 popover calendar:selected, popover calendar label:selected, popover calendar .day-number:selected { background: @accent@; color: @on@; border-radius: 6px; }
@@ -66,7 +67,8 @@ class ScriptWidget:
       "popup": {"title": "...", "items": [...]}    ventanita que se abre al hacer clic; items:
           {"type":"label","text":"..."} · {"type":"button","text":"...","command":[...]} ·
           {"type":"slider","min":0,"max":100,"value":50,"command":[...]}  (se llama con el valor como último argumento) ·
-          {"type":"calendar"} · {"type":"separator"}
+          {"type":"calendar"} · {"type":"separator"} ·
+          {"type":"entry","placeholder":"...","password":true,"command":[...]}  (al pulsar Intro se llama al comando con el texto como último argumento)
     Se ejecuta de forma asíncrona cada N segundos (comentario `owee-interval: N`), con límite de 5 s (`timeout` mata también
     a los procesos hijos); un fallo no afecta al panel (se muestra "⚠ nombre")."""
     def __init__(self, path, box):
@@ -121,7 +123,10 @@ class ScriptWidget:
         if spec.get("title"): box.append(Gtk.Label(label=spec["title"], xalign=0, css_classes=["heading"]))
         for it in spec.get("items", []):
             t = it.get("type")
-            if t == "label": box.append(Gtk.Label(label=it.get("text", ""), xalign=0))
+            if t == "label": box.append(Gtk.Label(label=it.get("text", ""), xalign=0, css_classes=[it["class"]] if it.get("class") else []))
+            elif t == "entry":                                           # campo de texto (p. ej. contraseña de WiFi): al pulsar Intro se llama al comando con el texto como último argumento
+                e = Gtk.PasswordEntry(placeholder_text=it.get("placeholder", ""), show_peek_icon=True) if it.get("password") else Gtk.Entry(placeholder_text=it.get("placeholder", ""))
+                e.connect("activate", lambda w, c=it.get("command", []): (self.act(c, [w.get_text()]), self.pop.popdown())); e.set_size_request(260, -1); box.append(e)
             elif t == "separator": box.append(Gtk.Separator())
             elif t == "calendar": box.append(Gtk.Calendar())
             elif t == "button":

@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+# `nmcli` FALSO para pruebas del widget de red (mismo formato terso que NetworkManager): un WiFi conectado, otras redes y las órdenes recibidas en /tmp/nm.log.
+import os, sys
+a = sys.argv[1:]; R = "/tmp/nm-radio-off"
+def log(t): open("/tmp/nm.log", "a").write(t + "\n"); os.chmod("/tmp/nm.log", 0o666)
+if a[:1] == ["radio"]:
+    if len(a) == 3: (open(R, "w").close() if a[2] == "off" else os.path.exists(R) and os.remove(R)); log("radio " + a[2])
+    else: print("disabled" if os.path.exists(R) else "enabled")
+elif a[:4] == ["-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device"]: print("wlan0:wifi:connected:OweeCasa\nlo:loopback:unmanaged:")
+elif a[:2] == ["-g", "IP4.ADDRESS"]: print("192.168.1.23/24")
+elif a[:2] == ["-t", "-f"] and "IN-USE,SSID,SIGNAL,SECURITY" in a: print("*:OweeCasa:72:WPA2\n:CafeLibre:55:\n:Vecino_5G:48:WPA2\n:Oficina\\:Piso2:30:WPA2")
+elif a[:2] == ["-t", "-f"] and "NAME,TYPE" in a: print("OweeCasa:802-11-wireless\nOficina\\:Piso2:802-11-wireless")
+elif a[:3] == ["device", "wifi", "rescan"]: log("rescan")
+elif a[:3] == ["connection", "up", "id"]: log("up " + a[3])
+elif a[:3] == ["device", "wifi", "connect"]: log("connect " + " ".join(a[3:]))
