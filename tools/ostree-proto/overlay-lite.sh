@@ -38,8 +38,35 @@ Icon=owee-calc
 Categories=Utility;Calculator;
 Keywords=calculadora;suma;matemáticas;
 EOD
+# Capturadora propia (reemplaza a Spectacle): capturas con editor, vídeo con audio y cámara, modo presentación
+for f in owee_capture.py core.py editor.py overlay.py camera.py; do install -Dm0755 "$D/apps/capturadora/$f" "$R/usr/libexec/owee/apps/capturadora/$f"; done
+install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-capture.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-capture.svg"
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-capture.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Capturadora
+GenericName=Captura y grabación de pantalla
+Comment=Capturas con editor, grabación de vídeo con audio y cámara, modo presentación
+Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py
+Icon=owee-capture
+Categories=Utility;AudioVideo;Recorder;
+Keywords=captura;pantalla;grabar;video;screenshot;recorder;
+Actions=Shot;Region;Record;Present;
+[Desktop Action Shot]
+Name=Capturar pantalla completa
+Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --shot full
+[Desktop Action Region]
+Name=Capturar una zona
+Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --shot region
+[Desktop Action Record]
+Name=Grabar pantalla
+Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --record full
+[Desktop Action Present]
+Name=Modo presentación
+Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --present
+EOD
 # Apps de KDE que OweeLinux reemplaza con las propias: se ocultan del lanzador (siguen instaladas por si otra app las llama)
-for f in org.kde.kcalc.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
+for f in org.kde.kcalc.desktop org.kde.spectacle.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

@@ -102,3 +102,8 @@ locales
 wtype
 wf-recorder
 wlr-randr
+ffmpeg
+gstreamer1.0-gtk4
+gir1.2-gstreamer-1.0
+v4l-utils
+libnotify-bin

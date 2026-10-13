@@ -38,8 +38,13 @@
     <keybind key="W-Up"><action name="ToggleMaximize"/></keybind>
     <keybind key="W-Left"><action name="SnapToEdge"><direction>left</direction></action></keybind>
     <keybind key="W-Right"><action name="SnapToEdge"><direction>right</direction></action></keybind>
-    <keybind key="Print"><action name="Execute" command="sh -c 'mkdir -p ~/Imágenes/Capturas &amp;&amp; grim ~/Imágenes/Capturas/captura-$(date +%Y%m%d-%H%M%S).png'"/></keybind>
-    <keybind key="S-Print"><action name="Execute" command="sh -c 'mkdir -p ~/Imágenes/Capturas &amp;&amp; grim -g &quot;$(slurp)&quot; ~/Imágenes/Capturas/captura-$(date +%Y%m%d-%H%M%S).png'"/></keybind>
+    <keybind key="Print"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --shot full"/></keybind>
+    <keybind key="S-Print"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --shot region"/></keybind>
+    <keybind key="C-Print"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py"/></keybind>
+    <keybind key="W-A-r"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --record full"/></keybind>
+    <keybind key="W-A-S-r"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --record region"/></keybind>
+    <keybind key="W-A-p"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --present"/></keybind>
+    <keybind key="W-A-c"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --camera"/></keybind>
     <keybind key="XF86AudioRaiseVolume"><action name="Execute" command="wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"/></keybind>
     <keybind key="XF86AudioLowerVolume"><action name="Execute" command="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"/></keybind>
     <keybind key="XF86AudioMute"><action name="Execute" command="wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"/></keybind>

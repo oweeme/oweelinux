@@ -12,7 +12,7 @@ def describe(act):
     n = act.get("name"); c = act.get("command", "")
     if n == "Execute":
         for key, txt in (("action org.oweelinux.PanelPrototype launcher", "Abrir el lanzador"), ("action org.oweelinux.PanelPrototype calendar", "Abrir el calendario"), ("foot", "Terminal"), ("dolphin", "Archivos"), ("swaylock", "Bloquear la pantalla"),
-                         ("grim -g", "Captura de una zona"), ("grim", "Captura de pantalla"), ("set-volume", "Volumen"), ("set-mute", "Silenciar"), ("brightnessctl", "Brillo")):
+                         ("owee_capture.py --shot region", "Captura de una zona"), ("owee_capture.py --shot full", "Captura de pantalla"), ("--record", "Grabar la pantalla (otra vez = parar)"), ("--present", "Modo presentación (dibujar)"), ("--camera", "Mostrar u ocultar la cámara"), ("owee_capture.py", "Capturadora"), ("grim -g", "Captura de una zona"), ("grim", "Captura de pantalla"), ("set-volume", "Volumen"), ("set-mute", "Silenciar"), ("brightnessctl", "Brillo")):
             if key in c: return txt + (" ↑" if "5%+" in c else " ↓" if "5%-" in c else "")
         return "Ejecutar: " + c[:40]
     return {"Close": "Cerrar ventana", "ToggleMaximize": "Maximizar / restaurar", "SnapToEdge": "Acoplar al lado", "NextWindow": "Siguiente ventana", "Exit": "Cerrar sesión"}.get(n, n)

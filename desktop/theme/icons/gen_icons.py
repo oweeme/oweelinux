@@ -45,6 +45,7 @@ svg("owee-set-language", '<circle cx="12" cy="12" r="9"/>' + P("M3 12h18M12 3c3 
 # --- Calculadora (icono de la app y del historial)
 open(os.path.join(out, "owee-calc.svg"), "w").write('''<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="8" y="4" width="48" height="56" rx="10" fill="#102019"/><rect x="14" y="10" width="36" height="14" rx="4" fill="#2A9D8F"/><g fill="#EFF0F1"><circle cx="21" cy="34" r="3.4"/><circle cx="32" cy="34" r="3.4"/><circle cx="43" cy="34" r="3.4"/><circle cx="21" cy="45" r="3.4"/><circle cx="32" cy="45" r="3.4"/><circle cx="21" cy="55" r="0"/></g><rect x="38" y="41" width="10" height="14" rx="5" fill="#F06548"/></svg>\n''')
 svg("owee-calc-history", P("M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4v4.5H8") + P("M12 7.5V12l3 2"))
+open(os.path.join(out, "owee-capture.svg"), "w").write('''<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="6" y="12" width="52" height="40" rx="9" fill="#102019"/><path d="M6 24V21a9 9 0 0 1 9-9h6M43 12h6a9 9 0 0 1 9 9v3M58 40v3a9 9 0 0 1-9 9h-6M21 52h-6a9 9 0 0 1-9-9v-3" fill="none" stroke="#2A9D8F" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="8" fill="#F06548"/></svg>\n''')
 # Logo de OweeLinux (el pez koi del autor, desktop/theme/branding): PNG de 32 px (basta para el panel y pesa poco en memoria; el original grande queda en branding/)
 import shutil
 os.makedirs(os.path.join(dest, "32x32", "apps"), exist_ok=True)

@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+"""Capturadora de OweeLinux: capturas de pantalla (con editor de anotaciones), grabación de vídeo (con audio del sistema y micrófono, y burbuja de cámara web) y modo
+presentación para dibujar sobre la pantalla. Reemplaza a Spectacle. Python + GTK4; las herramientas de fondo son grim, slurp, wf-recorder, pw-record y ffmpeg.
+Uso:  owee_capture.py                      ventana principal
+      owee_capture.py --shot [full|region] captura inmediata y abre el editor        --record [full|region]   empieza a grabar (de nuevo = parar)
+      owee_capture.py --present            modo presentación                            --camera                 burbuja de cámara"""
+import os, sys, time, subprocess
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+for p in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shell")): sys.path.append(p)
+_LS = "/usr/lib/x86_64-linux-gnu/libgtk4-layer-shell.so.0"                                      # layer-shell antes que libwayland (ver owee_panel.py)
+if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exists(_LS):
+    os.environ["LD_PRELOAD"] = (_LS + " " + os.environ.get("LD_PRELOAD", "")).strip(); os.execv(sys.executable, [sys.executable] + sys.argv)
+import gi
+gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
+from gi.repository import Gtk, Gdk, Gio, GLib, Gtk4LayerShell as LS
+import core
+try: import owee_config
+except Exception: owee_config = None
+import editor as ed
+import overlay as ov
+
+CSS = """
+window.cap { background: @bg@; color: @fg@; }
+.cap .title { font-weight: bold; font-size: 15pt; } .cap .big { font-size: 12pt; padding: 14px 10px; border-radius: 12px; background-image: none; border: none; box-shadow: none; background: @key@; color: @fg@; } .cap .big:hover { background: @keyh@; }
+.cap .go { background: @accent@; color: @on@; font-weight: bold; } .cap .rec { background: #F06548; color: #fff; font-weight: bold; }
+.cap .seg button { background: @key@; color: @fg@; border: none; box-shadow: none; background-image: none; border-radius: 8px; padding: 6px 18px; } .cap .seg button.on { background: @accent@; color: @on@; }
+.cap .setrow { padding: 6px 0; border-bottom: 1px solid alpha(@fg@, 0.1); }
+window.pill, window.pill > * { background: transparent; } .pillbox { background: rgba(16,32,25,0.94); border: 1px solid #F06548; border-radius: 999px; padding: 4px 10px; color: #EFF0F1; }
+.pillbox button { background: #F06548; color: #fff; border: none; border-radius: 999px; background-image: none; box-shadow: none; font-weight: bold; padding: 2px 12px; min-height: 0; } .pillbox button.alt { background: #2b4a3d; }
+.count { font-size: 80pt; font-weight: bold; color: #fff; text-shadow: 0 0 20px #000; }
+"""
+
+def colors():
+    if owee_config:
+        pal = owee_config.palette(owee_config.load()); light = pal["fg"].lower().startswith("#17"); a = pal["accent"]
+        return dict(bg="#F6F8F7" if light else "#102019", fg=pal["fg"], key="#E7EEEB" if light else "#1b3128", keyh="#D8E3DF" if light else "#264438", accent=a, on=pal["on"]), pal["icons"]
+    return dict(bg="#102019", fg="#EFF0F1", key="#1b3128", keyh="#264438", accent="#2A9D8F", on="#102019"), "Owee"
+
+class App(Gtk.Application):
+    def __init__(self):
+        super().__init__(application_id="org.oweelinux.Capture", flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
+        self.cfg = core.load_cfg(); self.rec = core.Recorder(); self.win = None; self.pill = None; self.cam = None; self.pres = None; self.tick_id = 0
+
+    def restyle(self):
+        col, icons = colors(); css = CSS
+        for k, v in col.items(): css = css.replace("@%s@" % k, v)
+        css = css.replace("alpha(@fg@, 0.1)", "rgba(128,128,128,0.2)")
+        if not hasattr(self, "prov"):
+            self.prov = Gtk.CssProvider(); Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        self.prov.load_from_string(css); Gtk.Settings.get_default().set_property("gtk-icon-theme-name", icons); Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", not col["fg"].lower().startswith("#17"))
+
+    def do_command_line(self, cl):
+        args = cl.get_arguments()[1:]; self.restyle(); self.hold_once()
+        def opt(name, default=None):
+            if name in args:
+                i = args.index(name); return args[i + 1] if i + 1 < len(args) and not args[i + 1].startswith("--") else default
+            return None
+        if "--shot" in args: self.do_shot(opt("--shot", "full") or "full")
+        elif "--record" in args:
+            if self.rec.running: self.stop_recording()
+            else: self.start_recording(opt("--record", "full") or "full")
+        elif "--present" in args: self.present_mode()
+        elif "--camera" in args: self.toggle_camera()
+        else: self.show_main()
+        return 0
+
+    def hold_once(self):
+        if not getattr(self, "_held", False): self._held = True; self.hold()
+
+    def quit_if_idle(self):
+        if not self.rec.running and not self.pres and not self.cam and not (self.win and self.win.get_visible()) and not [w for w in self.get_windows() if isinstance(w, ed.Editor)]:
+            self.release(); self._held = False
+
+    # --- ventana principal
+    def show_main(self):
+        if self.win: self.win.present(); return
+        w = self.win = Gtk.ApplicationWindow(application=self, title="Capturadora", icon_name="owee-capture", default_width=480, default_height=560); w.add_css_class("cap")
+        w.connect("close-request", lambda x: (setattr(self, "win", None), GLib.idle_add(self.quit_if_idle), False)[2])
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin_top=16, margin_bottom=16, margin_start=18, margin_end=18); w.set_child(root)
+        root.append(Gtk.Label(label="Capturadora", xalign=0, css_classes=["title"]))
+        seg = Gtk.Box(spacing=6, css_classes=["seg"]); self.b_img = Gtk.Button(label="Imagen"); self.b_vid = Gtk.Button(label="Vídeo"); seg.append(self.b_img); seg.append(self.b_vid); root.append(seg)
+        self.stack = Gtk.Stack(); root.append(self.stack); self.b_img.connect("clicked", lambda b: self.page("img")); self.b_vid.connect("clicked", lambda b: self.page("vid"))
+        self.stack.add_named(self.page_img(), "img"); self.stack.add_named(self.page_vid(), "vid")
+        root.append(Gtk.Box(vexpand=True)); foot = Gtk.Box(spacing=8); root.append(foot)
+        for label, fn in (("Abrir carpeta de capturas", lambda b: self.open_dir(core.DIR_IMG)), ("Abrir carpeta de grabaciones", lambda b: self.open_dir(core.DIR_VID))):
+            b = Gtk.Button(label=label, css_classes=["flat"]); b.connect("clicked", fn); foot.append(b)
+        self.msg = Gtk.Label(xalign=0, wrap=True, css_classes=["dim-label"]); root.append(self.msg)
+        self.page("img"); w.present()
+
+    def page(self, k):
+        self.stack.set_visible_child_name(k)
+        for b, kk in ((self.b_img, "img"), (self.b_vid, "vid")): (b.add_css_class if kk == k else b.remove_css_class)("on")
+
+    def row(self, label, widget, hint=""):
+        r = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, css_classes=["setrow"]); h = Gtk.Box(spacing=10); h.append(Gtk.Label(label=label, xalign=0, hexpand=True)); widget.set_valign(Gtk.Align.CENTER); h.append(widget); r.append(h)
+        if hint: r.append(Gtk.Label(label=hint, xalign=0, wrap=True, css_classes=["dim-label"]))
+        return r
+    def set(self, **kw): self.cfg.update(kw); core.save_cfg(self.cfg)
+    def sw(self, key, **kw):
+        s = Gtk.Switch(active=bool(self.cfg[key]), **kw); s.connect("notify::active", lambda w, _p: self.set(**{key: w.get_active()})); return s
+    def drop(self, key, opts):
+        dd = Gtk.DropDown.new_from_strings([t for _k, t in opts]); keys = [k for k, _t in opts]; cur = self.cfg[key]; dd.set_selected(keys.index(cur) if cur in keys else 0)
+        dd.connect("notify::selected", lambda w, _p: self.set(**{key: keys[w.get_selected()]})); return dd
+
+    def page_img(self):
+        b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        for label, mode, cls in (("🖵  Pantalla completa", "full", "go"), ("⬚  Seleccionar una zona", "region", "big")):
+            btn = Gtk.Button(label=label, css_classes=["big"] + (["go"] if cls == "go" else [])); btn.connect("clicked", lambda _b, m=mode: self.do_shot(m)); b.append(btn)
+        b.append(self.row("Temporizador", self.drop("timer", [(0, "Sin temporizador"), (3, "3 segundos"), (5, "5 segundos"), (10, "10 segundos")])))
+        b.append(self.row("Incluir el puntero del ratón", self.sw("cursor"))); b.append(self.row("Copiar al portapapeles", self.sw("clipboard")))
+        return b
+
+    def page_vid(self):
+        b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        for label, mode, cls in (("●  Grabar pantalla completa", "full", "rec"), ("⬚  Grabar una zona", "region", "big")):
+            btn = Gtk.Button(label=label, css_classes=["big"] + (["rec"] if cls == "rec" else [])); btn.connect("clicked", lambda _b, m=mode: self.start_recording(m)); b.append(btn)
+        sys_t, mic_t = core.audio_sources()
+        b.append(self.row("Fotogramas por segundo", self.drop("fps", [(15, "15"), (24, "24"), (30, "30"), (60, "60")])))
+        sw = self.sw("audio_system"); sw.set_sensitive(bool(sys_t)); b.append(self.row("Audio del sistema", sw, "" if sys_t else "No se detectó una salida de audio"))
+        sm = self.sw("audio_mic"); sm.set_sensitive(bool(mic_t)); b.append(self.row("Micrófono", sm, "" if mic_t else "No se detectó un micrófono"))
+        cs = self.sw("camera"); b.append(self.row("Mostrar mi cámara en la grabación", cs, "Una burbuja redonda que puedes arrastrar; la rueda cambia su tamaño"))
+        pb = Gtk.Button(label="✎  Modo presentación (dibujar en pantalla)", css_classes=["big"]); pb.connect("clicked", lambda _b: self.present_mode()); b.append(pb)
+        return b
+
+    def say(self, t):
+        if self.win and hasattr(self, "msg"): self.msg.set_text(t)
+        else: print("[capturadora]", t, flush=True)
+
+    def open_dir(self, d):
+        os.makedirs(d, exist_ok=True); Gio.AppInfo.launch_default_for_uri("file://" + d, None)
+
+    # --- capturas
+    def do_shot(self, mode):
+        geometry = None
+        if self.win: self.win.set_visible(False)
+        delay = 400                                                                     # tiempo para que la ventana desaparezca del todo
+        def go():
+            nonlocal geometry
+            if mode == "region":
+                geometry = core.select_region()
+                if not geometry: self.after_cancel(); return False
+            t = int(self.cfg["timer"])
+            if t: self.countdown(t, lambda: self.take(geometry))
+            else: GLib.timeout_add(150, lambda: (self.take(geometry), False)[1])
+            return False
+        GLib.timeout_add(delay, go)
+
+    def after_cancel(self):
+        if self.win: self.win.set_visible(True); self.win.present()
+        self.quit_if_idle()
+
+    def take(self, geometry):
+        def work(): return core.shot(geometry, cursor=bool(self.cfg["cursor"]))
+        def done(path, err):
+            if err: self.say(err); self.after_cancel(); return
+            if self.cfg["clipboard"]: core.copy_image(path)
+            ed.open_editor(self, path)
+            if self.win: self.win.set_visible(True); self.say("Guardada en " + path + (" y copiada al portapapeles" if self.cfg["clipboard"] else ""))
+        core.run_async(work, done)
+
+    def countdown(self, n, cb):
+        w = Gtk.Window(application=self, decorated=False); w.add_css_class("pill"); LS.init_for_window(w); LS.set_layer(w, LS.Layer.OVERLAY); LS.set_namespace(w, "owee-countdown"); LS.set_keyboard_mode(w, LS.KeyboardMode.NONE); LS.set_exclusive_zone(w, -1)
+        lab = Gtk.Label(label=str(n), css_classes=["count"]); w.set_child(lab); w.present(); left = [n]
+        def tick():
+            left[0] -= 1
+            if left[0] <= 0: w.close(); GLib.timeout_add(250, lambda: (cb(), False)[1]); return False
+            lab.set_text(str(left[0])); return True
+        GLib.timeout_add_seconds(1, tick)
+
+    # --- vídeo
+    def start_recording(self, mode):
+        if self.rec.running: return
+        if self.win: self.win.set_visible(False)
+        def go():
+            geometry = None
+            if mode == "region":
+                geometry = core.select_region()
+                if not geometry: self.after_cancel(); return False
+            def begin():
+                if self.cfg["camera"]: self.toggle_camera(force=True)
+                def work(): self.rec.start(geometry, int(self.cfg["fps"]), bool(self.cfg["audio_system"]), bool(self.cfg["audio_mic"])); return True
+                def done(_r, err):
+                    if err: self.say(err); self.close_cam(); self.after_cancel(); return
+                    self.show_pill()
+                core.run_async(work, done)
+            self.countdown(3, begin); return False
+        GLib.timeout_add(400, go)
+
+    def show_pill(self):
+        w = self.pill = Gtk.Window(application=self, decorated=False); w.add_css_class("pill"); LS.init_for_window(w); LS.set_layer(w, LS.Layer.OVERLAY); LS.set_namespace(w, "owee-rec"); LS.set_keyboard_mode(w, LS.KeyboardMode.NONE)
+        LS.set_anchor(w, LS.Edge.TOP, True); LS.set_anchor(w, LS.Edge.RIGHT, True); LS.set_margin(w, LS.Edge.TOP, 52); LS.set_margin(w, LS.Edge.RIGHT, 12)
+        box = Gtk.Box(spacing=8, css_classes=["pillbox"]); self.timer_l = Gtk.Label(label="●  00:00"); box.append(self.timer_l)
+        pen = Gtk.Button(label="✎", css_classes=["alt"], tooltip_text="Modo presentación (dibujar)"); pen.connect("clicked", lambda b: self.present_mode()); box.append(pen)
+        cam = Gtk.Button(label="📷", css_classes=["alt"], tooltip_text="Mostrar u ocultar la cámara"); cam.connect("clicked", lambda b: self.toggle_camera()); box.append(cam)
+        st = Gtk.Button(label="■ Detener"); st.connect("clicked", lambda b: self.stop_recording()); box.append(st); w.set_child(box); w.present()
+        self.tick_id = GLib.timeout_add_seconds(1, self.tick_pill)
+
+    def tick_pill(self):
+        if not self.rec.running: return False
+        s = self.rec.elapsed(); self.timer_l.set_text(f"●  {s // 60:02d}:{s % 60:02d}"); return True
+
+    def stop_recording(self):
+        if not self.rec.running: return
+        if self.pill: self.timer_l.set_text("Guardando…")
+        def done(path, err):
+            if self.pill: self.pill.close(); self.pill = None
+            self.close_cam()
+            if self.pres: self.pres.finish()
+            if err: self.say(err)
+            else:
+                self.say("Grabación guardada: " + path); self.notify("Grabación guardada", path)
+                if self.win: self.win.set_visible(True); self.win.present()
+            GLib.idle_add(self.quit_if_idle)
+        core.run_async(self.rec.stop, done)
+
+    def notify(self, title, body):
+        try: subprocess.Popen(["notify-send", "-i", "owee-capture", title, body], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except OSError: pass
+
+    # --- extras
+    def toggle_camera(self, force=False):
+        if self.cam: 
+            if not force: self.close_cam()
+            return
+        import camera
+        ok, why = camera.available()
+        if not ok: self.say("Cámara: " + why); self.notify("Cámara no disponible", why); return
+        self.cam = camera.Bubble(self); self.cam.start()
+    def close_cam(self):
+        if self.cam: self.cam.stop(); self.cam = None
+
+    def present_mode(self):
+        if self.pres: self.pres.finish(); return
+        if self.win: self.win.set_visible(False)
+        self.pres = ov.Overlay(self, on_close=lambda: (setattr(self, "pres", None), self.after_cancel() if not self.rec.running else None)); self.pres.present()
+
+if __name__ == "__main__": sys.exit(App().run(sys.argv))
