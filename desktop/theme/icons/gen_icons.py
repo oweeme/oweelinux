@@ -26,15 +26,15 @@ for lvl in (0, 20, 40, 60, 80, 100):
     shell = '<rect x="2.5" y="7" width="16" height="10" rx="2.2"/>' + P("M21 10.5v3")
     svg(f"owee-battery-{lvl}", shell + fill)
     svg(f"owee-battery-{lvl}-charging", shell + fill + '<path d="M11 8.6l-2.6 4h3.4l-2.6 4" stroke="#F06548" stroke-width="1.6"/>')
-# Logo de OweeLinux (el pez koi del autor, desktop/theme/branding): PNG de 256 px que GTK reduce al tamaño pedido (botón del lanzador)
+# Logo de OweeLinux (el pez koi del autor, desktop/theme/branding): PNG de 32 px (basta para el panel y pesa poco en memoria; el original grande queda en branding/)
 import shutil
-os.makedirs(os.path.join(dest, "256x256", "apps"), exist_ok=True)
-shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "branding", "owee-logo-256.png"), os.path.join(dest, "256x256", "apps", "owee-logo.png"))
+os.makedirs(os.path.join(dest, "32x32", "apps"), exist_ok=True)
+shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "branding", "owee-logo-32.png"), os.path.join(dest, "32x32", "apps", "owee-logo.png"))
 open(os.path.join(dest, "index.theme"), "w").write("""[Icon Theme]
 Name=Owee
 Comment=Iconos propios de OweeLinux (línea, redondeados)
 Inherits=breeze,Adwaita,hicolor
-Directories=scalable/actions,256x256/apps
+Directories=scalable/actions,32x32/apps
 
 [scalable/actions]
 Size=24
@@ -43,10 +43,10 @@ MaxSize=512
 Type=Scalable
 Context=Actions
 
-[256x256/apps]
-Size=256
+[32x32/apps]
+Size=32
 MinSize=16
-MaxSize=512
+MaxSize=64
 Type=Scalable
 Context=Applications
 """)
