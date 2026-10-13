@@ -6,7 +6,7 @@ Uso:  owee_capture.py                      ventana principal
       owee_capture.py --present            modo presentación                            --camera                 burbuja de cámara"""
 import os, sys, time, subprocess
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-for p in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shell")): sys.path.append(p)
+for p in (os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shell"), "/usr/libexec/owee"): sys.path.append(p)      # primero la carpeta del código fuente (desarrollo), después la instalada
 _LS = "/usr/lib/x86_64-linux-gnu/libgtk4-layer-shell.so.0"                                      # layer-shell antes que libwayland (ver owee_panel.py)
 if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exists(_LS):
     os.environ["LD_PRELOAD"] = (_LS + " " + os.environ.get("LD_PRELOAD", "")).strip(); os.execv(sys.executable, [sys.executable] + sys.argv)
@@ -33,8 +33,8 @@ window.pill, window.pill > * { background: transparent; } .pillbox { background:
 
 def colors():
     if owee_config:
-        pal = owee_config.palette(owee_config.load()); light = pal["fg"].lower().startswith("#17"); a = pal["accent"]
-        return dict(bg="#F6F8F7" if light else "#102019", fg=pal["fg"], key="#E7EEEB" if light else "#1b3128", keyh="#D8E3DF" if light else "#264438", accent=a, on=pal["on"]), pal["icons"]
+        pal = owee_config.palette(owee_config.load())
+        return dict(bg=pal["win"], fg=pal["fg"], key=pal["key"], keyh=pal["keyh"], accent=pal["accent"], on=pal["on"]), pal["icons"]
     return dict(bg="#102019", fg="#EFF0F1", key="#1b3128", keyh="#264438", accent="#2A9D8F", on="#102019"), "Owee"
 
 class App(Gtk.Application):
@@ -48,7 +48,7 @@ class App(Gtk.Application):
         css = css.replace("alpha(@fg@, 0.1)", "rgba(128,128,128,0.2)")
         if not hasattr(self, "prov"):
             self.prov = Gtk.CssProvider(); Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        self.prov.load_from_string(css); Gtk.Settings.get_default().set_property("gtk-icon-theme-name", icons); Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", not col["fg"].lower().startswith("#17"))
+        self.prov.load_from_string(css); Gtk.Settings.get_default().set_property("gtk-icon-theme-name", icons); Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", owee_config.palette(owee_config.load())["mode"] == "dark" if owee_config else True)
 
     def do_command_line(self, cl):
         args = cl.get_arguments()[1:]; self.restyle(); self.hold_once()
@@ -69,10 +69,17 @@ class App(Gtk.Application):
         if not getattr(self, "_held", False): self._held = True; self.hold()
 
     def quit_if_idle(self):
-        if not self.rec.running and not self.pres and not self.cam and not (self.win and self.win.get_visible()) and not [w for w in self.get_windows() if isinstance(w, ed.Editor)]:
+        if getattr(self, "pending_main", False): return
+        if not self.rec.running and not self.pres and not self.cam and not self.win and not [w for w in self.get_windows() if isinstance(w, ed.Editor)]:
             self.release(); self._held = False
 
     # --- ventana principal
+    def hide_main(self):
+        """Quita la ventana principal mientras se captura o graba. Se DESTRUYE y se vuelve a crear después: una ventana minimizada o escondida que reaparece pierde en labwc
+        su barra de título; una ventana nueva, no."""
+        if self.win: w, self.win = self.win, None; self.reopen = True; w.destroy()
+    def restore_main(self):
+        if getattr(self, "reopen", False): self.reopen = False; self.pending_main = True; GLib.timeout_add(300, lambda: (setattr(self, "pending_main", False), self.show_main(), False)[2])
     def show_main(self):
         if self.win: self.win.present(); return
         w = self.win = Gtk.ApplicationWindow(application=self, title="Capturadora", icon_name="owee-capture", default_width=480, default_height=560); w.add_css_class("cap")
@@ -87,6 +94,7 @@ class App(Gtk.Application):
             b = Gtk.Button(label=label, css_classes=["flat"]); b.connect("clicked", fn); foot.append(b)
         self.msg = Gtk.Label(xalign=0, wrap=True, css_classes=["dim-label"]); root.append(self.msg)
         self.page("img"); w.present()
+        if getattr(self, "last_msg", ""): self.msg.set_text(self.last_msg)
 
     def page(self, k):
         self.stack.set_visible_child_name(k)
@@ -124,6 +132,7 @@ class App(Gtk.Application):
         return b
 
     def say(self, t):
+        self.last_msg = t
         if self.win and hasattr(self, "msg"): self.msg.set_text(t)
         else: print("[capturadora]", t, flush=True)
 
@@ -133,7 +142,7 @@ class App(Gtk.Application):
     # --- capturas
     def do_shot(self, mode):
         geometry = None
-        if self.win: self.win.set_visible(False)
+        self.hide_main()
         delay = 400                                                                     # tiempo para que la ventana desaparezca del todo
         def go():
             nonlocal geometry
@@ -147,16 +156,16 @@ class App(Gtk.Application):
         GLib.timeout_add(delay, go)
 
     def after_cancel(self):
-        if self.win: self.win.set_visible(True); self.win.present()
-        self.quit_if_idle()
+        self.restore_main(); self.quit_if_idle()
 
     def take(self, geometry):
         def work(): return core.shot(geometry, cursor=bool(self.cfg["cursor"]))
         def done(path, err):
             if err: self.say(err); self.after_cancel(); return
             if self.cfg["clipboard"]: core.copy_image(path)
+            self.reopen = False                                                          # el editor es ahora el foco; la Capturadora se reabre desde el lanzador
             ed.open_editor(self, path)
-            if self.win: self.win.set_visible(True); self.say("Guardada en " + path + (" y copiada al portapapeles" if self.cfg["clipboard"] else ""))
+            self.say("Guardada en " + path + (" y copiada al portapapeles" if self.cfg["clipboard"] else ""))
         core.run_async(work, done)
 
     def countdown(self, n, cb):
@@ -171,7 +180,7 @@ class App(Gtk.Application):
     # --- vídeo
     def start_recording(self, mode):
         if self.rec.running: return
-        if self.win: self.win.set_visible(False)
+        self.hide_main()
         def go():
             geometry = None
             if mode == "region":
@@ -210,7 +219,7 @@ class App(Gtk.Application):
             if err: self.say(err)
             else:
                 self.say("Grabación guardada: " + path); self.notify("Grabación guardada", path)
-                if self.win: self.win.set_visible(True); self.win.present()
+                self.restore_main()
             GLib.idle_add(self.quit_if_idle)
         core.run_async(self.rec.stop, done)
 
@@ -232,7 +241,7 @@ class App(Gtk.Application):
 
     def present_mode(self):
         if self.pres: self.pres.finish(); return
-        if self.win: self.win.set_visible(False)
+        self.hide_main()
         self.pres = ov.Overlay(self, on_close=lambda: (setattr(self, "pres", None), self.after_cancel() if not self.rec.running else None)); self.pres.present()
 
 if __name__ == "__main__": sys.exit(App().run(sys.argv))

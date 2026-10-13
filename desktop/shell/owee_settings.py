@@ -27,6 +27,17 @@ CSS = b"""
 .ok { color: #2A9D8F; } .bad { color: #F06548; }
 scale highlight { background: @acc@; } switch:checked { background: @acc@; } switch:checked slider { background: @onacc@; }
 row.navrow:selected { background: @acc@; color: @onacc@; } row.navrow:selected image { color: @onacc@; }
+window.background, window.background > box, stack, scrolledwindow, viewport, list, row { background-color: @win@; color: @fg@; }
+list.navlist, list.navlist row { background-color: transparent; }
+entry, searchentry, passwordentry, text { background-color: @entry@; color: @fg@; border-color: @line@; }
+button { background-image: none; background-color: @key@; color: @fg@; border-color: transparent; box-shadow: none; } button:hover { background-color: @keyh@; }
+button.flat, button.modecard, button.thumb, button.swatch, .navrow { background-color: transparent; } button.modecard:hover, button.thumb:hover { background-color: @key@; }
+dropdown > button, dropdown > popover > contents, popover > contents, popover.menu > contents { background-color: @pop@; color: @fg@; border-color: @line@; }
+popover row:hover, popover row:selected { background-color: @key@; }
+switch { background-color: @line@; } separator { background-color: @line@; min-width: 1px; min-height: 1px; }
+label.dim-label { color: @dim@; opacity: 1; } .navgroup { color: @dim@; opacity: 1; }
+scale trough { background-color: @line@; }
+.card { background-color: @pop@; }
 """
 
 class App(Gtk.Application):
@@ -35,6 +46,9 @@ class App(Gtk.Application):
     def style(self):
         """CSS y tema de iconos de la propia app según modo y acento (los mismos del panel)."""
         pal = owee_config.palette(self.cfg); css = CSS.replace(b"@acc@", pal["accent"].encode()).replace(b"@onacc@", pal["on"].encode())
+        defs = owee_config.gtk_colors(pal)           # colores con nombre de GTK4: así TODA la ventana (fondos, campos, botones, listas) toma el tema elegido
+        for k in ("win", "fg", "pop", "entry", "key", "keyh", "line", "dim"): css = css.replace(("@%s@" % k).encode(), pal[k].encode())
+        css = ("".join(f"@define-color {k} {v};\n" for k, v in defs.items())).encode() + css
         self.prov.load_from_data(css); Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", self.cfg["mode"] == "dark")
         Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])
 
@@ -44,6 +58,7 @@ class App(Gtk.Application):
         for fn in self.listeners: fn(kw)
 
     def do_activate(self):
+        if self.get_active_window(): self.get_active_window().present(); return          # ya abierta (p. ej. segundo clic en el lanzador): solo se trae al frente
         self.prov = Gtk.CssProvider(); Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION); self.style()
         for name in PAGES:
             try: self.pages.append(importlib.import_module("ajustes." + name).PAGE)
@@ -56,7 +71,7 @@ class App(Gtk.Application):
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE, hexpand=True)
         side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=230)
         self.search = Gtk.SearchEntry(placeholder_text="Buscar ajustes…", margin_top=8, margin_start=8, margin_end=8, margin_bottom=4); side.append(self.search)
-        self.nav = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE); self.nav.set_filter_func(self.nav_filter); self.nav.set_header_func(None)
+        self.nav = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, css_classes=["navlist"]); self.nav.set_filter_func(self.nav_filter); self.nav.set_header_func(None)
         self.rows = []
         for g in GROUPS:
             ps = sorted((p for p in self.pages if p.group == g), key=lambda p: p.order)

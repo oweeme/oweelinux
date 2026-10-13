@@ -63,7 +63,7 @@ try:
     q = Qmp(); time.sleep(3)
     F = lambda cmd, k, t=30: sh(U + cmd, k, t) or ""
     ENV = "WAYLAND_DISPLAY=wayland-0 PATH=/tmp/mockbin:/usr/local/bin:/usr/bin:/bin "
-    CAP = "/usr/libexec/owee/apps/capturadora/owee_capture.py"
+    CAP = "python3 /tmp/apps/capturadora/owee_capture.py"
     vm.screenshot(os.path.join(out, "cap-0.png")); print("loginctl:", sh("loginctl list-sessions --no-legend | cut -c1-80; pgrep -c -x labwc", "LC", 30))
     F(ENV + f"sh -c 'nohup {CAP} --shot full > /tmp/cap.log 2>&1 &'", "S"); time.sleep(10); vm.screenshot(os.path.join(out, "cap-1-editor.png"))
     D = "/var/home/oweeuser/Imágenes/Capturas"; n = sh(f"ls {D}/*.png 2>/dev/null | wc -l", "N", 30) or ""; check("--shot full guarda una captura PNG", n.strip("|").strip() == "1", n)
@@ -97,8 +97,16 @@ try:
     VD = "/var/home/oweeuser/Vídeos/Grabaciones"
     vf = sh(f"ls -l {VD}/ 2>&1 | tail -2; ffprobe -v error -show_entries stream=codec_name,width,height,duration -of csv=p=0 {VD}/*.mp4 2>&1 | head -3", "VF", 60) or ""; print("video:", vf)
     check("la grabación produce un MP4 con vídeo h264", "h264" in vf, vf)
-    print("log rec:", sh("grep -v -i 'dconf\\|a11y' /tmp/rec.log /tmp/rec2.log | head -6 | cut -c1-220", "LR", 30))
+    print("log rec:", sh("grep -v -i 'dconf\\|a11y' /tmp/rec.log /tmp/rec2.log | tail -12 | cut -c1-260", "LR", 30))
     vm.screenshot(os.path.join(out, "cap-7-despues.png"))
+    sh("pkill -f owee_capture.py", "KK", 30); time.sleep(2)
+    open(srv + "/cfg2.json", "w").write(json.dumps({"camera": False, "audio_system": False, "audio_mic": False, "fps": 15}))
+    sh("curl -s http://10.0.2.2:8006/cfg2.json -o /var/home/oweeuser/.config/owee/capture.json; chown oweeuser:oweeuser /var/home/oweeuser/.config/owee/capture.json", "CF2", 30)
+    F(ENV + f"sh -c 'nohup {CAP} > /tmp/main2.log 2>&1 &'", "M2"); time.sleep(6)
+    q.click(551, 193); time.sleep(1); vm.screenshot(os.path.join(out, "cap-8a-video.png"))
+    q.click(640, 248); time.sleep(12); vm.screenshot(os.path.join(out, "cap-8b-grabando-gui.png"))        # cuenta atrás 3 s + grabando
+    F(ENV + f"sh -c 'nohup {CAP} --record full > /tmp/stop.log 2>&1 &'", "ST2"); time.sleep(12); vm.screenshot(os.path.join(out, "cap-8c-despues-de-grabar.png"))
+    nvid = sh(f"ls {VD}/*.mp4 | wc -l", "NV", 30) or ""; check("grabar desde la ventana (botón) y parar con el atajo deja un MP4", nvid.strip("|").strip().isdigit() and int(nvid.strip("|").strip()) >= 2, nvid)
 finally:
     vm.kill(); http.kill()
 print("PASA todo" if res and all(res) else "HAY FALLOS"); sys.exit(0 if res and all(res) else 1)

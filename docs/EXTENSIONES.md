@@ -134,6 +134,13 @@ Probado con clics reales: captura, editor (dibujar, guardar, copiar), presentaci
 (labwc no expone captura por ventana todavía) y pausa de grabación.
 **Escritorios virtuales:** puntos en el panel, Super+N, Super+Mayús+N, Ctrl+Alt+←/→, rueda sobre el fondo y esquinas activas (Ajustes → Escritorios); la «vista general» es el menú de ventanas de labwc (Super+Tab), sin miniaturas.
 
+## Temas de apariencia (probado en VM)
+Siete temas en `owee_config.THEMES` (Koi, Claro, Pizarra, Niebla, Crepúsculo, Arena, Medianoche): fondos suaves (nunca negro ni blanco puro), texto con contraste 11–15:1, cada uno con su acento (se puede cambiar).
+Al elegir uno, Ajustes → Apariencia escribe **todo** a partir de la misma paleta: el panel (instantáneo), `kdeglobals` (Qt/KDE: ventana, vistas, botones, selección, tooltips), `gtk.css` de GTK3/4 y libadwaita
+(`@define-color`), el tema de barras de título de labwc (`Owee-Tema`) y `gsettings color-scheme`. Las apps propias (Ajustes, Calculadora, Capturadora) usan la paleta directamente.
+Probado con Dolphin (tema Arena) y los siete temas en Ajustes. No probado: LibreOffice, Firefox y apps con tema propio.
+Capturadora: la ventana principal se cierra y se vuelve a crear tras capturar/grabar (si solo se oculta o minimiza, labwc la vuelve a mostrar sin barra de título).
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que

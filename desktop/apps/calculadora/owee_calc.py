@@ -3,7 +3,7 @@
 teclado completo (también Ctrl+C / Ctrl+V). Sigue el modo claro/oscuro y el color de acento de Ajustes. Python + GTK4; el cálculo está en calc_engine.py (sin eval)."""
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-for p in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shell")): sys.path.append(p)
+for p in (os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "shell"), "/usr/libexec/owee"): sys.path.append(p)      # primero la carpeta del código fuente (desarrollo), después la instalada
 import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gdk, Gio, GLib
@@ -34,16 +34,16 @@ BASIC = [["AC", "⌫", "%", "÷"], ["7", "8", "9", "×"], ["4", "5", "6", "−"]
 SCI = [["sin(", "cos(", "tan(", "ln("], ["log(", "√(", "π", "e"], ["^", "(", ")", "!"]]
 
 def colors():
-    pal = owee_config.palette(owee_config.load()) if owee_config else {"fg": "#EFF0F1", "accent": "#2A9D8F", "on": "#102019", "pop": "#16251f", "hover": "rgba(42,157,143,0.35)", "bg": "rgba(16,32,25,0.92)", "icons": "Owee"}
-    light = pal["fg"].lower().startswith("#17")
+    pal = owee_config.palette(owee_config.load()) if owee_config else None
+    if not pal: return dict(bg="#102019", fg="#EFF0F1", key="#1b3128", keyh="#264438", accent="#2A9D8F", accenth="#2A9D8F", on="#102019", opbg="rgba(42,157,143,0.18)", opbgh="rgba(42,157,143,0.30)", pop="#16251f"), "Owee"
     acc = pal["accent"]; r, g, b = (int(acc[i:i + 2], 16) for i in (1, 3, 5))
-    return dict(bg="#F6F8F7" if light else "#102019", fg=pal["fg"], key="#E7EEEB" if light else "#1b3128", keyh="#D8E3DF" if light else "#264438", accent=acc, accenth=acc, on=pal["on"],
-                opbg=f"rgba({r},{g},{b},0.18)", opbgh=f"rgba({r},{g},{b},0.30)", pop=pal["pop"]), pal["icons"]
+    return dict(bg=pal["win"], fg=pal["fg"], key=pal["key"], keyh=pal["keyh"], accent=acc, accenth=acc, on=pal["on"], opbg=f"rgba({r},{g},{b},0.18)", opbgh=f"rgba({r},{g},{b},0.30)", pop=pal["pop"]), pal["icons"]
 
 class Calc(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.Calculator"); self.expr = ""; self.degrees = True; self.history = []; self.just_evaluated = False
 
     def do_activate(self):
+        if self.get_active_window(): self.get_active_window().present(); return          # ya abierta: solo se trae al frente
         self.prov = Gtk.CssProvider(); Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION); self.restyle()
         try:
             self.load_history(); self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None) if owee_config else None
@@ -82,7 +82,7 @@ class Calc(Gtk.Application):
         col, icons = colors(); css = CSS
         for k, v in col.items(): css = css.replace("@%s@" % k, v)
         self.prov.load_from_string(css); Gtk.Settings.get_default().set_property("gtk-icon-theme-name", icons)
-        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", not col["fg"].lower().startswith("#17"))
+        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", owee_config.palette(owee_config.load())["mode"] == "dark" if owee_config else True)
 
     # --- lógica de teclas
     def press(self, t):
