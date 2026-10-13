@@ -76,6 +76,10 @@ try:
     vm.screenshot(os.path.join(out, "t-ventanas-claro.png"))
     A(497); time.sleep(2); q.click(1054, 236); time.sleep(1.5); q.click(1054, 322); time.sleep(2); q.click(1081, 291); time.sleep(3); vm.screenshot(os.path.join(out, "t-reloj.png"))
     cfg = F("cat /var/home/oweeuser/.config/owee/settings.json | tr -d ' \\n'", "C"); check("Fecha y hora: 12 h y segundos se guardan", '"clock_hours":"12"' in cfg and '"clock_seconds":true' in cfg, cfg)
+    time.sleep(1); q.click(975, 514); time.sleep(2)
+    for ch in ["l", "a", "shift-minus", "p", "a", "z"]: key(ch)
+    time.sleep(1.5); vm.screenshot(os.path.join(out, "t-zona.png")); q.click(917, 611); time.sleep(8)
+    tz = F("timedatectl show -p Timezone --value", "TZ"); check("Zona horaria: elegir La_Paz en la lista la cambia de verdad", "America/La_Paz" in tz, tz); time.sleep(4); vm.screenshot(os.path.join(out, "t-zona2.png"))
 finally:
     vm.kill(); http.kill()
 print("PASA todo" if res and all(res) else "HAY FALLOS"); sys.exit(0 if res and all(res) else 1)

@@ -20,6 +20,8 @@ class FechaHora(Page):
         if len(v) > 1: self.holder.append(row("Sincronizar la hora por internet", Gtk.Label(label="activado" if v[1] == "yes" else "desactivado")))
         self.msg = Gtk.Label(xalign=0); self.zones = Gtk.StringList()
         self.dd = Gtk.DropDown(model=self.zones, enable_search=True, expression=Gtk.PropertyExpression.new(Gtk.StringObject, None, "string"))
+        try: self.dd.set_search_match_mode(Gtk.StringFilterMatchMode.SUBSTRING)          # buscar «La_Paz» dentro de «America/La_Paz» (por defecto solo busca por el principio; GTK ≥ 4.12)
+        except AttributeError: pass
         self.dd.set_size_request(260, -1); self.cur_tz = tz; self.loading_tz = True
         self.holder.append(row("Cambiar zona horaria", self.dd, "Escribe para buscar (por ejemplo «La_Paz»). Pide la contraseña de administrador.")); self.holder.append(self.msg)
         self.dd.connect("notify::selected", self.on_pick)
