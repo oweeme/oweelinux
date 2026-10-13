@@ -1,0 +1,30 @@
+# Notificaciones de OweeLinux Lite (mako): mismo lenguaje visual que el panel (koi: fondo #102019, acento teal, texto #EFF0F1).
+# Para cambiarlas copia este archivo a ~/.config/mako/config. Cambiar de verdad se aplica con: makoctl reload
+font=Noto Sans 10
+width=360
+height=140
+margin=8,10
+padding=12,14
+border-radius=12
+border-size=1
+border-color=#2A9D8F
+background-color=#102019EE
+text-color=#EFF0F1
+progress-color=over #2A9D8F
+icon-border-radius=8
+max-icon-size=40
+default-timeout=6000
+layer=overlay
+anchor=top-right
+group-by=app-name
+
+[urgency=low]
+border-color=#2b4a3d
+default-timeout=4000
+
+[urgency=critical]
+border-color=#F06548
+default-timeout=0
+
+[mode=silencio]
+invisible=1

@@ -23,11 +23,13 @@ window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
 menubutton.owee-widget > button, menubutton.owee-widget > button label { background: transparent; background-image: none; color: @fg@; border: none; box-shadow: none; padding: 0 2px; min-height: 0; }
 menubutton.owee-widget > button:hover, menubutton.owee-widget > button:checked { background: @hover@; background-image: none; }
 popover > contents { background: @pop@; color: @fg@; border: 1px solid @accent@; border-radius: 12px; }
+label.clock-big { font-size: 26pt; font-weight: bold; padding: 0; }
+popover label.clock-big { color: @fg@; }
 popover label.heading { color: @accent@; font-weight: bold; }
 popover button { background: @accent@; color: @on@; border: none; border-radius: 8px; box-shadow: none; }
 popover scale trough { background: @line@; } popover scale highlight { background: @accent@; } popover scale slider { background: @fg@; }
 popover calendar { background: transparent; color: @fg@; border-color: @line@; }
-popover calendar:selected { background: @accent@; color: @on@; }
+popover calendar:selected, popover calendar label:selected, popover calendar .day-number:selected { background: @accent@; color: @on@; border-radius: 6px; }
 popover calendar.view, popover calendar button { color: @fg@; background: transparent; }
 button.owee-tray { background: transparent; background-image: none; border: none; box-shadow: none; padding: 2px 4px; min-height: 0; min-width: 0; }
 button.owee-tray:hover { background: @hover@; }
@@ -219,6 +221,29 @@ class PowerMenu:
         try: Gio.Subprocess.new(cmd, Gio.SubprocessFlags.NONE)
         except GLib.Error as e: print("[sesión] no se pudo ejecutar", cmd, e, flush=True)
 
+DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+class Clock:
+    """Reloj del centro del panel. Al hacer clic abre un calendario visual con la hora, la fecha completa y el botón «Hoy».
+    Los nombres de día y mes están en español en el propio código (no dependen de que la imagen traiga el idioma instalado)."""
+    def __init__(self):
+        self.label = Gtk.Label(); self.btn = Gtk.MenuButton(child=self.label, has_frame=False); self.btn.add_css_class("owee-widget")
+        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _: self.pop.get_visible() and self.today())
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=14, margin_end=14)
+        self.big = Gtk.Label(xalign=0, css_classes=["clock-big"]); self.date = Gtk.Label(xalign=0, css_classes=["heading"])
+        self.cal = Gtk.Calendar(show_week_numbers=True); self.go = Gtk.Button(label="Hoy"); self.go.connect("clicked", lambda b: self.today())
+        for w in (self.big, self.date, Gtk.Separator(), self.cal, self.go): box.append(w)
+        self.pop.set_child(box); self.tick()
+
+    def today(self): self.cal.select_day(GLib.DateTime.new_now_local())
+
+    def tick(self):
+        n = GLib.DateTime.new_now_local(); self.label.set_text(f"{n.format('%H:%M')}   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}")
+        if self.pop.get_visible():
+            self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(f"{DIAS[n.get_day_of_week() - 1].capitalize()}, {n.get_day_of_month()} de {MESES[n.get_month() - 1]} de {n.get_year()}")
+        return True
+
 class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
 
@@ -230,6 +255,8 @@ class Panel(Gtk.Application):
             self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None)
             self.mon.connect("changed", lambda m, f, o, ev: f.get_basename() == "settings.json" and GLib.timeout_add(150, lambda: (self.apply_settings(), False)[1]))
         except GLib.Error as e: print("[ajustes] sin vigilancia:", e, flush=True)
+        for name, fn in (("launcher", lambda *a: self.launcher.btn.popup()), ("calendar", lambda *a: self.clock.btn.popup()), ("power", lambda *a: self.power.btn.popup())):
+            act = Gio.SimpleAction.new(name, None); act.connect("activate", fn); self.add_action(act)    # `gapplication action org.oweelinux.PanelPrototype launcher` (atajos de labwc)
         win = Gtk.ApplicationWindow(application=self); win.add_css_class("owee-panel")
         LS.init_for_window(win); LS.set_layer(win, LS.Layer.TOP); LS.set_namespace(win, "owee-panel")
         for e in (LS.Edge.TOP, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(win, e, True)
@@ -238,7 +265,7 @@ class Panel(Gtk.Application):
         LS.set_keyboard_mode(win, LS.KeyboardMode.ON_DEMAND)         # que las ventanitas (popovers) reciban teclado al hacer clic
         bar = Gtk.CenterBox(); win.set_child(bar)
         self.launcher = Launcher(); bar.set_start_widget(self.launcher.btn)
-        self.clock = Gtk.Label(); bar.set_center_widget(self.clock)
+        self.clock = Clock(); bar.set_center_widget(self.clock.btn)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
         try:                                           # la bandeja es opcional: si falla, el panel sigue sin ella
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from owee_tray import Tray
@@ -267,8 +294,7 @@ class Panel(Gtk.Application):
             if ok: out["tray"] = [int(r.get_x() + 8 + r.get_width() / 2), int(r.get_y() + 6 + r.get_height() / 2)]
         print("[layout] " + json.dumps(out), flush=True)
 
-    def tick(self):
-        self.clock.set_text(GLib.DateTime.new_now_local().format("%H:%M  %d %b")); return True
+    def tick(self): return self.clock.tick()
 
 if __name__ == "__main__":
     t0 = time.time(); mem("tras importar"); Panel().run(sys.argv)

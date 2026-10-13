@@ -59,6 +59,10 @@ try:
     n = sh("pgrep -c -u oweeuser konsole", "K", 30) or ""
     check("Intro lanza la primera coincidencia (konsole)", n.strip("|").strip().isdigit() and int(n.strip("|").strip()) > 0, n.strip("|"))
     vm.screenshot(os.path.join(out, "imagen-app.png"))
+    key("esc"); q.click(640, 22); time.sleep(2.5); vm.screenshot(os.path.join(out, "imagen-calendario.png")); key("esc"); time.sleep(1)
+    lc = sh("locale -a | grep -i es_ES; ls /usr/libexec/owee/ | tr '\\n' ' '; ls /usr/share/icons | grep -i owee | tr '\\n' ' '", "LC", 30) or ""
+    check("la imagen trae locale es_ES, ajustes, owee-wallpaper e iconos Owee/Owee-Light", all(x in lc for x in ("es_ES", "owee_settings.py", "owee-wallpaper", "Owee-Light")), lc)
+    key("meta_l-spc"); time.sleep(2.5); vm.screenshot(os.path.join(out, "imagen-atajo-lanzador.png")); key("esc"); time.sleep(1)
     q.click(1255, 24); time.sleep(2); vm.screenshot(os.path.join(out, "imagen-sesion.png"))
     q.click(1200, 157); time.sleep(2); vm.screenshot(os.path.join(out, "imagen-sesion-confirmar.png"))   # primer clic en Reiniciar: pide confirmación (NO reinicia)
     n2 = sh("systemctl is-system-running; uptime -s | cut -c1-5", "UP", 30) or ""; print("estado tras el primer clic:", n2)

@@ -95,3 +95,7 @@ curl
 jq
 zsh
 librsvg2-common
+slurp
+brightnessctl
+wl-clipboard
+locales
