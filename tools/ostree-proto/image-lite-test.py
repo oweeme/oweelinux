@@ -62,6 +62,9 @@ try:
     key("esc"); q.click(640, 22); time.sleep(2.5); vm.screenshot(os.path.join(out, "imagen-calendario.png")); key("esc"); time.sleep(1)
     lc = sh("locale -a | grep -i es_ES; ls /usr/libexec/owee/ | tr '\\n' ' '; ls /usr/share/icons | grep -i owee | tr '\\n' ' '", "LC", 30) or ""
     check("la imagen trae locale es_ES, ajustes, owee-wallpaper e iconos Owee/Owee-Light", all(x in lc for x in ("es_ES", "owee_settings.py", "owee-wallpaper", "Owee-Light")), lc)
+    sh(U + "WAYLAND_DISPLAY=wayland-0 sh -c 'nohup /usr/libexec/owee/owee_settings.py > /tmp/set.log 2>&1 &'", "AJ", 30); time.sleep(8)
+    ps = sh("pgrep -c -f owee_settings.py; grep -c 'no cargó' /tmp/set.log", "PS", 30) or ""; check("Ajustes (de la imagen) arranca y carga todas las páginas", ps.startswith("1") or ps.startswith("2") and ps.rstrip("|").endswith("0"), ps)
+    vm.screenshot(os.path.join(out, "imagen-ajustes.png")); sh("pkill -f owee_settings.py", "KS", 30); time.sleep(1)
     key("meta_l-spc"); time.sleep(2.5); vm.screenshot(os.path.join(out, "imagen-atajo-lanzador.png")); key("esc"); time.sleep(1)
     q.click(1255, 24); time.sleep(2); vm.screenshot(os.path.join(out, "imagen-sesion.png"))
     q.click(1200, 157); time.sleep(2); vm.screenshot(os.path.join(out, "imagen-sesion-confirmar.png"))   # primer clic en Reiniciar: pide confirmación (NO reinicia)
