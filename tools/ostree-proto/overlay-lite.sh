@@ -15,7 +15,7 @@ install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644
 for f in "$D"/widgets/sistema/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets/$(basename "$f")"; done
 for f in "$D"/widgets/ejemplos/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets-ejemplos/$(basename "$f")"; done
 python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" >/dev/null; python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" "#17231e" Owee-Light >/dev/null
-install -Dm0644 "$D/theme/themerc" "$R/usr/share/themes/Owee/openbox-3/themerc"
+install -Dm0644 "$D/theme/themerc" "$R/usr/share/themes/Owee/openbox-3/themerc"; install -Dm0644 "$D/theme/themerc-light" "$R/usr/share/themes/Owee-Light/openbox-3/themerc"
 install -Dm0644 "$D/waybar/config.jsonc" "$ETC/xdg/waybar/config.jsonc"; install -Dm0644 "$D/waybar/style.css" "$ETC/xdg/waybar/style.css"
 # Debian instala waybar.service y mako.service (usuario) y arrancan solos con la sesión gráfica: la sesión Lite
 # controla sus piezas ella misma, así que se enmascaran (si no, hay dos paneles y dos demonios de notificaciones).
@@ -24,6 +24,20 @@ rm -rf "$R/usr/lib/owee/wlgen"; mkdir -p "$R/usr/lib/owee/wlgen"
 python3 -m pywayland.scanner -o "$R/usr/lib/owee/wlgen" -i \
   /usr/share/wayland-protocols/staging/ext-foreign-toplevel-list/ext-foreign-toplevel-list-v1.xml 2>&1 | tail -1
 chroot "$R" localedef -i es_ES -f UTF-8 es_ES.UTF-8 2>/dev/null || echo "(aviso: sin locale es_ES)"   # escribe en /usr/lib/locale (la parte inmutable)
+# Calculadora propia (desktop/apps/calculadora) + icono + lanzador
+for f in owee_calc.py calc_engine.py; do install -Dm0755 "$D/apps/calculadora/$f" "$R/usr/libexec/owee/apps/calculadora/$f"; done
+install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-calc.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-calc.svg"
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-calc.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Calculadora
+GenericName=Calculadora
+Comment=Calculadora con modo científico e historial
+Exec=/usr/libexec/owee/apps/calculadora/owee_calc.py
+Icon=owee-calc
+Categories=Utility;Calculator;
+Keywords=calculadora;suma;matemáticas;
+EOD
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

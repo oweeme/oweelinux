@@ -1,0 +1,19 @@
+# Tema de ventanas de labwc, variante CLARA, con la paleta de OweeLinux (fondo #F6F8F7, teal #2A9D8F, coral #F06548, texto #17231e)
+border.width: 1
+padding.height: 4
+window.active.border.color: #2A9D8F
+window.inactive.border.color: #cfdad5
+window.active.title.bg.color: #F6F8F7
+window.inactive.title.bg.color: #EAEFED
+window.active.label.text.color: #17231e
+window.inactive.label.text.color: #7a8a83
+window.active.button.unpressed.image.color: #17231e
+window.inactive.button.unpressed.image.color: #7a8a83
+window.active.button.hover.image.color: #F06548
+menu.items.bg.color: #F6F8F7
+menu.items.text.color: #17231e
+menu.items.active.bg.color: #2A9D8F
+menu.items.active.text.color: #102019
+osd.bg.color: #F6F8F7
+osd.border.color: #2A9D8F
+osd.label.text.color: #17231e

@@ -4,7 +4,8 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib
 import owee_config
-from .base import Page, page_box, scrolled, heading
+from .base import Page, page_box, scrolled, heading, run, have
+from . import rcxml
 
 SCHEME_DIRS = ["/usr/share/color-schemes", os.path.expanduser("~/.local/share/color-schemes")]
 
@@ -13,6 +14,14 @@ def write_gtk_prefs(mode):
         d = os.path.expanduser(f"~/.config/gtk-{v}"); os.makedirs(d, exist_ok=True); p = os.path.join(d, "settings.ini")
         lines = [l for l in (open(p).read().splitlines() if os.path.exists(p) else []) if not l.startswith("gtk-application-prefer-dark-theme") and l != "[Settings]"]
         open(p, "w").write("\n".join(["[Settings]", f"gtk-application-prefer-dark-theme={1 if mode == 'dark' else 0}"] + lines) + "\n")
+
+def notify_running_apps(mode):
+    """Avisa a las apps YA abiertas: las de Qt/KDE (señal KGlobalSettings: releen kdeglobals y repintan), las de GTK4/libadwaita y el portal (gsettings color-scheme)
+    y a labwc (variante clara u oscura del tema de ventanas)."""
+    if have("gdbus"): run(["gdbus", "emit", "--session", "--object-path", "/KGlobalSettings", "--signal", "org.kde.KGlobalSettings.notifyChange", "0", "0"])
+    if have("gsettings"):
+        run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", "prefer-dark" if mode == "dark" else "prefer-light"])
+    rcxml.set_values([("theme/name", "Owee" if mode == "dark" else "Owee-Light")])
 
 def write_qt_scheme(mode, accent):
     """Aplica el esquema de colores a las apps Qt/KDE como hace KDE: copia los grupos [Colors:*] de BreezeDark/Breeze(Light).colors a ~/.config/kdeglobals y fija
@@ -49,11 +58,11 @@ class Apariencia(Page):
             btn = Gtk.Button(css_classes=["swatch"], tooltip_text=name); c = Gtk.CssProvider(); c.load_from_string(f"button {{ background: {col}; background-image: none; }}")
             btn.get_style_context().add_provider(c, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION); btn.connect("clicked", lambda _b, x=col: self.set(accent=x)); sw.append(btn); self.swatches[col] = btn
         b.append(sw)
-        b.append(Gtk.Label(label="El panel cambia al instante. Las apps GTK y Qt/KDE toman el modo y el acento cuando las abres de nuevo (las ya abiertas no cambian).", xalign=0, wrap=True, css_classes=["dim-label"]))
+        b.append(Gtk.Label(label="Cambia al instante en el panel, las ventanas y las apps (GTK4/libadwaita, Qt/KDE y LibreOffice con tema del sistema). Algunas apps de terceros con tema propio pueden pedir reiniciarse.", xalign=0, wrap=True, css_classes=["dim-label"]))
         self.refresh(); return scrolled(b)
     def set(self, **kw):
         self.app.change(**kw); c = self.app.cfg
-        write_gtk_prefs(c["mode"]); write_qt_scheme(c["mode"], c["accent"]); self.refresh()
+        write_gtk_prefs(c["mode"]); write_qt_scheme(c["mode"], c["accent"]); notify_running_apps(c["mode"]); self.refresh()
     def refresh(self):
         c = self.app.cfg
         for m, btn in self.cards.items(): (btn.add_css_class if m == c["mode"] else btn.remove_css_class)("sel")

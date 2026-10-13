@@ -2,6 +2,10 @@
 y el aspecto de OweeLinux se conservan. Se conservan los comentarios; la escritura es atómica y después se pide a labwc recargar (`labwc --reconfigure`)."""
 import os, shutil, xml.etree.ElementTree as ET
 from .base import run, config_home
+
+def reconfigure():
+    """Pide a labwc recargar su configuración (tema, rc.xml, environment). labwc exige LABWC_PID: lo hereda quien se lanzó desde la sesión; si no está (p. ej. desde una terminal ajena) se busca."""
+    run(["sh", "-c", 'LABWC_PID="${LABWC_PID:-$(pgrep -u "$(id -u)" -x labwc | head -1)}" labwc --reconfigure'], timeout=5)
 USER = os.path.join(config_home(), "labwc", "rc.xml"); SYSTEM = "/etc/xdg/labwc/rc.xml"
 
 def _parse(path): return ET.parse(path, parser=ET.XMLParser(target=ET.TreeBuilder(insert_comments=True)))
@@ -39,7 +43,7 @@ def get(path, default=None):
     except (OSError, ET.ParseError): return default
     return (n.text or "").strip() if n is not None and n.text and n.text.strip() else default
 
-def set_values(items, reconfigure=True):
+def set_values(items, reload=True):
     """items: lista de (path, valor). Un valor None borra el elemento."""
     tree = load(); root = tree.getroot()
     for path, value in items:
@@ -50,4 +54,4 @@ def set_values(items, reconfigure=True):
             if parent is not None: parent.remove(n)
         else: n.text = str(value)
     ET.indent(tree, space="  "); tmp = USER + ".tmp"; tree.write(tmp, encoding="utf-8", xml_declaration=True); os.replace(tmp, USER)
-    if reconfigure: run(["labwc", "--reconfigure"], timeout=5)
+    if reload: reconfigure()

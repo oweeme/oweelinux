@@ -16,9 +16,25 @@ class FechaHora(Page):
         return scrolled(b)
     def on_tz(self, out, code):
         v = out.split(); tz = v[0] if v else "?"
-        self.holder.append(row("Zona horaria actual", Gtk.Label(label=tz)))
+        self.holder.append(row("Zona horaria actual", Gtk.Label(label=tz, selectable=True)))
         if len(v) > 1: self.holder.append(row("Sincronizar la hora por internet", Gtk.Label(label="activado" if v[1] == "yes" else "desactivado")))
-        region = Gtk.Entry(placeholder_text="America/La_Paz", text=""); region.set_width_chars(28)
-        region.connect("activate", lambda e: run(["timedatectl", "set-timezone", e.get_text().strip()], lambda o, c: self.msg.set_text("Zona horaria cambiada." if c == 0 else "No se pudo cambiar (¿nombre válido y permisos de administrador?).")))
-        self.holder.append(row("Cambiar zona (Intro)", region, "Ejemplos: America/La_Paz, America/Lima, Europe/Madrid. Pide la contraseña de administrador.")); self.msg = Gtk.Label(xalign=0); self.holder.append(self.msg)
+        self.msg = Gtk.Label(xalign=0); self.zones = Gtk.StringList()
+        self.dd = Gtk.DropDown(model=self.zones, enable_search=True, expression=Gtk.PropertyExpression.new(Gtk.StringObject, None, "string"))
+        self.dd.set_size_request(260, -1); self.cur_tz = tz; self.loading_tz = True
+        self.holder.append(row("Cambiar zona horaria", self.dd, "Escribe para buscar (por ejemplo «La_Paz»). Pide la contraseña de administrador.")); self.holder.append(self.msg)
+        self.dd.connect("notify::selected", self.on_pick)
+        run(["timedatectl", "list-timezones"], self.on_list)
+    def on_list(self, out, code):
+        names = [l.strip() for l in out.splitlines() if l.strip()]
+        for n in names: self.zones.append(n)
+        if self.cur_tz in names: self.dd.set_selected(names.index(self.cur_tz))
+        self.loading_tz = False
+    def on_pick(self, dd, _p):
+        if self.loading_tz: return
+        item = dd.get_selected_item()
+        if not item: return
+        z = item.get_string()
+        if z == self.cur_tz: return
+        self.msg.set_text("Cambiando…")
+        run(["timedatectl", "set-timezone", z], lambda o, c: (self.msg.set_text(f"Zona horaria: {z}" if c == 0 else "No se pudo cambiar (¿cancelaste la contraseña?)."), setattr(self, "cur_tz", z if c == 0 else self.cur_tz)), timeout=60)
 PAGE = FechaHora()

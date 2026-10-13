@@ -9,6 +9,8 @@ chroot "$R" id oweeuser >/dev/null 2>&1 || chroot "$R" useradd -M -d /home/oweeu
 chroot "$R" passwd -d oweeuser >/dev/null
 mkdir -p "$R/etc/sddm.conf.d" "$R/usr/lib/tmpfiles.d"
 printf '[Autologin]\nUser=oweeuser\nSession=%s\n\n[General]\nDisplayServer=x11\n' "${OWEE_TEST_SESSION:-plasmax11.desktop}" > "$R/etc/sddm.conf.d/10-owee-test.conf"
+# SOLO PRUEBAS: el usuario de prueba (sin contraseña) puede hacer tareas de administrador por polkit (zona horaria, owee-update desde Ajustes...); una imagen real NO lleva esto
+mkdir -p "$R/etc/polkit-1/rules.d"; printf 'polkit.addRule(function (action, subject) { if (subject.user == "oweeuser") return polkit.Result.YES; });\n' > "$R/etc/polkit-1/rules.d/49-owee-test.rules"
 # /home es /var/home y /var nace vacío: el directorio personal se crea al arrancar.
 printf 'd /var/home 0755 root root -\nd /var/home/oweeuser 0700 oweeuser oweeuser -\n' > "$R/usr/lib/tmpfiles.d/owee-test-user.conf"
 echo "overlay-test-user: usuario oweeuser sin contraseña + autologin SDDM (SOLO PRUEBAS)"

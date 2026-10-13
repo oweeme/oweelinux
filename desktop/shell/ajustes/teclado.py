@@ -48,5 +48,5 @@ class Teclado(Page):
         self.cur[idx] = key; keys = [k for k in self.cur if k]
         lay = ",".join(k.split("(")[0] for k in keys); var = ",".join((k.split("(")[1].rstrip(")") if "(" in k else "") for k in keys)
         write_env({"XKB_DEFAULT_LAYOUT": lay, "XKB_DEFAULT_VARIANT": var if var.strip(",") else "", "XKB_DEFAULT_OPTIONS": "grp:alt_shift_toggle" if len(keys) > 1 else ""})
-        run(["labwc", "--reconfigure"])
+        rcxml.reconfigure()
 PAGE = Teclado()

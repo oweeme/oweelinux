@@ -2,6 +2,8 @@
 # Arranque de la sesión "OweeLinux Lite": prepara el entorno y entrega el control al compositor (labwc).
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite XDG_SESSION_DESKTOP=owee-lite
 export QT_QPA_PLATFORM=wayland MOZ_ENABLE_WAYLAND=1
+# Apps Qt/KDE: tomar colores, fuentes e iconos de ~/.config/kdeglobals (lo escribe Ajustes → Apariencia); sin este tema de plataforma el modo oscuro no les llega
+[ -e /usr/lib/x86_64-linux-gnu/qt6/plugins/platformthemes/KDEPlasmaPlatformTheme6.so ] && export QT_QPA_PLATFORMTHEME=kde
 # Idioma: español si la imagen lo trae y el usuario no eligió otro (nombres de meses y días en calendarios y apps)
 case "${LANG:-C}" in C|C.*|POSIX) locale -a 2>/dev/null | grep -qi "^es_ES\.utf" && export LANG=es_ES.UTF-8 ;; esac
 # En una máquina virtual no hay GPU: gráficos por software (en hardware real NO se tocan)
