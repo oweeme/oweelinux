@@ -144,7 +144,7 @@ class Launcher:
     La lista se construye al ABRIR por primera vez (no al arrancar): no cuesta memoria ni tiempo de sesión si no se usa.
     Escribir filtra; Intro lanza la primera coincidencia; Esc cierra."""
     def __init__(self):
-        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-koi", pixel_size=18)); inner.append(Gtk.Label(label="OweeLinux"))
+        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); inner.append(Gtk.Label(label="OweeLinux"))
         self.btn = Gtk.MenuButton(child=inner, has_frame=False); self.btn.add_css_class("launcher")
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False
 

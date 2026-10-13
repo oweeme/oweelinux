@@ -26,15 +26,15 @@ for lvl in (0, 20, 40, 60, 80, 100):
     shell = '<rect x="2.5" y="7" width="16" height="10" rx="2.2"/>' + P("M21 10.5v3")
     svg(f"owee-battery-{lvl}", shell + fill)
     svg(f"owee-battery-{lvl}-charging", shell + fill + '<path d="M11 8.6l-2.6 4h3.4l-2.6 4" stroke="#F06548" stroke-width="1.6"/>')
-# El pez koi (marca de OweeLinux, botón del lanzador): silueta rellena en el color del texto del botón
-fish = ('<path d="M2.8 12c2.6-4.6 8.2-5.8 12-2.2l5.6-3.2c.5 2.8.5 7 0 9.6l-5.6-3.2C11 16.6 5.4 16.6 2.8 12z" fill="%s" stroke="none"/>'
-        '<circle cx="7.3" cy="11.2" r="1" fill="#2A9D8F" stroke="none"/>') % "#102019"
-open(os.path.join(out, "owee-koi.svg"), "w").write(f'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">{fish}</svg>\n')
+# Logo de OweeLinux (el pez koi del autor, desktop/theme/branding): PNG de 256 px que GTK reduce al tamaño pedido (botón del lanzador)
+import shutil
+os.makedirs(os.path.join(dest, "256x256", "apps"), exist_ok=True)
+shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "branding", "owee-logo-256.png"), os.path.join(dest, "256x256", "apps", "owee-logo.png"))
 open(os.path.join(dest, "index.theme"), "w").write("""[Icon Theme]
 Name=Owee
 Comment=Iconos propios de OweeLinux (línea, redondeados)
 Inherits=breeze,Adwaita,hicolor
-Directories=scalable/actions
+Directories=scalable/actions,256x256/apps
 
 [scalable/actions]
 Size=24
@@ -42,5 +42,12 @@ MinSize=8
 MaxSize=512
 Type=Scalable
 Context=Actions
+
+[256x256/apps]
+Size=256
+MinSize=16
+MaxSize=512
+Type=Scalable
+Context=Applications
 """)
 print("iconos escritos en", dest, "(%d)" % len(os.listdir(out)))
