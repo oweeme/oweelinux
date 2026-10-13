@@ -11,7 +11,7 @@ LANGS = [  # (código, nombre en su propio idioma, locale del sistema, familia d
     ("qow", "Owee (romano)", "qow_BO.UTF-8"), ("qow@owee", "Owee (Owee Script)", "qow_BO.UTF-8"),
 ]
 SETTINGS = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.realpath(__file__))
 CAT_DIRS = [os.path.join(HERE, "..", "i18n"), "/usr/share/owee/i18n"]
 
 def locale_of(code):

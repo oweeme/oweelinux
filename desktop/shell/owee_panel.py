@@ -57,7 +57,7 @@ def mem(tag):
     d = {}
     try:
         for l in open("/proc/self/smaps_rollup"):
-            k, _, v = l.partition(":")
+            k, _x, v = l.partition(":")
             if k in ("Rss", "Pss"): d[k] = int(v.split()[0]) / 1024
     except OSError: return
     print(f"[mem] {tag}: Rss={d.get('Rss',0):.0f} MB Pss={d.get('Pss',0):.0f} MB", flush=True)
@@ -100,7 +100,7 @@ class ScriptWidget:
 
     def done(self, p, res):
         try:
-            ok, out, _ = p.communicate_utf8_finish(res); d = json.loads(out.strip().splitlines()[-1]); self.data = d
+            ok, out, _x = p.communicate_utf8_finish(res); d = json.loads(out.strip().splitlines()[-1]); self.data = d
             self.btn.set_visible(not d.get("hidden")); 
             if d.get("hidden"): return
             self.label.set_text(str(d.get("text", ""))); self.label.set_visible(bool(d.get("text"))); self.btn.set_tooltip_text(d.get("tooltip"))

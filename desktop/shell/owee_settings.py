@@ -13,7 +13,8 @@ from ajustes.base import Page
 from owee_i18n import _, N_
 
 PAGES = ["apariencia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "teclado", "raton", "energia", "fechahora", "aplicaciones", "atajos", "actualizaciones", "acerca"]
-GROUPS = [_("Personal"), _("Dispositivos"), _("Sistema")]
+GROUPS = ["Personal", "Dispositivos", "Sistema"]          # códigos internos (cada página dice a qué grupo pertenece); se traducen al mostrarlos
+_NOMBRES_DE_GRUPO = (N_("Personal"), N_("Dispositivos"), N_("Sistema"))                   # solo para que el extractor de textos los vea
 CSS = b"""
 .swatch { min-width: 34px; min-height: 34px; border-radius: 999px; padding: 0; border: 3px solid transparent; }
 .swatch.sel { border-color: @theme_fg_color; }
