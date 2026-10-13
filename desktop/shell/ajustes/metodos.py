@@ -22,14 +22,33 @@ def read_items():
     return [n for _i, n in sorted(items)]
 
 def write_profile(layout, methods):
-    """Escribe el perfil: primero el teclado normal con la distribución actual y luego los métodos pedidos."""
+    """Escribe el perfil: primero el teclado normal con la distribución actual y luego los métodos pedidos. Fcitx5 NO relee el perfil en marcha (`fcitx5-remote -r` solo recarga la
+    configuración) y al salir reescribe el archivo con lo que tiene en memoria: por eso primero se le pide salir, luego se escribe el perfil y por último se vuelve a lanzar."""
+    from gi.repository import Gio, GLib
     first = "keyboard-" + (layout or "us").split(",")[0]
     names = [first] + [m for m in methods if m != first]
     out = f"[Groups/0]\nName=Default\nDefault Layout={(layout or 'us').split(',')[0]}\nDefaultIM={first}\n\n"
     for i, n in enumerate(names): out += f"[Groups/0/Items/{i}]\nName={n}\nLayout=\n\n"
     out += "[GroupOrder]\n0=Default\n"
-    os.makedirs(os.path.dirname(PROFILE), exist_ok=True); tmp = PROFILE + ".tmp"; open(tmp, "w").write(out); os.replace(tmp, PROFILE)
-    if have("fcitx5-remote"): run(["fcitx5-remote", "-r"], timeout=3)
+    def write_and_start(*_a):
+        os.makedirs(os.path.dirname(PROFILE), exist_ok=True); tmp = PROFILE + ".tmp"; open(tmp, "w").write(out); os.replace(tmp, PROFILE)
+        if have("fcitx5"):
+            try: Gio.Subprocess.new(["fcitx5", "-d"], Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE)
+            except GLib.Error: pass
+        return False
+    def running():
+        for d in os.listdir("/proc"):
+            if d.isdigit():
+                try:
+                    if open(f"/proc/{d}/comm").read().strip() == "fcitx5" and os.getuid() == os.stat(f"/proc/{d}").st_uid: return True
+                except OSError: pass
+        return False
+    def wait_exit(tries=[0]):
+        tries[0] += 1
+        if running() and tries[0] < 25: return True                      # sigue vivo (guarda su perfil al salir): esperar hasta 5 s
+        write_and_start(); return False
+    if have("fcitx5-remote") and running(): run(["fcitx5-remote", "-e"], lambda *a: GLib.timeout_add(200, wait_exit), timeout=3)
+    else: write_and_start()
 
 def enabled():
     return [n for n in read_items() if not n.startswith("keyboard-")]

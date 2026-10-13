@@ -70,6 +70,22 @@ for f in org.kde.kcalc.desktop org.kde.spectacle.desktop; do [ -f "$R/usr/share/
 # ---- Idiomas: catálogos de la interfaz, locales del sistema, fuentes y teclados (docs/EXTENSIONES.md → Idiomas)
 install -d "$R/usr/share/owee/i18n"; cp "$D"/i18n/*.json "$R/usr/share/owee/i18n/"
 for l in es_ES en_US pt_BR fr_FR de_DE ru_RU zh_CN ja_JP; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
+# Nombres de nuestras apps en cada idioma dentro del lanzador (Name[xx]= en los .desktop), a partir de los mismos catálogos
+python3 - "$R" "$D/i18n" <<'PYEOF'
+import json, os, sys
+R, cat = sys.argv[1], sys.argv[2]
+SRC = {"owee-settings.desktop": "Ajustes de OweeLinux", "owee-calc.desktop": "Calculadora", "owee-capture.desktop": "Capturadora"}
+LOC = {"en": "en", "pt": "pt", "fr": "fr", "de": "de", "ru": "ru", "zh": "zh_CN", "ja": "ja"}
+for f, es in SRC.items():
+    p = os.path.join(R, "usr/share/applications", f)
+    if not os.path.exists(p): continue
+    lines = open(p, encoding="utf-8").read().splitlines(); out = []
+    for l in lines:
+        out.append(l)
+        if l.startswith("Name=") and not l.startswith("Name["):
+            out += ["Name[es]=" + es] + [f"Name[{loc}]=" + json.load(open(os.path.join(cat, lg + ".json"), encoding="utf-8")).get(es, es) for lg, loc in LOC.items()]
+    open(p, "w", encoding="utf-8").write("\n".join(out) + "\n")
+PYEOF
 # Owee: fuentes, teclado (Fcitx5) y locale qow_BO del proyecto del idioma (build-owee-debs.sh); catálogos de interfaz desde su glosario
 OWEE_DEBS=${OWEE_DEBS:-/var/tmp/owee-debs}; OWEE_SRC=${OWEE_SRC:-/var/tmp/owee-src}
 if ls "$OWEE_DEBS"/*.deb >/dev/null 2>&1; then
