@@ -6,6 +6,7 @@ from gi.repository import Gtk, GLib
 import owee_config
 from .base import Page, page_box, scrolled, heading, run, have
 from . import rcxml
+from owee_i18n import _
 
 SCHEME_DIRS = ["/usr/share/color-schemes", os.path.expanduser("~/.local/share/color-schemes")]
 
@@ -89,10 +90,10 @@ osd.label.text.color: {fg}
     d = os.path.expanduser("~/.local/share/themes/Owee-Tema/openbox-3"); os.makedirs(d, exist_ok=True); p = os.path.join(d, "themerc"); tmp = p + ".tmp"; open(tmp, "w").write(t); os.replace(tmp, p)
 
 class Apariencia(Page):
-    title = "Apariencia"; icon = "owee-set-appearance"; group = "Personal"; order = 10; keywords = "tema claro oscuro color acento gris paleta"
+    title = _("Apariencia"); icon = "owee-set-appearance"; group = "Personal"; order = 10; keywords = _("tema claro oscuro color acento gris paleta")
     def build(self, app):
-        self.app = app; b = page_box("Apariencia", "Elige un tema. Todos están pensados para no cansar la vista: fondos suaves, buen contraste y colores apagados.")
-        b.append(heading("Tema"))
+        self.app = app; b = page_box(_("Apariencia"), _("Elige un tema. Todos están pensados para no cansar la vista: fondos suaves, buen contraste y colores apagados."))
+        b.append(heading(_("Tema")))
         flow = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=4, min_children_per_line=2, column_spacing=10, row_spacing=10, homogeneous=True, valign=Gtk.Align.START); self.cards = {}
         for tid, th in owee_config.THEMES.items():
             prev = Gtk.Label(label="Aa", css_classes=["preview"]); pc = Gtk.CssProvider()
@@ -100,13 +101,13 @@ class Apariencia(Page):
             prev.get_style_context().add_provider(pc, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
             v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); v.append(prev); v.append(Gtk.Label(label=th["name"], wrap=True, max_width_chars=16, justify=Gtk.Justification.CENTER))
             btn = Gtk.Button(child=v, has_frame=False, css_classes=["modecard"]); btn.connect("clicked", lambda _b, t=tid: self.set_theme(t)); flow.append(btn); self.cards[tid] = btn
-        b.append(flow); b.append(heading("Color de acento"))
+        b.append(flow); b.append(heading(_("Color de acento")))
         sw = Gtk.Box(spacing=10); self.swatches = {}
         for name, col in owee_config.ACCENTS:
             btn = Gtk.Button(css_classes=["swatch"], tooltip_text=name); c = Gtk.CssProvider(); c.load_from_string(f"button {{ background: {col}; background-image: none; }}")
             btn.get_style_context().add_provider(c, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION); btn.connect("clicked", lambda _b, x=col: self.apply(accent=x)); sw.append(btn); self.swatches[col] = btn
         b.append(sw)
-        b.append(Gtk.Label(label="Cambia al instante en el panel, las ventanas y las apps (GTK, Qt/KDE y LibreOffice con tema del sistema). Algunas apps de terceros con tema propio pueden pedir reiniciarse.", xalign=0, wrap=True, css_classes=["dim-label"]))
+        b.append(Gtk.Label(label=_("Cambia al instante en el panel, las ventanas y las apps (GTK, Qt/KDE y LibreOffice con tema del sistema). Algunas apps de terceros con tema propio pueden pedir reiniciarse."), xalign=0, wrap=True, css_classes=["dim-label"]))
         self.refresh(); return scrolled(b)
     def set_theme(self, tid): self.apply(theme=tid, mode=owee_config.THEMES[tid]["mode"], accent=owee_config.THEMES[tid]["accent"])       # cada tema trae su acento; luego se puede cambiar
     def apply(self, **kw):

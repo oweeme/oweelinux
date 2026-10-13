@@ -6,8 +6,9 @@ gi.require_version("Gtk", "4.0"); gi.require_version("Gdk", "4.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Gio
 import cairo
 import core
+from owee_i18n import _
 
-TOOLS = [("pen", "Lápiz", "✎"), ("marker", "Resaltador", "▬"), ("arrow", "Flecha", "➚"), ("rect", "Rectángulo", "▭"), ("ellipse", "Elipse", "◯"), ("text", "Texto", "T"), ("step", "Número", "①"), ("blur", "Pixelar", "▦")]
+TOOLS = [("pen", _("Lápiz"), "✎"), ("marker", _("Resaltador"), "▬"), ("arrow", _("Flecha"), "➚"), ("rect", _("Rectángulo"), "▭"), ("ellipse", _("Elipse"), "◯"), ("text", _("Texto"), "T"), ("step", _("Número"), "①"), ("blur", _("Pixelar"), "▦")]
 COLORS = ["#F06548", "#2A9D8F", "#F2C94C", "#3B82C4", "#FFFFFF", "#111111"]
 CSS = b"""
 window.editor { background: #102019; color: #EFF0F1; }
@@ -19,7 +20,7 @@ window.editor { background: #102019; color: #EFF0F1; }
 
 class Editor(Gtk.ApplicationWindow):
     def __init__(self, app, path):
-        super().__init__(application=app, title="Editar captura — " + os.path.basename(path)); self.add_css_class("editor"); self.path = path
+        super().__init__(application=app, title=_("Editar captura — ") + os.path.basename(path)); self.add_css_class("editor"); self.path = path
         prov = Gtk.CssProvider(); prov.load_from_data(CSS); Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         self.base = cairo.ImageSurface.create_from_png(path); self.w, self.h = self.base.get_width(), self.base.get_height()
         self.items = []; self.redo = []; self.cur = None; self.tool = "pen"; self.color = COLORS[0]; self.width = 4; self.step_n = 1; self.zoom = 1.0
@@ -31,10 +32,10 @@ class Editor(Gtk.ApplicationWindow):
         for c in COLORS:
             b = Gtk.Button(css_classes=["swatch"], tooltip_text=c); p = Gtk.CssProvider(); p.load_from_string(f"button {{ background: {c}; background-image: none; }}"); b.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_USER)
             b.connect("clicked", lambda _b, c=c: self.set_color(c)); tb.append(b); self.sw[c] = b
-        tb.append(Gtk.Label(label="Grosor")); sc = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 1, 24, 1); sc.set_value(4); sc.set_size_request(110, -1); sc.connect("value-changed", lambda s: setattr(self, "width", s.get_value())); tb.append(sc)
+        tb.append(Gtk.Label(label=_("Grosor"))); sc = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 1, 24, 1); sc.set_value(4); sc.set_size_request(110, -1); sc.connect("value-changed", lambda s: setattr(self, "width", s.get_value())); tb.append(sc)
         tb.append(Gtk.Box(hexpand=True))
-        for label, fn in (("↶", self.undo), ("↷", self.do_redo), ("Copiar", self.copy), ("Guardar", self.save), ("Guardar como…", self.save_as)):
-            b = Gtk.Button(label=label, tooltip_text={"↶": "Deshacer (Ctrl+Z)", "↷": "Rehacer (Ctrl+Mayús+Z)"}.get(label)); b.connect("clicked", lambda _b, fn=fn: fn()); tb.append(b)
+        for label, fn in (("↶", self.undo), ("↷", self.do_redo), (_("Copiar"), self.copy), (_("Guardar"), self.save), (_("Guardar como…"), self.save_as)):
+            b = Gtk.Button(label=label, tooltip_text={"↶": _("Deshacer (Ctrl+Z)"), "↷": _("Rehacer (Ctrl+Mayús+Z)")}.get(label)); b.connect("clicked", lambda _b, fn=fn: fn()); tb.append(b)
         self.area = Gtk.DrawingArea(); self.area.set_draw_func(self.draw); self.area.set_content_width(min(self.w, 1100)); self.area.set_content_height(min(self.h, 700))
         drag = Gtk.GestureDrag(); drag.connect("drag-begin", self.begin); drag.connect("drag-update", self.update); drag.connect("drag-end", self.end); self.area.add_controller(drag)
         sw = Gtk.ScrolledWindow(child=self.area, hexpand=True, vexpand=True); root.append(sw)
@@ -114,8 +115,8 @@ class Editor(Gtk.ApplicationWindow):
     def push(self, it): self.items.append(it); self.redo.clear(); self.area.queue_draw()
 
     def ask_text(self, x, y):
-        dlg = Gtk.Window(title="Texto", transient_for=self, modal=True, default_width=320); box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=12, margin_end=12)
-        e = Gtk.Entry(placeholder_text="Escribe y pulsa Intro"); box.append(e); dlg.set_child(box)
+        dlg = Gtk.Window(title=_("Texto"), transient_for=self, modal=True, default_width=320); box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=12, margin_end=12)
+        e = Gtk.Entry(placeholder_text=_("Escribe y pulsa Intro")); box.append(e); dlg.set_child(box)
         def ok(_e):
             if e.get_text(): self.push({"t": "text", "pts": [(x, y)], "c": self.color, "w": self.width, "text": e.get_text()})
             dlg.close()
@@ -140,15 +141,15 @@ class Editor(Gtk.ApplicationWindow):
         surf.write_to_png(path)
     def save(self):
         if self.items: self.render(self.path)
-        self.msg("Guardado: " + self.path); return self.path
+        self.msg(_("Guardado: ") + self.path); return self.path
     def save_as(self):
-        dlg = Gtk.FileDialog(title="Guardar como", initial_name=os.path.basename(self.path))
+        dlg = Gtk.FileDialog(title=_("Guardar como"), initial_name=os.path.basename(self.path))
         def done(d, res):
             try: f = d.save_finish(res).get_path()
             except GLib.Error: return
-            self.render(f); self.path = f; self.msg("Guardado: " + f)
+            self.render(f); self.path = f; self.msg(_("Guardado: ") + f)
         dlg.save(self, None, done)
     def copy(self):
-        tmp = os.path.join("/tmp", f"owee-copy-{os.getpid()}.png"); self.render(tmp); ok = core.copy_image(tmp); os.remove(tmp); self.msg("Copiada al portapapeles" if ok else "Falta wl-copy")
+        tmp = os.path.join("/tmp", f"owee-copy-{os.getpid()}.png"); self.render(tmp); ok = core.copy_image(tmp); os.remove(tmp); self.msg(_("Copiada al portapapeles") if ok else _("Falta wl-copy"))
 
 def open_editor(app, path): w = Editor(app, path); w.present(); return w

@@ -14,8 +14,9 @@ if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exi
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 import json, re
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import owee_config
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import owee_config, owee_i18n
 from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
+from owee_i18n import _
 CSS_TEMPLATE = """
 window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
 .owee-panel label { padding: 0 10px; }
@@ -110,7 +111,7 @@ class ScriptWidget:
             has = bool(d.get("popup"))                      # reasignar la ventanita en cada refresco la CERRABA (bug visto con refrescos de 3 s)
             if has != getattr(self, "has_popup", None): self.has_popup = has; self.btn.set_popover(self.pop if has else None)
         except Exception as e:
-            self.btn.set_visible(True); self.label.set_visible(True); self.icon.set_visible(False); self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text("el widget falló: %s" % e)
+            self.btn.set_visible(True); self.label.set_visible(True); self.icon.set_visible(False); self.label.set_text("⚠ " + self.name); self.label.set_tooltip_text(_("el widget falló: %s") % e)
 
     def click(self):
         cmd = self.data.get("on_click")
@@ -161,7 +162,7 @@ class Launcher:
     La lista se construye al ABRIR por primera vez (no al arrancar): no cuesta memoria ni tiempo de sesión si no se usa.
     Escribir filtra; Intro lanza la primera coincidencia; Esc cierra."""
     def __init__(self):
-        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); inner.append(Gtk.Label(label="OweeLinux"))
+        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); inner.append(Gtk.Label(label=_("OweeLinux")))
         self.btn = Gtk.MenuButton(child=inner, has_frame=False); self.btn.add_css_class("launcher")
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False
 
@@ -173,7 +174,7 @@ class Launcher:
     def build(self):
         self.built = True
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
-        self.entry = Gtk.SearchEntry(placeholder_text="Buscar aplicación…"); box.append(self.entry)
+        self.entry = Gtk.SearchEntry(placeholder_text=_("Buscar aplicación…")); box.append(self.entry)
         self.list = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=True)
         self.list.set_filter_func(self.visible_row); self.list.connect("row-activated", lambda l, r: self.launch(r.app))
         for a in sorted((a for a in Gio.AppInfo.get_all() if a.should_show()), key=lambda a: a.get_name().lower()):
@@ -206,13 +207,13 @@ class Launcher:
 
 class PowerMenu:
     """Botón de sesión: Bloquear, Cerrar sesión, Reiniciar, Apagar (con iconos propios). Reiniciar y Apagar piden un segundo clic para confirmar."""
-    ACTIONS = [("owee-lock", "Bloquear pantalla", ["swaylock", "-f", "-c", "102019"], False),
-               ("owee-logout", "Cerrar sesión", ["labwc", "--exit"], False),
-               ("owee-restart", "Reiniciar", ["systemctl", "reboot"], True),
-               ("owee-power", "Apagar", ["systemctl", "poweroff"], True)]
+    ACTIONS = [("owee-lock", _("Bloquear pantalla"), ["swaylock", "-f", "-c", "102019"], False),
+               ("owee-logout", _("Cerrar sesión"), ["labwc", "--exit"], False),
+               ("owee-restart", _("Reiniciar"), ["systemctl", "reboot"], True),
+               ("owee-power", _("Apagar"), ["systemctl", "poweroff"], True)]
     def __init__(self):
         self.btn = Gtk.MenuButton(child=Gtk.Image(icon_name="owee-power", pixel_size=18), has_frame=False); self.btn.add_css_class("owee-widget")
-        self.btn.set_tooltip_text("Sesión"); pop = Gtk.Popover(); self.btn.set_popover(pop); pop.connect("notify::visible", lambda p, _: self.reset())
+        self.btn.set_tooltip_text(_("Sesión")); pop = Gtk.Popover(); self.btn.set_popover(pop); pop.connect("notify::visible", lambda p, _: self.reset())
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
         self.rows = []
         for icon, text, cmd, confirm in self.ACTIONS:
@@ -225,13 +226,13 @@ class PowerMenu:
         for lab, text in self.rows: lab.set_text(text); lab.remove_css_class("warn")
     def clicked(self, b, cmd, confirm, lab, text, pop):
         if confirm and not lab.has_css_class("warn"):
-            self.reset(); lab.set_text("¿Seguro? Clic para confirmar"); lab.add_css_class("warn"); return
+            self.reset(); lab.set_text(_("¿Seguro? Clic para confirmar")); lab.add_css_class("warn"); return
         pop.popdown()
         try: Gio.Subprocess.new(cmd, Gio.SubprocessFlags.NONE)
         except GLib.Error as e: print("[sesión] no se pudo ejecutar", cmd, e, flush=True)
 
-DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+DIAS = [_("lunes"), _("martes"), _("miércoles"), _("jueves"), _("viernes"), _("sábado"), _("domingo")]
+MESES = [_("enero"), _("febrero"), _("marzo"), _("abril"), _("mayo"), _("junio"), _("julio"), _("agosto"), _("septiembre"), _("octubre"), _("noviembre"), _("diciembre")]
 
 class Clock:
     """Reloj del centro del panel. Al hacer clic abre un calendario visual con la hora, la fecha completa y el botón «Hoy».
@@ -241,7 +242,7 @@ class Clock:
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _: self.pop.get_visible() and self.today())
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=14, margin_end=14)
         self.big = Gtk.Label(xalign=0, css_classes=["clock-big"]); self.date = Gtk.Label(xalign=0, css_classes=["heading"])
-        self.cal = Gtk.Calendar(show_week_numbers=True); self.go = Gtk.Button(label="Hoy"); self.go.connect("clicked", lambda b: self.today())
+        self.cal = Gtk.Calendar(show_week_numbers=True); self.go = Gtk.Button(label=_("Hoy")); self.go.connect("clicked", lambda b: self.today())
         for w in (self.big, self.date, Gtk.Separator(), self.cal, self.go): box.append(w)
         self.pop.set_child(box); self.tick()
 
@@ -252,7 +253,7 @@ class Clock:
         hm = n.format("%I:%M" + (":%S" if c.get("clock_seconds") else "") + " %p") if str(c.get("clock_hours", "24")) == "12" else n.format("%H:%M" + (":%S" if c.get("clock_seconds") else ""))
         self.label.set_text(hm + (f"   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}" if c.get("clock_date", True) else ""))
         if self.pop.get_visible():
-            self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(f"{DIAS[n.get_day_of_week() - 1].capitalize()}, {n.get_day_of_month()} de {MESES[n.get_month() - 1]} de {n.get_year()}")
+            self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(_('{0}, {1} de {2} de {3}', DIAS[n.get_day_of_week() - 1].capitalize(), n.get_day_of_month(), MESES[n.get_month() - 1], n.get_year()))
         return True
 
 class Panel(Gtk.Application):
@@ -307,6 +308,8 @@ class Panel(Gtk.Application):
 
     def apply_settings(self):
         cfg = owee_config.load()
+        if cfg.get("lang") and cfg["lang"] != owee_i18n.LANG:             # cambió el idioma en Ajustes: el panel se reinicia a sí mismo para mostrarse en el idioma nuevo
+            GLib.timeout_add(400, lambda: os.execv(sys.executable, [sys.executable] + sys.argv))
         if hasattr(self, "corners"): self.corners.set_actions(cfg.get("corners", {}))
         pal = owee_config.palette(cfg)
         self.prov.load_from_data(css_for(pal))

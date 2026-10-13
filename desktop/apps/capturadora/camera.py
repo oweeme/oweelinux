@@ -4,6 +4,7 @@ import os
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gtk, Gdk, GLib, Gtk4LayerShell as LS
+from owee_i18n import _
 try:
     gi.require_version("Gst", "1.0"); from gi.repository import Gst; Gst.init(None); HAVE_GST = True
 except Exception: HAVE_GST = False
@@ -12,10 +13,10 @@ SIZES = [120, 180, 240, 320]
 
 def available():
     """(ok, motivo) — comprueba el complemento y que haya una cámara (o el modo de prueba)."""
-    if not HAVE_GST: return False, "Falta GStreamer para Python (gir1.2-gst)."
-    if not Gst.ElementFactory.find("gtk4paintablesink"): return False, "Falta el complemento gstreamer1.0-gtk4."
+    if not HAVE_GST: return False, _("Falta GStreamer para Python (gir1.2-gst).")
+    if not Gst.ElementFactory.find("gtk4paintablesink"): return False, _("Falta el complemento gstreamer1.0-gtk4.")
     if os.environ.get("OWEE_CAM_TEST"): return True, ""
-    if not any(n.startswith("video") for n in os.listdir("/dev")): return False, "No se encontró ninguna cámara."
+    if not any(n.startswith("video") for n in os.listdir("/dev")): return False, _("No se encontró ninguna cámara.")
     return True, ""
 
 class Bubble(Gtk.Window):

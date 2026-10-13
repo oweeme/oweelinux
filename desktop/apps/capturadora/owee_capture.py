@@ -18,6 +18,7 @@ try: import owee_config
 except Exception: owee_config = None
 import editor as ed
 import overlay as ov
+from owee_i18n import _
 
 CSS = """
 window.cap { background: @bg@; color: @fg@; }
@@ -82,15 +83,15 @@ class App(Gtk.Application):
         if getattr(self, "reopen", False): self.reopen = False; self.pending_main = True; GLib.timeout_add(300, lambda: (setattr(self, "pending_main", False), self.show_main(), False)[2])
     def show_main(self):
         if self.win: self.win.present(); return
-        w = self.win = Gtk.ApplicationWindow(application=self, title="Capturadora", icon_name="owee-capture", default_width=480, default_height=560); w.add_css_class("cap")
+        w = self.win = Gtk.ApplicationWindow(application=self, title=_("Capturadora"), icon_name="owee-capture", default_width=480, default_height=560); w.add_css_class("cap")
         w.connect("close-request", lambda x: (setattr(self, "win", None), GLib.idle_add(self.quit_if_idle), False)[2])
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin_top=16, margin_bottom=16, margin_start=18, margin_end=18); w.set_child(root)
-        root.append(Gtk.Label(label="Capturadora", xalign=0, css_classes=["title"]))
-        seg = Gtk.Box(spacing=6, css_classes=["seg"]); self.b_img = Gtk.Button(label="Imagen"); self.b_vid = Gtk.Button(label="Vídeo"); seg.append(self.b_img); seg.append(self.b_vid); root.append(seg)
+        root.append(Gtk.Label(label=_("Capturadora"), xalign=0, css_classes=["title"]))
+        seg = Gtk.Box(spacing=6, css_classes=["seg"]); self.b_img = Gtk.Button(label=_("Imagen")); self.b_vid = Gtk.Button(label=_("Vídeo")); seg.append(self.b_img); seg.append(self.b_vid); root.append(seg)
         self.stack = Gtk.Stack(); root.append(self.stack); self.b_img.connect("clicked", lambda b: self.page("img")); self.b_vid.connect("clicked", lambda b: self.page("vid"))
         self.stack.add_named(self.page_img(), "img"); self.stack.add_named(self.page_vid(), "vid")
         root.append(Gtk.Box(vexpand=True)); foot = Gtk.Box(spacing=8); root.append(foot)
-        for label, fn in (("Abrir carpeta de capturas", lambda b: self.open_dir(core.DIR_IMG)), ("Abrir carpeta de grabaciones", lambda b: self.open_dir(core.DIR_VID))):
+        for label, fn in ((_("Abrir carpeta de capturas"), lambda b: self.open_dir(core.DIR_IMG)), (_("Abrir carpeta de grabaciones"), lambda b: self.open_dir(core.DIR_VID))):
             b = Gtk.Button(label=label, css_classes=["flat"]); b.connect("clicked", fn); foot.append(b)
         self.msg = Gtk.Label(xalign=0, wrap=True, css_classes=["dim-label"]); root.append(self.msg)
         self.page("img"); w.present()
@@ -113,22 +114,22 @@ class App(Gtk.Application):
 
     def page_img(self):
         b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        for label, mode, cls in (("🖵  Pantalla completa", "full", "go"), ("⬚  Seleccionar una zona", "region", "big")):
+        for label, mode, cls in ((_("🖵  Pantalla completa"), "full", "go"), (_("⬚  Seleccionar una zona"), "region", "big")):
             btn = Gtk.Button(label=label, css_classes=["big"] + (["go"] if cls == "go" else [])); btn.connect("clicked", lambda _b, m=mode: self.do_shot(m)); b.append(btn)
-        b.append(self.row("Temporizador", self.drop("timer", [(0, "Sin temporizador"), (3, "3 segundos"), (5, "5 segundos"), (10, "10 segundos")])))
-        b.append(self.row("Incluir el puntero del ratón", self.sw("cursor"))); b.append(self.row("Copiar al portapapeles", self.sw("clipboard")))
+        b.append(self.row(_("Temporizador"), self.drop("timer", [(0, _("Sin temporizador")), (3, _("3 segundos")), (5, _("5 segundos")), (10, _("10 segundos"))])))
+        b.append(self.row(_("Incluir el puntero del ratón"), self.sw("cursor"))); b.append(self.row(_("Copiar al portapapeles"), self.sw("clipboard")))
         return b
 
     def page_vid(self):
         b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        for label, mode, cls in (("●  Grabar pantalla completa", "full", "rec"), ("⬚  Grabar una zona", "region", "big")):
+        for label, mode, cls in ((_("●  Grabar pantalla completa"), "full", "rec"), (_("⬚  Grabar una zona"), "region", "big")):
             btn = Gtk.Button(label=label, css_classes=["big"] + (["rec"] if cls == "rec" else [])); btn.connect("clicked", lambda _b, m=mode: self.start_recording(m)); b.append(btn)
         sys_t, mic_t = core.audio_sources()
-        b.append(self.row("Fotogramas por segundo", self.drop("fps", [(15, "15"), (24, "24"), (30, "30"), (60, "60")])))
-        sw = self.sw("audio_system"); sw.set_sensitive(bool(sys_t)); b.append(self.row("Audio del sistema", sw, "" if sys_t else "No se detectó una salida de audio"))
-        sm = self.sw("audio_mic"); sm.set_sensitive(bool(mic_t)); b.append(self.row("Micrófono", sm, "" if mic_t else "No se detectó un micrófono"))
-        cs = self.sw("camera"); b.append(self.row("Mostrar mi cámara en la grabación", cs, "Una burbuja redonda que puedes arrastrar; la rueda cambia su tamaño"))
-        pb = Gtk.Button(label="✎  Modo presentación (dibujar en pantalla)", css_classes=["big"]); pb.connect("clicked", lambda _b: self.present_mode()); b.append(pb)
+        b.append(self.row(_("Fotogramas por segundo"), self.drop("fps", [(15, "15"), (24, "24"), (30, "30"), (60, "60")])))
+        sw = self.sw("audio_system"); sw.set_sensitive(bool(sys_t)); b.append(self.row(_("Audio del sistema"), sw, "" if sys_t else _("No se detectó una salida de audio")))
+        sm = self.sw("audio_mic"); sm.set_sensitive(bool(mic_t)); b.append(self.row(_("Micrófono"), sm, "" if mic_t else _("No se detectó un micrófono")))
+        cs = self.sw("camera"); b.append(self.row(_("Mostrar mi cámara en la grabación"), cs, _("Una burbuja redonda que puedes arrastrar; la rueda cambia su tamaño")))
+        pb = Gtk.Button(label=_("✎  Modo presentación (dibujar en pantalla)"), css_classes=["big"]); pb.connect("clicked", lambda _b: self.present_mode()); b.append(pb)
         return b
 
     def say(self, t):
@@ -165,7 +166,7 @@ class App(Gtk.Application):
             if self.cfg["clipboard"]: core.copy_image(path)
             self.reopen = False                                                          # el editor es ahora el foco; la Capturadora se reabre desde el lanzador
             ed.open_editor(self, path)
-            self.say("Guardada en " + path + (" y copiada al portapapeles" if self.cfg["clipboard"] else ""))
+            self.say(_("Guardada en ") + path + (_(" y copiada al portapapeles") if self.cfg["clipboard"] else ""))
         core.run_async(work, done)
 
     def countdown(self, n, cb):
@@ -200,9 +201,9 @@ class App(Gtk.Application):
         w = self.pill = Gtk.Window(application=self, decorated=False); w.add_css_class("pill"); LS.init_for_window(w); LS.set_layer(w, LS.Layer.OVERLAY); LS.set_namespace(w, "owee-rec"); LS.set_keyboard_mode(w, LS.KeyboardMode.NONE)
         LS.set_anchor(w, LS.Edge.TOP, True); LS.set_anchor(w, LS.Edge.RIGHT, True); LS.set_margin(w, LS.Edge.TOP, 52); LS.set_margin(w, LS.Edge.RIGHT, 12)
         box = Gtk.Box(spacing=8, css_classes=["pillbox"]); self.timer_l = Gtk.Label(label="●  00:00"); box.append(self.timer_l)
-        pen = Gtk.Button(label="✎", css_classes=["alt"], tooltip_text="Modo presentación (dibujar)"); pen.connect("clicked", lambda b: self.present_mode()); box.append(pen)
-        cam = Gtk.Button(label="📷", css_classes=["alt"], tooltip_text="Mostrar u ocultar la cámara"); cam.connect("clicked", lambda b: self.toggle_camera()); box.append(cam)
-        st = Gtk.Button(label="■ Detener"); st.connect("clicked", lambda b: self.stop_recording()); box.append(st); w.set_child(box); w.present()
+        pen = Gtk.Button(label="✎", css_classes=["alt"], tooltip_text=_("Modo presentación (dibujar)")); pen.connect("clicked", lambda b: self.present_mode()); box.append(pen)
+        cam = Gtk.Button(label="📷", css_classes=["alt"], tooltip_text=_("Mostrar u ocultar la cámara")); cam.connect("clicked", lambda b: self.toggle_camera()); box.append(cam)
+        st = Gtk.Button(label=_("■ Detener")); st.connect("clicked", lambda b: self.stop_recording()); box.append(st); w.set_child(box); w.present()
         self.tick_id = GLib.timeout_add_seconds(1, self.tick_pill)
 
     def tick_pill(self):
@@ -211,14 +212,14 @@ class App(Gtk.Application):
 
     def stop_recording(self):
         if not self.rec.running: return
-        if self.pill: self.timer_l.set_text("Guardando…")
+        if self.pill: self.timer_l.set_text(_("Guardando…"))
         def done(path, err):
             if self.pill: self.pill.close(); self.pill = None
             self.close_cam()
             if self.pres: self.pres.finish()
             if err: self.say(err)
             else:
-                self.say("Grabación guardada: " + path); self.notify("Grabación guardada", path)
+                self.say(_("Grabación guardada: ") + path); self.notify(_("Grabación guardada"), path)
                 self.restore_main()
             GLib.idle_add(self.quit_if_idle)
         core.run_async(self.rec.stop, done)
@@ -234,7 +235,7 @@ class App(Gtk.Application):
             return
         import camera
         ok, why = camera.available()
-        if not ok: self.say("Cámara: " + why); self.notify("Cámara no disponible", why); return
+        if not ok: self.say(_("Cámara: ") + why); self.notify(_("Cámara no disponible"), why); return
         self.cam = camera.Bubble(self); self.cam.start()
     def close_cam(self):
         if self.cam: self.cam.stop(); self.cam = None

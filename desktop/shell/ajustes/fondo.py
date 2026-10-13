@@ -4,6 +4,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gio, GLib, GdkPixbuf
 from .base import Page, page_box, scrolled
+from owee_i18n import _
 
 WALL_DIRS = ["/usr/share/backgrounds/oweelinux", "/usr/share/wallpapers/OweeLinux/contents/images", os.path.expanduser("~/Pictures/Wallpapers"), os.path.expanduser("~/Imágenes/Fondos"),
              os.path.expanduser("~/.local/share/owee/wallpapers")]
@@ -15,15 +16,15 @@ def set_wallpaper(path):
     except GLib.Error as e: print("[ajustes] no se pudo cambiar el fondo:", e, flush=True)
 
 class Fondo(Page):
-    title = "Fondo de pantalla"; icon = "owee-set-wallpaper"; group = "Personal"; order = 20; keywords = "imagen escritorio wallpaper"
+    title = _("Fondo de pantalla"); icon = "owee-set-wallpaper"; group = "Personal"; order = 20; keywords = _("imagen escritorio wallpaper")
     def build(self, app):
-        self.app = app; b = page_box("Fondo de pantalla")
+        self.app = app; b = page_box(_("Fondo de pantalla"))
         self.flow = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=4, min_children_per_line=2, column_spacing=8, row_spacing=8, homogeneous=True, valign=Gtk.Align.START); self.thumbs = {}
         files = []
         for d in WALL_DIRS: files += sorted(f for ext in ("jpg", "jpeg", "png", "webp") for f in glob.glob(os.path.join(d, "*." + ext)))
         for f in files: self.add_thumb(f)
         b.append(Gtk.ScrolledWindow(child=self.flow, vexpand=True))
-        pick = Gtk.Button(label="Elegir otra imagen…", halign=Gtk.Align.START); pick.connect("clicked", self.pick_file); b.append(pick)
+        pick = Gtk.Button(label=_("Elegir otra imagen…"), halign=Gtk.Align.START); pick.connect("clicked", self.pick_file); b.append(pick)
         self.refresh(); return b
     def add_thumb(self, f):
         try: pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(f, 160, 90, True)          # miniatura pequeña: no se guarda la imagen entera en memoria
@@ -33,7 +34,7 @@ class Fondo(Page):
         self.flow.append(btn); self.thumbs[f] = btn
     def choose(self, f): self.app.change(wallpaper=f); set_wallpaper(f); self.refresh()
     def pick_file(self, _b):
-        dlg = Gtk.FileDialog(title="Elige una imagen"); flt = Gtk.FileFilter(); flt.set_name("Imágenes"); flt.add_mime_type("image/jpeg"); flt.add_mime_type("image/png"); flt.add_mime_type("image/webp"); dlg.set_default_filter(flt)
+        dlg = Gtk.FileDialog(title=_("Elige una imagen")); flt = Gtk.FileFilter(); flt.set_name(_("Imágenes")); flt.add_mime_type("image/jpeg"); flt.add_mime_type("image/png"); flt.add_mime_type("image/webp"); dlg.set_default_filter(flt)
         def done(d, res):
             try: f = d.open_finish(res).get_path()
             except GLib.Error: return

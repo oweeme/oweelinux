@@ -8,6 +8,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gdk, Gio, GLib
 import calc_engine as eng
+from owee_i18n import _
 try: import owee_config
 except Exception: owee_config = None
 
@@ -49,13 +50,13 @@ class Calc(Gtk.Application):
             self.load_history(); self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None) if owee_config else None
             if self.mon: self.mon.connect("changed", lambda *a: GLib.timeout_add(200, lambda: (self.restyle(), False)[1]))
         except Exception: pass
-        self.win = win = Gtk.ApplicationWindow(application=self, title="Calculadora", icon_name="owee-calc", default_width=320, default_height=500); win.add_css_class("calc")
+        self.win = win = Gtk.ApplicationWindow(application=self, title=_("Calculadora"), icon_name="owee-calc", default_width=320, default_height=500); win.add_css_class("calc")
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=8, margin_bottom=12, margin_start=12, margin_end=12); win.set_child(root)
         bar = Gtk.Box(spacing=4); root.append(bar)
         self.sci_btn = Gtk.ToggleButton(label="f(x)", css_classes=["tool"]); self.sci_btn.connect("toggled", self.toggle_sci); bar.append(self.sci_btn)
         self.deg_btn = Gtk.Button(label="DEG", css_classes=["tool"]); self.deg_btn.connect("clicked", self.toggle_deg); bar.append(self.deg_btn)
         bar.append(Gtk.Box(hexpand=True))
-        self.hist_btn = Gtk.MenuButton(icon_name="owee-calc-history", css_classes=["tool"], tooltip_text="Historial"); self.hpop = Gtk.Popover(); self.hist_btn.set_popover(self.hpop); self.hpop.connect("notify::visible", lambda p, _: p.get_visible() and self.fill_history()); bar.append(self.hist_btn)
+        self.hist_btn = Gtk.MenuButton(icon_name="owee-calc-history", css_classes=["tool"], tooltip_text=_("Historial")); self.hpop = Gtk.Popover(); self.hist_btn.set_popover(self.hpop); self.hpop.connect("notify::visible", lambda p, _: p.get_visible() and self.fill_history()); bar.append(self.hist_btn)
         disp = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, vexpand=True, valign=Gtk.Align.END); root.append(disp)
         self.prev = Gtk.Label(xalign=1, css_classes=["prev"], ellipsize=3); disp.append(self.prev)
         self.expr_l = Gtk.Label(xalign=1, css_classes=["expr"], ellipsize=1, selectable=False); disp.append(self.expr_l)
@@ -173,12 +174,12 @@ class Calc(Gtk.Application):
         """Ventanita del historial: lista (con desplazamiento solo si hay muchas operaciones) y el botón «Borrar» siempre visible debajo."""
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
         lst = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-        if not self.history: lst.append(Gtk.Label(label="Todavía no hay operaciones", margin_top=8, margin_bottom=8))
+        if not self.history: lst.append(Gtk.Label(label=_("Todavía no hay operaciones"), margin_top=8, margin_bottom=8))
         for e, r in reversed(self.history[-30:]):
             b = Gtk.Button(has_frame=False, child=Gtk.Label(label=f"{e} = {r}", xalign=1)); b.connect("clicked", lambda _b, r=r: (self.hpop.popdown(), self.use(r))); lst.append(b)
         sc = Gtk.ScrolledWindow(child=lst, propagate_natural_height=True, max_content_height=240, min_content_width=250, hscrollbar_policy=Gtk.PolicyType.NEVER); outer.append(sc)
         if self.history:
-            clr = Gtk.Button(label="Borrar historial", css_classes=["k"]); clr.connect("clicked", lambda b: (self.clear_history(), self.hpop.popdown())); outer.append(clr)
+            clr = Gtk.Button(label=_("Borrar historial"), css_classes=["k"]); clr.connect("clicked", lambda b: (self.clear_history(), self.hpop.popdown())); outer.append(clr)
         self.hpop.set_child(outer)
     def use(self, r): self.expr = r; self.just_evaluated = False; self.update()
 

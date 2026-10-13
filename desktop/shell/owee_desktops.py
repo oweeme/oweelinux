@@ -7,6 +7,7 @@ import os, re
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gtk, Gdk, Gio, GLib, Gtk4LayerShell as LS
+from owee_i18n import _
 
 STATE = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-desktop")
 RC = [os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "labwc", "rc.xml"), "/etc/xdg/labwc/rc.xml"]
@@ -46,7 +47,7 @@ class DesktopSwitcher:
         while (c := self.box.get_first_child()): self.box.remove(c)
         self.n = desktop_count(); self.dots = []
         for i in range(1, self.n + 1):
-            b = Gtk.Button(label=str(i), has_frame=False, focusable=False, tooltip_text=f"Escritorio {i}"); b.add_css_class("owee-desk"); b.connect("clicked", lambda _b, i=i: go(i)); self.box.append(b); self.dots.append(b)
+            b = Gtk.Button(label=str(i), has_frame=False, focusable=False, tooltip_text=_('Escritorio {0}', i)); b.add_css_class("owee-desk"); b.connect("clicked", lambda _b, i=i: go(i)); self.box.append(b); self.dots.append(b)
         self.mark()
 
     def mark(self):

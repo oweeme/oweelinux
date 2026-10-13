@@ -5,10 +5,11 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 from .base import Page, page_box, scrolled, heading, row, dropdown, switch
 from . import rcxml
+from owee_i18n import _
 
-ACTIONS = [("none", "Ninguna"), ("overview", "Vista general (todas las ventanas)"), ("next", "Escritorio siguiente"), ("prev", "Escritorio anterior"),
-           ("launcher", "Abrir el lanzador de apps"), ("calendar", "Abrir el calendario"), ("lock", "Bloquear la pantalla"), ("capture", "Capturar la pantalla")]
-CORNERS = [("tl", "Esquina superior izquierda"), ("tr", "Esquina superior derecha"), ("bl", "Esquina inferior izquierda"), ("br", "Esquina inferior derecha")]
+ACTIONS = [("none", _("Ninguna")), ("overview", _("Vista general (todas las ventanas)")), ("next", _("Escritorio siguiente")), ("prev", _("Escritorio anterior")),
+           ("launcher", _("Abrir el lanzador de apps")), ("calendar", _("Abrir el calendario")), ("lock", _("Bloquear la pantalla")), ("capture", _("Capturar la pantalla"))]
+CORNERS = [("tl", _("Esquina superior izquierda")), ("tr", _("Esquina superior derecha")), ("bl", _("Esquina inferior izquierda")), ("br", _("Esquina inferior derecha"))]
 OWEE = "/usr/libexec/owee/owee-desktop"
 
 def wheel_on():
@@ -31,17 +32,17 @@ def set_wheel(on):
     rcxml.edit(fn)
 
 class Escritorios(Page):
-    title = "Escritorios"; icon = "owee-set-desktops"; group = "Personal"; order = 30; keywords = "esquinas activas escritorios virtuales vista general ventanas espacios de trabajo"
+    title = _("Escritorios"); icon = "owee-set-desktops"; group = "Personal"; order = 30; keywords = _("esquinas activas escritorios virtuales vista general ventanas espacios de trabajo")
     def build(self, app):
-        self.app = app; b = page_box("Escritorios y esquinas", "Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).")
-        b.append(heading("Escritorios virtuales"))
+        self.app = app; b = page_box(_("Escritorios y esquinas"), _("Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general)."))
+        b.append(heading(_("Escritorios virtuales")))
         n = rcxml.get("desktops/number", default="4") or "4"
-        b.append(row("Cantidad de escritorios", dropdown([(str(i), str(i)) for i in range(1, 10)], n, lambda k: rcxml.set_values([("desktops/number", k)])), "El panel muestra un punto por escritorio; clic en uno para ir a él"))
-        b.append(row("Cambiar de escritorio con la rueda del ratón sobre el fondo", switch(wheel_on(), set_wheel)))
-        b.append(heading("Esquinas activas")); cur = app.cfg.get("corners", {})
+        b.append(row(_("Cantidad de escritorios"), dropdown([(str(i), str(i)) for i in range(1, 10)], n, lambda k: rcxml.set_values([("desktops/number", k)])), _("El panel muestra un punto por escritorio; clic en uno para ir a él")))
+        b.append(row(_("Cambiar de escritorio con la rueda del ratón sobre el fondo"), switch(wheel_on(), set_wheel)))
+        b.append(heading(_("Esquinas activas"))); cur = app.cfg.get("corners", {})
         for k, name in CORNERS:
             b.append(row(name, dropdown(ACTIONS, cur.get(k, "none"), lambda a, k=k: self.set_corner(k, a))))
-        b.append(Gtk.Label(label="Lleva el puntero a la esquina y espera un instante. Para repetir, sal de la esquina y vuelve a entrar.", xalign=0, wrap=True, css_classes=["dim-label"]))
+        b.append(Gtk.Label(label=_("Lleva el puntero a la esquina y espera un instante. Para repetir, sal de la esquina y vuelve a entrar."), xalign=0, wrap=True, css_classes=["dim-label"]))
         return scrolled(b)
     def set_corner(self, k, action):
         c = dict(self.app.cfg.get("corners", {})); c[k] = action; self.app.change(corners=c)

@@ -1,15 +1,17 @@
 """Ajustes del escritorio Lite compartidos por el panel y la app de ajustes: ~/.config/owee/settings.json
 {"theme": "koi"|"claro"|"pizarra"|"niebla"|"crepusculo"|"arena"|"medianoche", "mode": "dark"|"light" (lo fija el tema), "accent": "#RRGGBB", "wallpaper": "/ruta/imagen", "clock_hours": "24"|"12", "clock_seconds": bool, "clock_date": bool}. Si falta o está dañado se usan los valores de fábrica (nunca falla)."""
 import json, os
+from owee_i18n import _
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
-ACCENTS = [("Teal", "#2A9D8F"), ("Coral", "#F06548"), ("Azul", "#3B82C4"), ("Violeta", "#8B6FD6"), ("Dorado", "#D9A441"), ("Verde", "#5BA85B")]
+DEFAULTS = {"lang": "", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
+ACCENTS = [(_("Teal"), "#2A9D8F"), (_("Coral"), "#F06548"), (_("Azul"), "#3B82C4"), (_("Violeta"), "#8B6FD6"), (_("Dorado"), "#D9A441"), (_("Verde"), "#5BA85B")]
 
 def load():
     d = dict(DEFAULTS)
     try:
         j = json.load(open(PATH))
         if j.get("mode") in ("dark", "light"): d["mode"] = j["mode"]
+        if isinstance(j.get("lang"), str): d["lang"] = j["lang"]
         if j.get("theme") in THEMES: d["theme"] = j["theme"]; d["mode"] = THEMES[j["theme"]]["mode"]
         a = str(j.get("accent", ""))
         if len(a) == 7 and a[0] == "#": int(a[1:], 16); d["accent"] = a
@@ -28,13 +30,13 @@ def save(d):
 # Temas: «dark» o «light» de base + colores. Pensados para no cansar la vista: fondos suaves (nunca negro ni blanco puro), contraste de texto ≥ 7:1 y acentos apagados.
 # win=fondo de ventanas, fg=texto, pop=ventanitas, line=líneas, entry=campos, accent=acento por defecto del tema (se puede cambiar).
 THEMES = {
-    "koi":        dict(name="Koi (oscuro)",        mode="dark",  win="#102019", fg="#EFF0F1", pop="#16251f", line="#2b4a3d", entry="#102019", accent="#2A9D8F"),
-    "claro":      dict(name="Claro",               mode="light", win="#F6F8F7", fg="#17231e", pop="#FFFFFF", line="#cfdad5", entry="#EEF3F1", accent="#2A9D8F"),
-    "pizarra":    dict(name="Pizarra (gris oscuro)", mode="dark",  win="#262a30", fg="#dde1e6", pop="#2e333a", line="#3d434c", entry="#1f2328", accent="#6FA8C7"),
-    "niebla":     dict(name="Niebla (gris claro)", mode="light", win="#ECEDEF", fg="#23272d", pop="#F6F6F7", line="#d0d3d8", entry="#E1E3E7", accent="#4F8583"),
-    "crepusculo": dict(name="Crepúsculo (violeta)", mode="dark", win="#2a2833", fg="#e6e3ee", pop="#322f3d", line="#443f52", entry="#23212b", accent="#B39DDB"),
-    "arena":      dict(name="Arena (cálido claro)", mode="light", win="#F4EFE6", fg="#35302a", pop="#FBF8F2", line="#ddd4c5", entry="#EBE4D6", accent="#B9622F"),
-    "medianoche": dict(name="Medianoche (azul grisáceo)", mode="dark", win="#1d2330", fg="#d9dee8", pop="#252c3b", line="#343d52", entry="#181d28", accent="#7FB4CA"),
+    "koi":        dict(name=_("Koi (oscuro)"),        mode="dark",  win="#102019", fg="#EFF0F1", pop="#16251f", line="#2b4a3d", entry="#102019", accent="#2A9D8F"),
+    "claro":      dict(name=_("Claro"),               mode="light", win="#F6F8F7", fg="#17231e", pop="#FFFFFF", line="#cfdad5", entry="#EEF3F1", accent="#2A9D8F"),
+    "pizarra":    dict(name=_("Pizarra (gris oscuro)"), mode="dark",  win="#262a30", fg="#dde1e6", pop="#2e333a", line="#3d434c", entry="#1f2328", accent="#6FA8C7"),
+    "niebla":     dict(name=_("Niebla (gris claro)"), mode="light", win="#ECEDEF", fg="#23272d", pop="#F6F6F7", line="#d0d3d8", entry="#E1E3E7", accent="#4F8583"),
+    "crepusculo": dict(name=_("Crepúsculo (violeta)"), mode="dark", win="#2a2833", fg="#e6e3ee", pop="#322f3d", line="#443f52", entry="#23212b", accent="#B39DDB"),
+    "arena":      dict(name=_("Arena (cálido claro)"), mode="light", win="#F4EFE6", fg="#35302a", pop="#FBF8F2", line="#ddd4c5", entry="#EBE4D6", accent="#B9622F"),
+    "medianoche": dict(name=_("Medianoche (azul grisáceo)"), mode="dark", win="#1d2330", fg="#d9dee8", pop="#252c3b", line="#343d52", entry="#181d28", accent="#7FB4CA"),
 }
 DEFAULT_THEME = "koi"
 

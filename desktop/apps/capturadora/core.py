@@ -1,8 +1,16 @@
 """Capturadora de OweeLinux — núcleo sin interfaz: capturas con grim/slurp y grabación de vídeo con wf-recorder + audio con pw-record (se mezcla con ffmpeg).
 Todas las órdenes son procesos externos con tiempo límite; ninguna se espera en el hilo de la interfaz (el llamador usa `run_async`)."""
 import datetime, json, os, shutil, signal, subprocess, threading, time
+from owee_i18n import _
 HOME = os.path.expanduser("~")
-DIR_IMG = os.path.join(HOME, "Imágenes", "Capturas"); DIR_VID = os.path.join(HOME, "Vídeos", "Grabaciones")
+def _dir(kind, fallback):
+    """Carpeta estándar del usuario (XDG): Pictures/Videos si no hay otra configurada (no depende del idioma de la interfaz)."""
+    from gi.repository import GLib
+    return GLib.get_user_special_dir(kind) or os.path.join(HOME, fallback)
+def dirs():
+    from gi.repository import GLib
+    return (os.path.join(_dir(GLib.UserDirectory.DIRECTORY_PICTURES, "Pictures"), "Screenshots"), os.path.join(_dir(GLib.UserDirectory.DIRECTORY_VIDEOS, "Videos"), "Screen Recordings"))
+DIR_IMG, DIR_VID = dirs()
 CFG = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.join(HOME, ".config")), "owee", "capture.json")
 DEFAULTS = {"timer": 0, "cursor": False, "clipboard": True, "fps": 30, "audio_system": True, "audio_mic": False, "camera": False, "quality": "media"}
 
@@ -26,11 +34,11 @@ def select_region():
 
 def shot(geometry=None, cursor=False, path=None):
     """Hace una captura (toda la pantalla o `geometry`). Devuelve la ruta del PNG o lanza RuntimeError con un mensaje legible."""
-    if not have("grim"): raise RuntimeError("Falta «grim» (captura de pantalla de Wayland).")
+    if not have("grim"): raise RuntimeError(_("Falta «grim» (captura de pantalla de Wayland)."))
     os.makedirs(DIR_IMG, exist_ok=True); path = path or os.path.join(DIR_IMG, f"captura-{stamp()}.png")
     cmd = ["grim"] + (["-c"] if cursor else []) + (["-g", geometry] if geometry else []) + [path]
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-    if r.returncode != 0 or not os.path.exists(path): raise RuntimeError("No se pudo capturar la pantalla: " + (r.stderr.strip() or "error desconocido"))
+    if r.returncode != 0 or not os.path.exists(path): raise RuntimeError(_("No se pudo capturar la pantalla: ") + (r.stderr.strip() or _("error desconocido")))
     return path
 
 def copy_image(path):
@@ -48,11 +56,11 @@ def audio_sources():
 
 class Recorder:
     """Grabación de pantalla. start() lanza wf-recorder (vídeo) y, si se pide, pw-record por cada fuente de audio; stop() cierra con SIGINT (así los archivos quedan válidos),
-    mezcla el audio con ffmpeg y deja un MP4 en ~/Vídeos/Grabaciones. Un fallo en una fuente de audio no estropea el vídeo."""
+    mezcla el audio con ffmpeg y deja un MP4 en ~/Videos/Screen Recordings. Un fallo en una fuente de audio no estropea el vídeo."""
     def __init__(self): self.procs = []; self.tmp = None; self.out = None; self.t0 = 0; self.running = False
 
     def start(self, geometry=None, fps=30, system=False, mic=False):
-        if not have("wf-recorder"): raise RuntimeError("Falta «wf-recorder» (grabación de pantalla).")
+        if not have("wf-recorder"): raise RuntimeError(_("Falta «wf-recorder» (grabación de pantalla)."))
         os.makedirs(DIR_VID, exist_ok=True); self.out = os.path.join(DIR_VID, f"grabacion-{stamp()}.mp4"); self.tmp = os.path.join("/tmp", f"owee-rec-{os.getpid()}-{stamp()}")
         os.makedirs(self.tmp, exist_ok=True); self.audio = []
         v = ["wf-recorder", "-f", os.path.join(self.tmp, "video.mkv"), "-r", str(fps), "-c", "libx264", "-p", "preset=veryfast", "-p", "crf=24", "-p", "pix_fmt=yuv420p"] + (["-g", geometry] if geometry else [])   # el puntero se graba por defecto
@@ -65,7 +73,7 @@ class Recorder:
         self.t0 = time.time(); self.running = True
         time.sleep(0.6)
         if self.procs[0].poll() is not None:
-            err = open(os.path.join(self.tmp, "wf.log")).read().strip()[-300:]; self.cleanup(); raise RuntimeError("No arrancó la grabación: " + (err or "wf-recorder terminó al instante"))
+            err = open(os.path.join(self.tmp, "wf.log")).read().strip()[-300:]; self.cleanup(); raise RuntimeError(_("No arrancó la grabación: ") + (err or _("wf-recorder terminó al instante")))
 
     def _pw(self, name, target, monitor):
         f = os.path.join(self.tmp, name + ".wav")
@@ -76,11 +84,11 @@ class Recorder:
 
     def stop(self):
         """Termina y devuelve la ruta del MP4 (o lanza RuntimeError). Bloquea unos segundos: llamar desde un hilo."""
-        if not self.running: raise RuntimeError("No hay una grabación en curso.")
+        if not self.running: raise RuntimeError(_("No hay una grabación en curso."))
         self.running = False
         for _n, _f, p in self.audio: self._term(p)
         self._term(self.procs[0]); video = os.path.join(self.tmp, "video.mkv")
-        if not os.path.exists(video) or os.path.getsize(video) < 1000: err = open(os.path.join(self.tmp, "wf.log")).read().strip()[-200:]; self.cleanup(); raise RuntimeError("La grabación quedó vacía. " + err)
+        if not os.path.exists(video) or os.path.getsize(video) < 1000: err = open(os.path.join(self.tmp, "wf.log")).read().strip()[-200:]; self.cleanup(); raise RuntimeError(_("La grabación quedó vacía. ") + err)
         wavs = [f for _n, f, _p in self.audio if os.path.exists(f) and os.path.getsize(f) > 2000]
         if wavs and have("ffmpeg"):
             cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", video] + sum([["-i", w] for w in wavs], [])

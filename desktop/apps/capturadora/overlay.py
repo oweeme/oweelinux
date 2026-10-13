@@ -6,6 +6,7 @@ import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gtk, Gdk, GLib, Gtk4LayerShell as LS
 import cairo
+from owee_i18n import _
 
 COLORS = [("#F06548", "1"), ("#F2C94C", "2"), ("#2A9D8F", "3"), ("#3B82C4", "4"), ("#FFFFFF", "5"), ("#8B6FD6", "6")]
 
@@ -19,15 +20,15 @@ class Overlay(Gtk.Window):
         Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 1)
         ov = Gtk.Overlay(); self.set_child(ov); self.area = Gtk.DrawingArea(hexpand=True, vexpand=True); self.area.set_draw_func(self.draw); ov.set_child(self.area)
         bar = Gtk.Box(spacing=6, halign=Gtk.Align.CENTER, valign=Gtk.Align.END, margin_bottom=22); bar.add_css_class("opbar"); ov.add_overlay(bar); self.btns = {}
-        for k, label, tip in (("pen", "✎ Lápiz", "Dibujar libremente"), ("marker", "▬ Resaltador", "Resaltar texto"), ("arrow", "➚ Flecha", "Señalar con una flecha")):
+        for k, label, tip in (("pen", _("✎ Lápiz"), _("Dibujar libremente")), ("marker", _("▬ Resaltador"), _("Resaltar texto")), ("arrow", _("➚ Flecha"), _("Señalar con una flecha"))):
             b = Gtk.Button(label=label, tooltip_text=tip); b.connect("clicked", lambda _b, k=k: self.set_tool(k)); bar.append(b); self.btns[k] = b
         self.sw = {}
         for c, key in COLORS:
-            b = Gtk.Button(css_classes=["sw"], tooltip_text=f"Color ({key})"); p = Gtk.CssProvider(); p.load_from_string(f"button {{ background: {c}; background-image: none; }}"); b.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_USER + 5)
+            b = Gtk.Button(css_classes=["sw"], tooltip_text=_('Color ({0})', key)); p = Gtk.CssProvider(); p.load_from_string(f"button {{ background: {c}; background-image: none; }}"); b.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_USER + 5)
             b.connect("clicked", lambda _b, c=c: self.set_color(c)); bar.append(b); self.sw[c] = b
-        hb = Gtk.Button(label="◉ Halo", tooltip_text="Resaltar el puntero (F)"); hb.connect("clicked", lambda b: self.toggle_halo()); bar.append(hb); self.halo_btn = hb
-        cl = Gtk.Button(label="⌫ Borrar", tooltip_text="Borrar todo (Supr)"); cl.connect("clicked", lambda b: self.clear()); bar.append(cl)
-        ex = Gtk.Button(label="✕ Salir", tooltip_text="Salir del modo presentación (Esc)"); ex.connect("clicked", lambda b: self.finish()); bar.append(ex)
+        hb = Gtk.Button(label=_("◉ Halo"), tooltip_text=_("Resaltar el puntero (F)")); hb.connect("clicked", lambda b: self.toggle_halo()); bar.append(hb); self.halo_btn = hb
+        cl = Gtk.Button(label=_("⌫ Borrar"), tooltip_text=_("Borrar todo (Supr)")); cl.connect("clicked", lambda b: self.clear()); bar.append(cl)
+        ex = Gtk.Button(label=_("✕ Salir"), tooltip_text=_("Salir del modo presentación (Esc)")); ex.connect("clicked", lambda b: self.finish()); bar.append(ex)
         drag = Gtk.GestureDrag(); drag.connect("drag-begin", self.begin); drag.connect("drag-update", self.update); drag.connect("drag-end", self.end); self.area.add_controller(drag)
         mc = Gtk.EventControllerMotion(); mc.connect("motion", self.motion); self.area.add_controller(mc)
         k = Gtk.EventControllerKey(); k.connect("key-pressed", self.on_key); self.add_controller(k)

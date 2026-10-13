@@ -10,9 +10,10 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gio, GLib, Gdk
 import owee_config
 from ajustes.base import Page
+from owee_i18n import _, N_
 
-PAGES = ["apariencia", "fondo", "escritorios", "pantalla", "sonido", "teclado", "raton", "energia", "fechahora", "aplicaciones", "atajos", "actualizaciones", "acerca"]
-GROUPS = ["Personal", "Dispositivos", "Sistema"]
+PAGES = ["apariencia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "teclado", "raton", "energia", "fechahora", "aplicaciones", "atajos", "actualizaciones", "acerca"]
+GROUPS = [_("Personal"), _("Dispositivos"), _("Sistema")]
 CSS = b"""
 .swatch { min-width: 34px; min-height: 34px; border-radius: 999px; padding: 0; border: 3px solid transparent; }
 .swatch.sel { border-color: @theme_fg_color; }
@@ -67,16 +68,16 @@ class App(Gtk.Application):
         try:
             g = Gdk.Display.get_default().get_monitors().get_item(0).get_geometry(); w, h = min(w, g.width - 60), min(h, g.height - 100)
         except Exception: pass
-        win = Gtk.ApplicationWindow(application=self, title="Ajustes de OweeLinux", icon_name="preferences-system", default_width=w, default_height=h)
+        win = Gtk.ApplicationWindow(application=self, title=_("Ajustes de OweeLinux"), icon_name="preferences-system", default_width=w, default_height=h)
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE, hexpand=True)
         side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=230)
-        self.search = Gtk.SearchEntry(placeholder_text="Buscar ajustes…", margin_top=8, margin_start=8, margin_end=8, margin_bottom=4); side.append(self.search)
+        self.search = Gtk.SearchEntry(placeholder_text=_("Buscar ajustes…"), margin_top=8, margin_start=8, margin_end=8, margin_bottom=4); side.append(self.search)
         self.nav = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, css_classes=["navlist"]); self.nav.set_filter_func(self.nav_filter); self.nav.set_header_func(None)
         self.rows = []
         for g in GROUPS:
             ps = sorted((p for p in self.pages if p.group == g), key=lambda p: p.order)
             if not ps: continue
-            hdr = Gtk.ListBoxRow(selectable=False, activatable=False, child=Gtk.Label(label=g.upper(), xalign=0, css_classes=["navgroup"])); hdr.group = g; hdr.page = None; self.nav.append(hdr); self.rows.append(hdr)
+            hdr = Gtk.ListBoxRow(selectable=False, activatable=False, child=Gtk.Label(label=_(g).upper(), xalign=0, css_classes=["navgroup"])); hdr.group = g; hdr.page = None; self.nav.append(hdr); self.rows.append(hdr)
             for p in ps:
                 h = Gtk.Box(spacing=10); h.append(Gtk.Image(icon_name=p.icon, pixel_size=18)); h.append(Gtk.Label(label=p.title, xalign=0))
                 r = Gtk.ListBoxRow(child=h, css_classes=["navrow"]); r.page = p; r.group = g; self.nav.append(r); self.rows.append(r)
@@ -100,7 +101,7 @@ class App(Gtk.Application):
     def show_page(self, p):
         if p.title not in self.built:
             try: w = p.build(self)
-            except Exception: traceback.print_exc(); w = Gtk.Label(label="Esta página no se pudo cargar (mira la terminal).")
+            except Exception: traceback.print_exc(); w = Gtk.Label(label=_("Esta página no se pudo cargar (mira la terminal)."))
             self.built[p.title] = w; self.stack.add_named(w, p.title)
         self.stack.set_visible_child_name(p.title)
         try: p.refresh()

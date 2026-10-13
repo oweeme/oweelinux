@@ -5,9 +5,10 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib
 from .base import Page, page_box, scrolled, heading, row, dropdown, slider, run, have, Debounce, config_home
+from owee_i18n import _
 
 SCALES = [("1", "100 %"), ("1.25", "125 %"), ("1.5", "150 %"), ("1.75", "175 %"), ("2", "200 %")]       # claves en formato %g (como se normaliza lo que dice wlr-randr)
-ROT = [("normal", "Normal"), ("90", "90° a la derecha"), ("180", "180°"), ("270", "90° a la izquierda")]
+ROT = [("normal", _("Normal")), ("90", _("90° a la derecha")), ("180", "180°"), ("270", _("90° a la izquierda"))]
 SAVE = os.path.join(config_home(), "owee", "display.json")
 
 def parse_randr(text):
@@ -29,16 +30,16 @@ def parse_randr(text):
 def randr_args(o, mode, scale, transform): return ["wlr-randr", "--output", o, "--mode", f"{mode[0]}x{mode[1]}@{mode[2]:.3f}Hz", "--scale", str(scale), "--transform", transform]
 
 class Pantalla(Page):
-    title = "Pantalla"; icon = "owee-set-display"; group = "Dispositivos"; order = 10; keywords = "resolución escala brillo monitor rotación"
+    title = _("Pantalla"); icon = "owee-set-display"; group = "Dispositivos"; order = 10; keywords = _("resolución escala brillo monitor rotación")
     def build(self, app):
-        self.b = page_box("Pantalla"); self.holder = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); self.b.append(self.holder); self.deb = Debounce(300); self.confirm_id = 0
+        self.b = page_box(_("Pantalla")); self.holder = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); self.b.append(self.holder); self.deb = Debounce(300); self.confirm_id = 0
         self.bar = Gtk.Box(spacing=10, css_classes=["card"], visible=False); self.msg = Gtk.Label(hexpand=True, xalign=0); self.bar.append(self.msg)
-        keep = Gtk.Button(label="Mantener"); keep.connect("clicked", lambda b: self.finish(True)); rev = Gtk.Button(label="Revertir"); rev.connect("clicked", lambda b: self.finish(False)); self.bar.append(keep); self.bar.append(rev)
+        keep = Gtk.Button(label=_("Mantener")); keep.connect("clicked", lambda b: self.finish(True)); rev = Gtk.Button(label=_("Revertir")); rev.connect("clicked", lambda b: self.finish(False)); self.bar.append(keep); self.bar.append(rev)
         self.b.append(self.bar); self.refresh(); return scrolled(self.b)
 
     def refresh(self):
         if not hasattr(self, "holder"): return
-        if not have("wlr-randr"): self.holder.append(Gtk.Label(label="No se encontró `wlr-randr`.", xalign=0)); return
+        if not have("wlr-randr"): self.holder.append(Gtk.Label(label=_("No se encontró `wlr-randr`."), xalign=0)); return
         run(["wlr-randr"], self.on_randr); run(["brightnessctl", "-m", "-c", "backlight"], self.on_bright)
 
     def on_randr(self, out, code):
@@ -46,15 +47,15 @@ class Pantalla(Page):
             if getattr(c, "is_bright", False): break
             self.holder.remove(c)
         self.outputs = parse_randr(out) if code == 0 else []; self.loading = True
-        if not self.outputs: self.holder.prepend(Gtk.Label(label="No se pudo leer la configuración de pantalla.", xalign=0)); self.loading = False; return
+        if not self.outputs: self.holder.prepend(Gtk.Label(label=_("No se pudo leer la configuración de pantalla."), xalign=0)); self.loading = False; return
         for o in reversed(self.outputs):
-            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); box.append(heading(f"Monitor {o['name']}"))
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); box.append(heading(_('Monitor {0}', o['name'])))
             cur = next((m for m in o["modes"] if m[3]), o["modes"][0] if o["modes"] else None)
             if cur:
                 opts = [(f"{w}x{h}@{hz:.3f}", f"{w} × {h}  ({hz:.0f} Hz)") for w, h, hz, _c in o["modes"]]
-                box.append(row("Resolución", dropdown(opts, f"{cur[0]}x{cur[1]}@{cur[2]:.3f}", lambda k, o=o: self.apply(o, mode=k))))
-            box.append(row("Escala", dropdown(SCALES, o["scale"] if o["scale"] in dict(SCALES) else "1", lambda k, o=o: self.apply(o, scale=k)), "Más grande = textos e iconos mayores"))
-            box.append(row("Rotación", dropdown(ROT, o["transform"] if o["transform"] in dict(ROT) else "normal", lambda k, o=o: self.apply(o, transform=k))))
+                box.append(row(_("Resolución"), dropdown(opts, f"{cur[0]}x{cur[1]}@{cur[2]:.3f}", lambda k, o=o: self.apply(o, mode=k))))
+            box.append(row(_("Escala"), dropdown(SCALES, o["scale"] if o["scale"] in dict(SCALES) else "1", lambda k, o=o: self.apply(o, scale=k)), _("Más grande = textos e iconos mayores")))
+            box.append(row(_("Rotación"), dropdown(ROT, o["transform"] if o["transform"] in dict(ROT) else "normal", lambda k, o=o: self.apply(o, transform=k))))
             box.is_out = True; self.holder.prepend(box)
         self.loading = False
 
@@ -64,8 +65,8 @@ class Pantalla(Page):
         line = out.strip().splitlines()[0] if out.strip() else ""
         p = line.split(",")
         if code != 0 or len(p) < 5: return
-        self.loading = True; box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); box.is_bright = True; box.append(heading("Brillo"))
-        box.append(row("Brillo de la pantalla", slider(1, 100, int(p[3].rstrip("%")), lambda v: not self.loading and self.deb(lambda: run(["brightnessctl", "set", f"{round(v)}%"])), width=260)))
+        self.loading = True; box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); box.is_bright = True; box.append(heading(_("Brillo")))
+        box.append(row(_("Brillo de la pantalla"), slider(1, 100, int(p[3].rstrip("%")), lambda v: not self.loading and self.deb(lambda: run(["brightnessctl", "set", f"{round(v)}%"])), width=260)))
         self.holder.append(box); self.loading = False
 
     def apply(self, o, mode=None, scale=None, transform=None):
@@ -76,12 +77,12 @@ class Pantalla(Page):
         w, h, hz = re.match(r"(\d+)x(\d+)@([\d.]+)", mode).groups() if mode else (0, 0, 0)
         new = ((int(w), int(h), float(hz), True), scale or o["scale"], transform or o["transform"])
         if mode is None: return
-        self.pending = (o, old, new); self.msg.set_text(f"Pantalla {o['name']} cambiada. ¿Mantener estos cambios? Se revertirán en 10 s."); self.bar.set_visible(True); self.left = 10
+        self.pending = (o, old, new); self.msg.set_text(_('Pantalla {0} cambiada. ¿Mantener estos cambios? Se revertirán en 10 s.', o['name'])); self.bar.set_visible(True); self.left = 10
         run(randr_args(o["name"], new[0], new[1], new[2]))
         self.confirm_id = GLib.timeout_add_seconds(1, self.tick)
 
     def tick(self):
-        self.left -= 1; self.msg.set_text(f"¿Mantener estos cambios? Se revertirán en {self.left} s.")
+        self.left -= 1; self.msg.set_text(_('¿Mantener estos cambios? Se revertirán en {0} s.', self.left))
         if self.left <= 0: self.finish(False); return False
         return True
 
