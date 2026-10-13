@@ -49,7 +49,7 @@ try:
                       "printf 'WLR_RENDERER=pixman\\nWLR_NO_HARDWARE_CURSORS=1\\nGSK_RENDERER=cairo\\n' > /etc/environment; "
            "printf '[Autologin]\\nUser=oweeuser\\nSession=owee-lite.desktop\\n\\n[General]\\nDisplayServer=x11\\n' > /etc/sddm.conf.d/10-owee-test.conf; systemctl start sddm; echo MARK_X=ok", "X", 120)
     time.sleep(45)
-    sh("mkdir -p /tmp/ov; curl -s http://10.0.2.2:8006/shell-over.tgz | tar xz -C /tmp/ov; chmod -R a+rX /tmp/ov; mount --bind /tmp/ov/shell /usr/libexec/owee && echo bound", "BD", 60)
+    if os.environ.get("OVERLAY"): sh("mkdir -p /tmp/ov; curl -s http://10.0.2.2:8006/shell-over.tgz | tar xz -C /tmp/ov; chmod -R a+rX /tmp/ov; mount --bind /tmp/ov/shell /usr/libexec/owee && echo bound", "BD", 60)
     q = Qmp(); time.sleep(2)
     F = lambda cmd, k, t=30: sh(U + cmd, k, t) or ""
     ENV = "WAYLAND_DISPLAY=wayland-0 "
