@@ -7,14 +7,14 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
-for f in owee_panel.py wl_toplevels.py owee_tray.py; do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee_panel.py wl_toplevels.py owee_tray.py owee_config.py owee_settings.py; do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
 # en ~/.config/owee/widgets); los ejemplos se dejan aparte para copiarlos y cambiarlos.
 for f in "$D"/widgets/sistema/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets/$(basename "$f")"; done
 for f in "$D"/widgets/ejemplos/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets-ejemplos/$(basename "$f")"; done
-python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" >/dev/null
+python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" >/dev/null; python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" "#17231e" Owee-Light >/dev/null
 install -Dm0644 "$D/theme/themerc" "$R/usr/share/themes/Owee/openbox-3/themerc"
 install -Dm0644 "$D/waybar/config.jsonc" "$ETC/xdg/waybar/config.jsonc"; install -Dm0644 "$D/waybar/style.css" "$ETC/xdg/waybar/style.css"
 # Debian instala waybar.service y mako.service (usuario) y arrancan solos con la sesión gráfica: la sesión Lite
@@ -24,3 +24,14 @@ rm -rf "$R/usr/lib/owee/wlgen"; mkdir -p "$R/usr/lib/owee/wlgen"
 python3 -m pywayland.scanner -o "$R/usr/lib/owee/wlgen" -i \
   /usr/share/wayland-protocols/staging/ext-foreign-toplevel-list/ext-foreign-toplevel-list-v1.xml 2>&1 | tail -1
 echo "sesión Lite instalada en $R"
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Ajustes de OweeLinux
+GenericName=Ajustes
+Comment=Apariencia y fondo de pantalla
+Exec=/usr/libexec/owee/owee_settings.py
+Icon=preferences-system
+Categories=Settings;
+Keywords=ajustes;tema;fondo;color;apariencia;
+EOD

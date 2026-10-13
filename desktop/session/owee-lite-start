@@ -3,7 +3,7 @@
 # PANEL (python | waybar | none) y OWEE_PANEL_PATH (para iterar sin reconstruir la imagen) se pueden fijar en /etc/owee/panel.conf
 PANEL=python
 [ -f /etc/owee/panel.conf ] && . /etc/owee/panel.conf
-swaybg -c '#102019' -i /usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg -m fill &
+/usr/libexec/owee/owee-wallpaper &
 mako &
 case "$PANEL" in
   python) python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > /tmp/owee-panel.log 2>&1 & ;;

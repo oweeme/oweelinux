@@ -97,6 +97,15 @@ el panel solo muestra el número junto al icono. El botón de sesión (a la dere
 Lección: la imagen **no traía el cargador de SVG** (`librsvg2-common`), así que ningún icono SVG se dibujaba (tampoco los de KDE); ahora está en `packages-plasma.txt`.
 Prueba: `tools/ostree-proto/image-lite-test.py` sobre la imagen completa (capturas `imagen-sesion*.png`). El panel sube a ~47 MB Pss con los iconos.
 
+## Ajustes de OweeLinux (probado, v0.1)
+App propia `owee_settings.py` (Python + GTK4, sin libadwaita) con **Apariencia** (modo claro/oscuro y 6 colores de acento) y **Fondo de pantalla** (miniaturas de las carpetas
+de fondos + «Elegir otra imagen…»). Escribe `~/.config/owee/settings.json` (se puede editar a mano; si falta o está dañado se usan los valores de fábrica).
+- El **panel vigila ese archivo** y cambia al instante (colores, texto sobre el acento claro/oscuro, y el tema de iconos `Owee` ↔ `Owee-Light`), sin reiniciar.
+- El fondo lo cambia `owee-wallpaper` (reinicia `swaybg`); al iniciar sesión se usa el elegido.
+- Apps GTK: `gtk-application-prefer-dark-theme` en `~/.config/gtk-{3,4}.0/settings.ini`; apps Qt/KDE: esquema Breeze/BreezeDark con `kwriteconfig` si existe (tomado al abrir la app de nuevo; **este último paso no está probado**).
+- Pendiente: color de acento en apps ajenas, tema de las ventanas de labwc (hoy fijo), tipografía propia, apariencia automática por hora, más ajustes (pantalla, teclado, red).
+Prueba: `tools/ostree-proto/settings-test.py` (clics reales en la VM: modo, acento, fondo; capturas `ajustes-*.png`).
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que

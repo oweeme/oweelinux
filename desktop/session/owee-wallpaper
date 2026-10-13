@@ -1,0 +1,8 @@
+#!/bin/sh
+# Cambia el fondo de pantalla: owee-wallpaper [IMAGEN]. Sin argumento usa la de ~/.config/owee/settings.json (o la de fábrica).
+S="${XDG_CONFIG_HOME:-$HOME/.config}/owee/settings.json"
+IMG="$1"
+[ -z "$IMG" ] && [ -f "$S" ] && IMG=$(jq -r '.wallpaper // empty' "$S" 2>/dev/null)
+[ -f "$IMG" ] || IMG=/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg
+pkill -x swaybg 2>/dev/null
+exec swaybg -c '#102019' -i "$IMG" -m fill

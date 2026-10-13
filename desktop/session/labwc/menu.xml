@@ -4,7 +4,7 @@
   <menu id="root-menu" label="">
     <item label="Terminal"><action name="Execute" command="foot"/></item>
     <item label="Archivos"><action name="Execute" command="dolphin"/></item>
-    <item label="Ajustes"><action name="Execute" command="systemsettings"/></item>
+    <item label="Ajustes"><action name="Execute" command="/usr/libexec/owee/owee_settings.py"/></item>
     <separator/>
     <item label="Cerrar sesión"><action name="Exit"/></item>
     <item label="Reiniciar"><action name="Execute" command="systemctl reboot"/></item>

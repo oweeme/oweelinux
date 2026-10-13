@@ -14,30 +14,36 @@ if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exi
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 import json, re
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import owee_config
 from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
-CSS = b"""
-window.owee-panel { background: rgba(16,32,25,0.92); color: #EFF0F1; border-radius: 12px; }
+CSS_TEMPLATE = """
+window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
-menubutton.owee-widget > button, menubutton.owee-widget > button label { background: transparent; background-image: none; color: #EFF0F1; border: none; box-shadow: none; padding: 0 2px; min-height: 0; }
-menubutton.owee-widget > button:hover, menubutton.owee-widget > button:checked { background: rgba(42,157,143,0.35); background-image: none; }
-popover > contents { background: #16251f; color: #EFF0F1; border: 1px solid #2A9D8F; border-radius: 12px; }
-popover label.heading { color: #2A9D8F; font-weight: bold; }
-popover button { background: #2A9D8F; color: #102019; border: none; border-radius: 8px; box-shadow: none; }
-popover scale trough { background: #2b4a3d; } popover scale highlight { background: #2A9D8F; } popover scale slider { background: #EFF0F1; }
-popover calendar { background: transparent; color: #EFF0F1; border-color: #2b4a3d; }
-popover calendar:selected { background: #2A9D8F; color: #102019; }
-popover calendar.view, popover calendar button { color: #EFF0F1; background: transparent; }
+menubutton.owee-widget > button, menubutton.owee-widget > button label { background: transparent; background-image: none; color: @fg@; border: none; box-shadow: none; padding: 0 2px; min-height: 0; }
+menubutton.owee-widget > button:hover, menubutton.owee-widget > button:checked { background: @hover@; background-image: none; }
+popover > contents { background: @pop@; color: @fg@; border: 1px solid @accent@; border-radius: 12px; }
+popover label.heading { color: @accent@; font-weight: bold; }
+popover button { background: @accent@; color: @on@; border: none; border-radius: 8px; box-shadow: none; }
+popover scale trough { background: @line@; } popover scale highlight { background: @accent@; } popover scale slider { background: @fg@; }
+popover calendar { background: transparent; color: @fg@; border-color: @line@; }
+popover calendar:selected { background: @accent@; color: @on@; }
+popover calendar.view, popover calendar button { color: @fg@; background: transparent; }
 button.owee-tray { background: transparent; background-image: none; border: none; box-shadow: none; padding: 2px 4px; min-height: 0; min-width: 0; }
-button.owee-tray:hover { background: rgba(42,157,143,0.35); }
-button.owee-row { background: transparent; background-image: none; color: #EFF0F1; border: none; box-shadow: none; border-radius: 8px; padding: 6px 10px; min-width: 200px; }
-button.owee-row:hover { background: rgba(42,157,143,0.35); }
+button.owee-tray:hover { background: @hover@; }
+button.owee-row { background: transparent; background-image: none; color: @fg@; border: none; box-shadow: none; border-radius: 8px; padding: 6px 10px; min-width: 200px; }
+button.owee-row:hover { background: @hover@; }
 button.owee-row label.warn { color: #F06548; padding: 0; }
-menubutton.launcher > button { background: #2A9D8F; background-image: none; color: #102019; border: none; box-shadow: none; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; min-height: 0; }
-popover entry { background: #102019; color: #EFF0F1; border: 1px solid #2b4a3d; border-radius: 8px; box-shadow: none; }
-popover list, popover row { background: transparent; color: #EFF0F1; }
-popover row { border-radius: 8px; padding: 4px 6px; } popover row:hover, popover row:selected { background: rgba(42,157,143,0.35); }
+menubutton.launcher > button { background: @accent@; background-image: none; color: @on@; border: none; box-shadow: none; border-radius: 8px; padding: 2px 12px; margin: 3px 4px; min-height: 0; }
+popover entry { background: @entry@; color: @fg@; border: 1px solid @line@; border-radius: 8px; box-shadow: none; }
+popover list, popover row { background: transparent; color: @fg@; }
+popover row { border-radius: 8px; padding: 4px 6px; } popover row:hover, popover row:selected { background: @hover@; }
 """
+
+def css_for(pal):
+    s = CSS_TEMPLATE
+    for k, v in pal.items(): s = s.replace("@%s@" % k, v)
+    return s.encode()
 
 def mem(tag):
     d = {}
@@ -217,9 +223,13 @@ class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
 
     def do_activate(self):
-        Gtk.Settings.get_default().set_property("gtk-icon-theme-name", "Owee")      # iconos propios; el resto cae a breeze/Adwaita/hicolor
-        prov = Gtk.CssProvider(); prov.load_from_data(CSS)
-        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        self.prov = Gtk.CssProvider(); self.apply_settings()
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        try:                                           # cambios en los ajustes (app de ajustes) se aplican al instante, sin reiniciar el panel
+            os.makedirs(os.path.dirname(owee_config.PATH), exist_ok=True)
+            self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None)
+            self.mon.connect("changed", lambda m, f, o, ev: f.get_basename() == "settings.json" and GLib.timeout_add(150, lambda: (self.apply_settings(), False)[1]))
+        except GLib.Error as e: print("[ajustes] sin vigilancia:", e, flush=True)
         win = Gtk.ApplicationWindow(application=self); win.add_css_class("owee-panel")
         LS.init_for_window(win); LS.set_layer(win, LS.Layer.TOP); LS.set_namespace(win, "owee-panel")
         for e in (LS.Edge.TOP, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(win, e, True)
@@ -241,6 +251,11 @@ class Panel(Gtk.Application):
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
         GLib.timeout_add_seconds(40, lambda: (mem("40 s tras abrir"), False)[1])
+
+    def apply_settings(self):
+        pal = owee_config.palette(owee_config.load())
+        self.prov.load_from_data(css_for(pal))
+        Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])       # iconos propios; el resto cae a breeze/Adwaita/hicolor
 
     def dump_layout(self, win):                                  # solo depuración: posición de cada widget (para pruebas con el ratón)
         out = {}

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Generador de los iconos PROPIOS de OweeLinux (tema "Owee"). Dibujos originales de línea (trazo redondeado de 1,8 px sobre 24x24), hechos aquí
-con formas simples para que cualquiera pueda cambiarlos. Uso: gen_icons.py DESTINO [COLOR_TRAZO]   (por defecto #EFF0F1, para barras oscuras).
+con formas simples para que cualquiera pueda cambiarlos. Uso: gen_icons.py DESTINO [COLOR_TRAZO [NOMBRE]]   (por defecto #EFF0F1 y "Owee", para barras oscuras; el tema claro es #17231e y "Owee-Light").
 Escribe DESTINO/Owee/{index.theme,scalable/actions/*.svg}. Para otro estilo (p. ej. modo claro) basta otro color o cambiar STROKE."""
 import os, sys
-dest = os.path.join(sys.argv[1], "Owee"); col = sys.argv[2] if len(sys.argv) > 2 else "#EFF0F1"
+col = sys.argv[2] if len(sys.argv) > 2 else "#EFF0F1"; NAME = sys.argv[3] if len(sys.argv) > 3 else "Owee"
+dest = os.path.join(sys.argv[1], NAME)
 out = os.path.join(dest, "scalable", "actions"); os.makedirs(out, exist_ok=True)
 STROKE = 1.8
 def svg(name, body, fill_none=True):
@@ -31,7 +32,7 @@ import shutil
 os.makedirs(os.path.join(dest, "32x32", "apps"), exist_ok=True)
 shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "branding", "owee-logo-32.png"), os.path.join(dest, "32x32", "apps", "owee-logo.png"))
 open(os.path.join(dest, "index.theme"), "w").write("""[Icon Theme]
-Name=Owee
+Name=%s
 Comment=Iconos propios de OweeLinux (línea, redondeados)
 Inherits=breeze,Adwaita,hicolor
 Directories=scalable/actions,32x32/apps
@@ -49,5 +50,5 @@ MinSize=16
 MaxSize=64
 Type=Scalable
 Context=Applications
-""")
+""" % NAME)
 print("iconos escritos en", dest, "(%d)" % len(os.listdir(out)))
