@@ -24,6 +24,7 @@ window.cap { background: @bg@; color: @fg@; }
 .cap .title { font-weight: bold; font-size: 15pt; } .cap .big { font-size: 12pt; padding: 14px 10px; border-radius: 12px; background-image: none; border: none; box-shadow: none; background: @key@; color: @fg@; } .cap .big:hover { background: @keyh@; }
 .cap .go { background: @accent@; color: @on@; font-weight: bold; } .cap .rec { background: #F06548; color: #fff; font-weight: bold; }
 .cap .seg button { background: @key@; color: @fg@; border: none; box-shadow: none; background-image: none; border-radius: 8px; padding: 6px 18px; } .cap .seg button.on { background: @accent@; color: @on@; }
+.cap switch:checked { background: @accent@; } .cap switch:checked slider { background: @on@; }
 .cap .setrow { padding: 6px 0; border-bottom: 1px solid alpha(@fg@, 0.1); }
 window.pill, window.pill > * { background: transparent; } .pillbox { background: rgba(16,32,25,0.94); border: 1px solid #F06548; border-radius: 999px; padding: 4px 10px; color: #EFF0F1; }
 .pillbox button { background: #F06548; color: #fff; border: none; border-radius: 999px; background-image: none; box-shadow: none; font-weight: bold; padding: 2px 12px; min-height: 0; } .pillbox button.alt { background: #2b4a3d; }
