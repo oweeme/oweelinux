@@ -124,6 +124,16 @@ El widget de red muestra las 8 redes más fuertes (una por nombre), marca la con
 Nuevo tipo de elemento de ventanita: `{"type":"entry","password":true,"command":[...]}` (al pulsar Intro se llama al comando con el texto como último argumento).
 Prueba: `tools/ostree-proto/wifi-test.py` con `mock-nmcli` (la VM no tiene WiFi): clic en red abierta, red guardada, red con clave y apagar WiFi; **no está probado con una tarjeta WiFi real**.
 
+## Apps propias del escritorio (probadas en VM)
+**Calculadora** (`desktop/apps/calculadora`): motor sin `eval` con decimales exactos (40 pruebas en `test_engine.py`), interfaz compacta, historial, modo científico, sigue claro/oscuro y acento.
+**Capturadora** (`desktop/apps/capturadora`, reemplaza a Spectacle): `core.py` (grim, slurp, wf-recorder, pw-record, ffmpeg), `editor.py` (lápiz, resaltador, flecha, rectángulo, elipse, texto, números, pixelar, deshacer),
+`overlay.py` (modo presentación: dibujo, halo del puntero, ondas al clic; **captura el ratón mientras está activo**), `camera.py` (burbuja redonda con GStreamer; OWEE_CAM_TEST=1 usa imagen de prueba).
+Atajos: Impr. Pant. (pantalla), Mayús+Impr. Pant. (zona), Ctrl+Impr. Pant. (ventana de la app), Super+Alt+R / +Mayús (grabar pantalla/zona; repetir = parar), Super+Alt+P (presentación), Super+Alt+C (cámara).
+Probado con clics reales: captura, editor (dibujar, guardar, copiar), presentación, grabación MP4 h264 de 6 s con la burbuja de cámara de prueba (`capture-test.py`).
+**No probado:** audio del sistema/micrófono (la VM no tiene audio), cámara real, grabar zona, temporizador; la barra de grabación aparece en el vídeo si se graba la pantalla completa; falta captura de una ventana suelta
+(labwc no expone captura por ventana todavía) y pausa de grabación.
+**Escritorios virtuales:** puntos en el panel, Super+N, Super+Mayús+N, Ctrl+Alt+←/→, rueda sobre el fondo y esquinas activas (Ajustes → Escritorios); la «vista general» es el menú de ventanas de labwc (Super+Tab), sin miniaturas.
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que

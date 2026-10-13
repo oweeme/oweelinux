@@ -63,7 +63,7 @@ try:
     q = Qmp(); time.sleep(3)
     F = lambda cmd, k, t=30: sh(U + cmd, k, t) or ""
     ENV = "WAYLAND_DISPLAY=wayland-0 PATH=/tmp/mockbin:/usr/local/bin:/usr/bin:/bin "
-    CAP = "python3 /tmp/apps/capturadora/owee_capture.py"
+    CAP = "/usr/libexec/owee/apps/capturadora/owee_capture.py"
     vm.screenshot(os.path.join(out, "cap-0.png")); print("loginctl:", sh("loginctl list-sessions --no-legend | cut -c1-80; pgrep -c -x labwc", "LC", 30))
     F(ENV + f"sh -c 'nohup {CAP} --shot full > /tmp/cap.log 2>&1 &'", "S"); time.sleep(10); vm.screenshot(os.path.join(out, "cap-1-editor.png"))
     D = "/var/home/oweeuser/Imágenes/Capturas"; n = sh(f"ls {D}/*.png 2>/dev/null | wc -l", "N", 30) or ""; check("--shot full guarda una captura PNG", n.strip("|").strip() == "1", n)
@@ -88,6 +88,17 @@ try:
     key("esc"); time.sleep(2)
     F(ENV + f"sh -c 'nohup {CAP} > /tmp/main.log 2>&1 &'", "MN"); time.sleep(6); vm.screenshot(os.path.join(out, "cap-5-principal.png"))
     alive = sh("pgrep -c -f owee_capture.py", "AL", 30) or ""; check("la Capturadora sigue viva y responde tras presentación", alive.strip("|").strip() not in ("", "0"), alive)
+    key("esc"); time.sleep(1)
+    # --- grabación real: pantalla completa 6 s con la burbuja de cámara de prueba
+    open(srv + "/cfg.json", "w").write(json.dumps({"camera": True, "audio_system": False, "audio_mic": False, "fps": 15}))
+    sh("pkill -f owee_capture.py; install -d -o oweeuser -g oweeuser /var/home/oweeuser/.config/owee; curl -s http://10.0.2.2:8006/cfg.json -o /var/home/oweeuser/.config/owee/capture.json; chown oweeuser:oweeuser /var/home/oweeuser/.config/owee/capture.json", "CF", 30)
+    F(ENV + "OWEE_CAM_TEST=1 " + f"sh -c 'nohup {CAP} --record full > /tmp/rec.log 2>&1 &'", "RC"); time.sleep(9); vm.screenshot(os.path.join(out, "cap-6-grabando.png"))
+    F(ENV + f"sh -c 'nohup {CAP} --record full > /tmp/rec2.log 2>&1 &'", "RS"); time.sleep(14)
+    VD = "/var/home/oweeuser/Vídeos/Grabaciones"
+    vf = sh(f"ls -l {VD}/ 2>&1 | tail -2; ffprobe -v error -show_entries stream=codec_name,width,height,duration -of csv=p=0 {VD}/*.mp4 2>&1 | head -3", "VF", 60) or ""; print("video:", vf)
+    check("la grabación produce un MP4 con vídeo h264", "h264" in vf, vf)
+    print("log rec:", sh("grep -v -i 'dconf\\|a11y' /tmp/rec.log /tmp/rec2.log | head -6 | cut -c1-220", "LR", 30))
+    vm.screenshot(os.path.join(out, "cap-7-despues.png"))
 finally:
     vm.kill(); http.kill()
 print("PASA todo" if res and all(res) else "HAY FALLOS"); sys.exit(0 if res and all(res) else 1)
