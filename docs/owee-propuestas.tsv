@@ -1,0 +1,457 @@
+es	en	owee	origen
+Calculadora	Calculator	banu-meka	GLOSARIO
+Historial	History	mena-tera	PROPUESTA
+Borrar historial	Clear history	mena-tera nuse-dare	PROPUESTA
+Todavía no hay operaciones	No operations yet	mado kema-no mora	PROPUESTA
+Falta GStreamer para Python (gir1.2-gst).	GStreamer for Python is missing (gir1.2-gst).	«GStreamer» «Python» ko no mora	PROPUESTA
+Falta el complemento gstreamer1.0-gtk4.	The gstreamer1.0-gtk4 plugin is missing.	«gstreamer1.0-gtk4» no mora	PROPUESTA
+No se encontró ninguna cámara.	No camera was found.	salo-sena-kera meka no pe kera	PROPUESTA
+Falta «grim» (captura de pantalla de Wayland).	«grim» is missing (Wayland screen capture).	«grim» no mora	PROPUESTA
+No se pudo capturar la pantalla: 	Could not capture the screen: 	loke-tabe no pe kera: 	PROPUESTA
+Falta «wf-recorder» (grabación de pantalla).	«wf-recorder» is missing (screen recording).	«wf-recorder» no mora	PROPUESTA
+No hay una grabación en curso.	There is no recording in progress.	salo-sena-duma-kera no mora	PROPUESTA
+error desconocido	unknown error	kare-no lare-no	PROPUESTA
+No arrancó la grabación: 	The recording did not start: 	salo-sena-duma-kera no pe pado: 	PROPUESTA
+La grabación quedó vacía. 	The recording is empty. 	salo-sena-duma-kera nuse pe mora. 	PROPUESTA
+wf-recorder terminó al instante	wf-recorder ended immediately	«wf-recorder» tera-no pe dure	PROPUESTA
+Lápiz	Pencil	beka-feke	PROPUESTA
+Resaltador	Highlighter	salo-lafe beka-feke	PROPUESTA
+Flecha	Arrow	tora-telo	PROPUESTA
+Rectángulo	Rectangle	fo-kado	PROPUESTA
+Elipse	Ellipse	selo-dore	PROPUESTA
+Texto	Text	doke-beka	GLOSARIO
+Número	Number	banu	PROPUESTA
+Pixelar	Pixelate	gore-po-dare	PROPUESTA
+Copiar	Copy	dare-se	GLOSARIO
+Guardar	Save	mena-fena	GLOSARIO
+Guardar como…	Save as…	mena-fena ko sena-nara	PROPUESTA
+Escribe y pulsa Intro	Type and press Enter	beka re «Intro» tada-kade	PROPUESTA
+Guardado: 	Saved: 	mena-fena pe fese: 	PROPUESTA
+Guardar como	Save as	mena-fena ko sena-nara	PROPUESTA
+Copiada al portapapeles	Copied to the clipboard	dare-se pe fese	PROPUESTA
+Falta wl-copy	wl-copy is missing	«wl-copy» no mora	PROPUESTA
+Editar captura — 	Edit screenshot — 	loke-tabe-kera telo — 	PROPUESTA
+Grosor	Thickness	dase-pa	PROPUESTA
+Deshacer (Ctrl+Z)	Undo (Ctrl+Z)	pe-telo (Ctrl+Z)	PROPUESTA
+Rehacer (Ctrl+Mayús+Z)	Redo (Ctrl+Shift+Z)	pu-telo (Ctrl+Shift+Z)	PROPUESTA
+✎ Lápiz	✎ Pencil	✎ beka-feke	PROPUESTA
+Dibujar libremente	Draw freely	beka-feke ko duma	PROPUESTA
+▬ Resaltador	▬ Highlighter	▬ salo-lafe beka-feke	PROPUESTA
+Resaltar texto	Highlight text	doke-beka salo-lafe	PROPUESTA
+➚ Flecha	➚ Arrow	➚ tora-telo	PROPUESTA
+Señalar con una flecha	Point with an arrow	tora-telo ko loke-pema	PROPUESTA
+◉ Halo	◉ Halo	◉ salo-selo	PROPUESTA
+Resaltar el puntero (F)	Highlight the pointer (F)	pose-feke salo-lafe (F)	PROPUESTA
+⌫ Borrar	⌫ Clear	⌫ nuse-dare	PROPUESTA
+Borrar todo (Supr)	Clear everything (Del)	kema-fese nuse-dare (Supr)	PROPUESTA
+✕ Salir	✕ Exit	✕ gune	PROPUESTA
+Salir del modo presentación (Esc)	Exit presentation mode (Esc)	meka-tabe loke-pema gune (Esc)	PROPUESTA
+Color ({0})	Color ({0})	salo-lafe ({0})	PROPUESTA
+Capturadora	Screen Capture	loke-tabe-kera	PROPUESTA
+Imagen	Image	salo-sena	GLOSARIO
+Vídeo	Video	salo-sena-duma	PROPUESTA
+Abrir carpeta de capturas	Open screenshots folder	loke-tabe-kera kopa bure	PROPUESTA
+Abrir carpeta de grabaciones	Open recordings folder	salo-sena-duma-kera kopa bure	PROPUESTA
+🖵  Pantalla completa	🖵  Full screen	🖵  loke-tabe fese	PROPUESTA
+⬚  Seleccionar una zona	⬚  Select an area	⬚  kore delo	PROPUESTA
+Temporizador	Timer	tera-kedo-po-po meka	PROPUESTA
+Incluir el puntero del ratón	Include the mouse pointer	pose-feke dore loke-pema	PROPUESTA
+Copiar al portapapeles	Copy to the clipboard	dare-se	PROPUESTA
+●  Grabar pantalla completa	●  Record full screen	●  loke-tabe fese salo-sena-duma-kera	PROPUESTA
+⬚  Grabar una zona	⬚  Record an area	⬚  kore salo-sena-duma-kera	PROPUESTA
+Fotogramas por segundo	Frames per second	tera-kedo-po-po bo salo-sena	PROPUESTA
+Audio del sistema	System audio	meka-gora sone	PROPUESTA
+Micrófono	Microphone	sone-feke	PROPUESTA
+Mostrar mi cámara en la grabación	Show my camera in the recording	me salo-sena-kera meka loke-pema	PROPUESTA
+Una burbuja redonda que puedes arrastrar; la rueda cambia su tamaño	A round bubble you can drag; the wheel changes its size	selo-dore kopa, me duma-dare pode; gore telo ko duma	PROPUESTA
+✎  Modo presentación (dibujar en pantalla)	✎  Presentation mode (draw on screen)	✎  meka-tabe beka-feke	PROPUESTA
+Modo presentación (dibujar)	Presentation mode (draw)	meka-tabe beka-feke	PROPUESTA
+Mostrar u ocultar la cámara	Show or hide the camera	salo-sena-kera meka loke-pema lo loke-kose	PROPUESTA
+■ Detener	■ Stop	■ dure-gune	PROPUESTA
+Guardando…	Saving…	mena-fena te	PROPUESTA
+Cámara no disponible	Camera not available	salo-sena-kera meka no pode	PROPUESTA
+No se detectó una salida de audio	No audio output was detected	sone-pema no pe kera	PROPUESTA
+No se detectó un micrófono	No microphone was detected	sone-feke no pe kera	PROPUESTA
+Grabación guardada	Recording saved	salo-sena-duma-kera mena-fena pe fese	PROPUESTA
+Cámara: 	Camera: 	salo-sena-kera meka: 	PROPUESTA
+Guardada en 	Saved in 	mena-fena pe fese bo 	PROPUESTA
+ y copiada al portapapeles	 and copied to the clipboard	 re dare-se pe fese	PROPUESTA
+Grabación guardada: 	Recording saved: 	salo-sena-duma-kera mena-fena pe fese: 	PROPUESTA
+Sin temporizador	No timer	tera-kedo-po-po no	PROPUESTA
+3 segundos	3 seconds	ga tera-kedo-po-po	PROPUESTA
+5 segundos	5 seconds	sa tera-kedo-po-po	PROPUESTA
+10 segundos	10 seconds	be tanu tera-kedo-po-po	PROPUESTA
+Acerca de	About	doke	GLOSARIO
+versión sistema equipo kernel memoria	version system computer kernel memory	tera-dore meka-gora meka-mado kore meka-gume mena	PROPUESTA
+Sitio web	Website	gora-rela kuma	PROPUESTA
+Equipo	Computer	meka-mado	GLOSARIO
+Procesador	Processor	mado-meka	PROPUESTA
+Memoria	Memory	mena	PROPUESTA
+Disco (datos)	Disk (data)	mena-kopa (doke)	PROPUESTA
+{0:.0f} GB libres de {1:.0f} GB	{0:.0f} GB free of {1:.0f} GB	{0:.0f} «GB» nuse bo {1:.0f} «GB»	PROPUESTA
+Kernel	Kernel	meka-gora choma	PROPUESTA
+Sesión	Session	nado-bure	PROPUESTA
+Escritorio Lite · Python + GTK4 · GPLv3	Lite desktop · Python + GTK4 · GPLv3	meka-tabe «Lite» · «Python» «GTK4» · «GPLv3»	PROPUESTA
+Actualizaciones	Updates	tame-telo	GLOSARIO
+actualizar versión rollback volver atrás ostree	update version rollback go back ostree	tame-telo tera-dore pe-duma «ostree»	PROPUESTA
+El sistema se actualiza por versiones completas: si una versión nueva no arranca bien, el equipo vuelve solo a la anterior.	The system updates in complete versions: if a new version does not boot properly, the computer goes back to the previous one by itself.	meka-gora tera-dore fese bo tame-telo; ke tame tera-dore no kare pado, meka-mado pe tera-dore to pe-duma	PROPUESTA
+Buscar e instalar actualizaciones	Check for and install updates	tame-telo kera-nume re fena	PROPUESTA
+Volver a la versión anterior…	Go back to the previous version…	pe tera-dore to pe-duma…	PROPUESTA
+Versión en uso	Version in use	kade te tera-dore	PROPUESTA
+Última confirmada	Last confirmed	pe-fese tare tera-dore	PROPUESTA
+Publicación	Release	tera-dore	PROPUESTA
+Estado	Status	te-dore	GLOSARIO
+Buscando… (puede tardar)	Checking… (may take a while)	kera-nume te… (dure pode)	PROPUESTA
+Volviendo a la versión anterior…	Going back to the previous version…	pe tera-dore to pe-duma te…	PROPUESTA
+estable ✓	stable ✓	fadu ✓	PROPUESTA
+a prueba (se confirma si el sistema queda sano)	on trial (confirmed if the system stays healthy)	mede te (meka-gora sado ke, tare-dare)	PROPUESTA
+No se pudo leer el estado del sistema (¿no es una instalación ostree o falta permiso?).	Could not read the system status (not an ostree install, or permission missing?).	meka-gora te-dore lodu no pode («ostree» no mora lo nado no mora ka)	PROPUESTA
+Listo.	Done.	fese.	PROPUESTA
+  (código {0}: ¿cancelaste la contraseña o falta permiso?)	  (code {0}: did you cancel the password, or is permission missing?)	  (dare-reka {0}: sena-fadu pe kose lo nado no ka)	PROPUESTA
+Apariencia	Appearance	dore-salo	GLOSARIO
+tema claro oscuro color acento gris paleta	theme light dark color accent gray palette	dore-seta salo-pa salo-po salo-lafe bore-fale	PROPUESTA
+Elige un tema. Todos están pensados para no cansar la vista: fondos suaves, buen contraste y colores apagados.	Choose a theme. All of them are designed to be easy on the eyes: soft backgrounds, good contrast and muted colors.	dore-seta delo. kema-fese loke-sado: tabe malo, salo-lafe sape-po, kare luma-sado	PROPUESTA
+Tema	Theme	dore-seta	GLOSARIO
+Color de acento	Accent color	salo-lafe go	PROPUESTA
+Cambia al instante en el panel, las ventanas y las apps (GTK, Qt/KDE y LibreOffice con tema del sistema). Algunas apps de terceros con tema propio pueden pedir reiniciarse.	Changes instantly in the panel, windows and apps (GTK, Qt/KDE and LibreOffice with the system theme). Some third-party apps with their own theme may ask to be restarted.	meka-tabe re loke-kopa re mado-foma bo te telo («GTK» «Qt» «KDE» «LibreOffice»). mado-foma gade-no ko dore-seta pu-telo moke pode	PROPUESTA
+Aplicaciones	Applications	mado-foma	GLOSARIO
+predeterminadas navegador abrir con tipos de archivo	default web browser open with file types	pado-foma gora-rela-duma bure ko doke-seta	PROPUESTA
+Navegador web	Web browser	gora-rela-duma	GLOSARIO
+Archivos (carpetas)	Files (folders)	doke-kopa (kopa)	PROPUESTA
+Documentos PDF	PDF documents	«PDF» doke-beka	PROPUESTA
+Imágenes	Images	salo-sena	GLOSARIO
+Música	Music	lena-sone	GLOSARIO
+Correo electrónico	Email	reka-rela	GLOSARIO
+Archivos comprimidos	Compressed files	doke-kopa gore-po-dare	PROPUESTA
+Aplicaciones predeterminadas	Default applications	pado-foma mado-foma	PROPUESTA
+Elige con qué app se abre cada tipo de archivo o enlace.	Choose which app opens each type of file or link.	mado-foma delo, doke-seta lo rela bure ko	PROPUESTA
+Mayús	Shift	Mayús	PROPUESTA
+Intro	Enter	Intro	PROPUESTA
+Espacio	Space	Espacio	PROPUESTA
+Impr. Pant.	Print Screen	Impr. Pant.	PROPUESTA
+Atajos de teclado	Keyboard shortcuts	maku-tabe sape-nado	GLOSARIO
+teclas combinaciones super	keys combinations super	maku-tabe seta «super»	PROPUESTA
+Para cambiarlos, edita ~/.config/labwc/rc.xml (se aplican al guardar con `labwc --reconfigure`).	To change them, edit ~/.config/labwc/rc.xml (applied when saved with `labwc --reconfigure`).	telo kade: «~/.config/labwc/rc.xml» telo-beka (mena-fena ke «labwc --reconfigure» kade)	PROPUESTA
+Abrir el lanzador	Open the launcher	mado-foma-seta bure	PROPUESTA
+Abrir el calendario	Open the calendar	loda-kelo-seta bure	PROPUESTA
+Terminal	Terminal	foot	PROPUESTA
+Archivos	Files	doke-kopa	PROPUESTA
+Bloquear la pantalla	Lock the screen	loke-tabe fadu-kose	PROPUESTA
+Captura de una zona	Capture an area	kore loke-tabe-kera	PROPUESTA
+Captura de pantalla	Screenshot	loke-tabe-kera	GLOSARIO
+Grabar la pantalla (otra vez = parar)	Record the screen (again = stop)	loke-tabe salo-sena-duma-kera (pu-kelo = gune)	PROPUESTA
+Volumen	Volume	sone-gore	GLOSARIO
+Silenciar	Mute	sone-nuse	PROPUESTA
+Brillo	Brightness	salo-gore	GLOSARIO
+Cambiar de ventana	Switch windows	loke-kopa telo	PROPUESTA
+Mover / redimensionar con el ratón	Move / resize with the mouse	pose-feke ko duma-dare lo gore-telo	PROPUESTA
+Alt + Tab	Alt + Tab	Alt + Tab	PROPUESTA
+Alt + arrastrar	Alt + drag	«Alt» + delo-duma	PROPUESTA
+Rendimiento	Performance	sape-mado	PROPUESTA
+Equilibrado	Balanced	se-mede	PROPUESTA
+Ahorro de energía	Power saver	enu-fadu	PROPUESTA
+Energía	Power	enu	GLOSARIO
+batería suspender bloqueo inactividad rendimiento ahorro	battery suspend lock inactivity performance saving	enu-kopa sule fadu-kose dure-no sape-mado enu-fadu	PROPUESTA
+Nunca	Never	tera-no	GLOSARIO
+1 minuto	1 minute	be tera-kedo-po	PROPUESTA
+2 minutos	2 minutes	du tera-kedo-po	PROPUESTA
+5 minutos	5 minutes	sa tera-kedo-po	PROPUESTA
+10 minutos	10 minutes	be tanu tera-kedo-po	PROPUESTA
+15 minutos	15 minutes	be tanu sa tera-kedo-po	PROPUESTA
+30 minutos	30 minutes	ga tanu tera-kedo-po	PROPUESTA
+1 hora	1 hour	be tera-kedo	PROPUESTA
+Inactividad	Inactivity	dure-no	PROPUESTA
+Bloquear la pantalla tras	Lock the screen after	loke-tabe fadu-kose pu	PROPUESTA
+Suspender el equipo tras	Suspend the computer after	meka-mado sule pu	PROPUESTA
+Suspender necesita un equipo que lo admita	Suspending needs a computer that supports it	meka-mado sule: meka-mado pode ke	PROPUESTA
+Perfil de rendimiento	Performance profile	sape-mado dore-seta	PROPUESTA
+Perfil	Profile	dore-seta	PROPUESTA
+Escritorios	Desktops	meka-tabe-seta	GLOSARIO
+esquinas activas escritorios virtuales vista general ventanas espacios de trabajo	hot corners virtual desktops overview windows workspaces	kore-go kore-gu meka-tabe-seta loke-tabe-kera loke-kopa	PROPUESTA
+Ninguna	None	bema-nuse	GLOSARIO
+Vista general (todas las ventanas)	Overview (all windows)	loke-kopa kema-fese luma-salo	PROPUESTA
+Escritorio siguiente	Next desktop	pu meka-tabe	PROPUESTA
+Escritorio anterior	Previous desktop	pe meka-tabe	PROPUESTA
+Abrir el lanzador de apps	Open the app launcher	mado-foma-seta bure	PROPUESTA
+Capturar la pantalla	Capture the screen	loke-tabe-kera	PROPUESTA
+Esquina superior izquierda	Top-left corner	go doma-kado kore	PROPUESTA
+Esquina superior derecha	Top-right corner	go doma-kado-no kore	PROPUESTA
+Esquina inferior izquierda	Bottom-left corner	gu doma-kado kore	PROPUESTA
+Esquina inferior derecha	Bottom-right corner	gu doma-kado-no kore	PROPUESTA
+Escritorios y esquinas	Desktops and corners	meka-tabe re kore	PROPUESTA
+Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).	Several desktops to organize your windows. Shortcuts: Super+1…4 (go), Super+Shift+1…4 (move the window), Ctrl+Alt+←/→, Super+Tab (overview).	meka-tabe gore-pa: loke-kopa seta. sape-nado: «Super»+be…fo (to duma), «Super»+«Shift»+be…fo (loke-kopa duma-dare), «Ctrl»+«Alt»+←/→, «Super»+«Tab» (luma-salo).	PROPUESTA
+Escritorios virtuales	Virtual desktops	meka-tabe-seta	PROPUESTA
+Cantidad de escritorios	Number of desktops	meka-tabe bema	PROPUESTA
+El panel muestra un punto por escritorio; clic en uno para ir a él	The panel shows one dot per desktop; click one to go to it	loke-tabe bo meka-tabe be pota loke-pema; pota tada-kade ke to duma	PROPUESTA
+Cambiar de escritorio con la rueda del ratón sobre el fondo	Switch desktops with the mouse wheel over the background	meka-tabe telo: pose-feke loda ko, gu-tabe go	PROPUESTA
+Esquinas activas	Hot corners	kore-go kore-gu kore	PROPUESTA
+Lleva el puntero a la esquina y espera un instante. Para repetir, sal de la esquina y vuelve a entrar.	Move the pointer to the corner and wait a moment. To repeat, leave the corner and come back.	pose-feke kore to duma re pu-dure. pu-kelo ke, kore ba duma re bo duma.	PROPUESTA
+Fecha y hora	Date and time	tera-sena	GLOSARIO
+reloj zona horaria 24 horas calendario	clock time zone 24 hours calendar	tera-mede-meka tera-kore du tanu fo tera-kedo loda-kelo-seta	PROPUESTA
+Cambiando…	Changing…	telo te…	PROPUESTA
+Reloj del panel	Panel clock	loke-tabe tera-mede-meka	PROPUESTA
+Formato de hora	Time format	tera dore	PROPUESTA
+Mostrar segundos	Show seconds	tera-kedo-po-po loke-pema	PROPUESTA
+Mostrar la fecha junto a la hora	Show the date next to the time	loda-sena ko tera loke-pema	PROPUESTA
+Zona horaria	Time zone	tera-kore	PROPUESTA
+Zona horaria actual	Current time zone	te tera-kore	PROPUESTA
+Cambiar zona horaria	Change time zone	tera-kore telo	PROPUESTA
+Escribe para buscar (por ejemplo «La_Paz»). Pide la contraseña de administrador.	Type to search (for example “La_Paz”). It asks for the administrator password.	beka ke kera-nume (kema-le: «La_Paz»). nara-bade sena-fadu nume.	PROPUESTA
+Sincronizar la hora por internet	Synchronize the time over the internet	gora-rela ko tera se	PROPUESTA
+24 horas	24 hours	du tanu fo tera-kedo	PROPUESTA
+12 horas (a. m. / p. m.)	12 hours (a.m. / p.m.)	be tanu du tera-kedo («AM» / «PM»)	PROPUESTA
+Zona horaria: {0}	Time zone: {0}	tera-kore: {0}	PROPUESTA
+No se pudo cambiar (¿cancelaste la contraseña?).	Could not change it (did you cancel the password?).	telo no pode (sena-fadu pe kose ka).	PROPUESTA
+Fondo de pantalla	Wallpaper	loke-tabe-lobe	GLOSARIO
+Elegir otra imagen…	Choose another image…	salo-sena gade-no delo…	PROPUESTA
+Elige una imagen	Choose an image	salo-sena delo	PROPUESTA
+Pantalla	Display	loke-tabe	GLOSARIO
+resolución escala brillo monitor rotación	resolution scale brightness monitor rotation	dore-gore dase-rata salo-gore loke-tabe loda	PROPUESTA
+Normal	Normal	foma-ko	GLOSARIO
+90° a la derecha	90° to the right	she tanu tora-telo doma-kado-no	PROPUESTA
+90° a la izquierda	90° to the left	she tanu tora-telo doma-kado	PROPUESTA
+Pantalla {0} cambiada. ¿Mantener estos cambios? Se revertirán en 10 s.	Display {0} changed. Keep these changes? They will be reverted in 10 s.	loke-tabe {0} pe telo. telo kade ka? be tanu tera-kedo-po-po bo pe-telo.	PROPUESTA
+¿Mantener estos cambios? Se revertirán en {0} s.	Keep these changes? They will be reverted in {0} s.	telo kade ka? {0} tera-kedo-po-po bo pe-telo.	PROPUESTA
+Mantener	Keep	kade	PROPUESTA
+Revertir	Revert	pe-telo	PROPUESTA
+Brillo de la pantalla	Screen brightness	loke-tabe salo-gore	PROPUESTA
+Monitor {0}	Monitor {0}	loke-tabe {0}	PROPUESTA
+Escala	Scale	gore	PROPUESTA
+Más grande = textos e iconos mayores	Larger = bigger text and icons	gore-pa = doke-beka re sena-gore gore-pa	PROPUESTA
+Rotación	Rotation	loda	PROPUESTA
+No se encontró `wlr-randr`.	`wlr-randr` was not found.	«wlr-randr» no pe kera.	PROPUESTA
+No se pudo leer la configuración de pantalla.	Could not read the display configuration.	loke-tabe foma-fena lodu no pode.	PROPUESTA
+Resolución	Resolution	dore-gore	PROPUESTA
+Ratón y touchpad	Mouse and touchpad	pose-feke re luma-tada-tabe	GLOSARIO
+puntero velocidad desplazamiento natural tap clic zurdo	pointer speed natural scrolling tap click left-handed	pose-feke sape-mado loke-duma tada-kade doma-kado	PROPUESTA
+Se aplican al instante. Los cambios no afectan a los atajos de teclado ni al resto de la configuración de labwc.	They apply instantly. The changes do not affect the keyboard shortcuts or the rest of the labwc configuration.	te kade. telo maku-tabe sape-nado re «labwc» foma-fena gade-no ko rela no.	PROPUESTA
+Ratón	Mouse	pose-feke	GLOSARIO
+Touchpad	Touchpad	luma-tada-tabe	GLOSARIO
+Velocidad del puntero	Pointer speed	pose-feke sape-mado	PROPUESTA
+Aceleración	Acceleration	sape-pa	PROPUESTA
+Desplazamiento natural	Natural scrolling	doke loke-duma	PROPUESTA
+El contenido sigue a los dedos, como en un móvil	Content follows your fingers, like on a phone	doke maku ko duma, meka-reka se	PROPUESTA
+Botones invertidos (zurdos)	Swap buttons (left-handed)	tada-sena telo (doma-kado nara)	PROPUESTA
+Tocar para hacer clic	Tap to click	tada-kade ke tada-sena kade	PROPUESTA
+Desactivar al escribir	Disable while typing	beka te dure-gune	PROPUESTA
+Adaptativa (normal)	Adaptive (normal)	meka-ko (foma-ko)	PROPUESTA
+Plana (sin aceleración)	Flat (no acceleration)	tabe (sape-pa no)	PROPUESTA
+Sonido	Sound	sone	GLOSARIO
+audio volumen altavoz micrófono salida entrada	audio volume speaker microphone output input	sone sone-gore sone-feke sone-pema sone-gura	PROPUESTA
+Salida	Output	doke-pema	PROPUESTA
+Entrada	Input	doke-gura	PROPUESTA
+Dispositivo	Device	meka	PROPUESTA
+No se encontró `wpctl` (PipeWire/WirePlumber).	`wpctl` (PipeWire/WirePlumber) was not found.	«wpctl» no pe kera («PipeWire» / «WirePlumber»).	PROPUESTA
+No hay dispositivos de audio (¿WirePlumber está en marcha?).	There are no audio devices (is WirePlumber running?).	sone meka no mora («WirePlumber» te mora ka).	PROPUESTA
+Teclado	Keyboard	maku-tabe	GLOSARIO
+distribución idioma teclas repetición	layout language keys repeat	dore reka maku-tabe pu-kelo	PROPUESTA
+Inglés (EE. UU.)	English (US)	Inglés (EE. UU.)	PROPUESTA
+Español (Latinoamérica)	Spanish (Latin America)	Español (Latinoamérica)	PROPUESTA
+Español (España)	Spanish (Spain)	Español (España)	PROPUESTA
+Inglés (EE. UU., internacional)	English (US, international)	Inglés (EE. UU., internacional)	PROPUESTA
+Portugués (Brasil)	Portuguese (Brazil)	Portugués (Brasil)	PROPUESTA
+Portugués (Portugal)	Portuguese (Portugal)	Portugués (Portugal)	PROPUESTA
+Francés	French	Francés	PROPUESTA
+Alemán	German	Alemán	PROPUESTA
+Italiano	Italian	Italiano	PROPUESTA
+Inglés (Reino Unido)	English (UK)	Inglés (Reino Unido)	PROPUESTA
+El cambio se aplica al instante en toda la sesión.	The change applies instantly to the whole session.	telo te kade bo kema-fese te.	PROPUESTA
+Distribución	Layout	dore	PROPUESTA
+Distribución principal	Main layout	go dore	PROPUESTA
+Segunda distribución	Second layout	du-pose dore	PROPUESTA
+Repetición de teclas	Key repeat	maku-tabe pu-kelo	PROPUESTA
+Velocidad de repetición (por segundo)	Repeat rate (per second)	pu-kelo sape (be tera-kedo-po-po bo)	PROPUESTA
+Retardo antes de repetir (ms)	Delay before repeating (ms)	pu-kelo pe dure (tera-kedo-po-po)	PROPUESTA
+Teal	Teal	nede-kulo	PROPUESTA
+Coral	Coral	rale-fale	PROPUESTA
+Azul	Blue	kulo	GLOSARIO
+Violeta	Violet	kulo-rale	PROPUESTA
+Dorado	Gold	kale-salo	PROPUESTA
+Verde	Green	nede	GLOSARIO
+Koi (oscuro)	Koi (dark)	«Koi» salo-po	PROPUESTA
+Claro	Light	salo-pa	GLOSARIO
+Pizarra (gris oscuro)	Slate (dark gray)	bore-fale salo-po	PROPUESTA
+Niebla (gris claro)	Mist (light gray)	bore-fale salo-pa	PROPUESTA
+Crepúsculo (violeta)	Twilight (violet)	kulo-rale salo-po	PROPUESTA
+Arena (cálido claro)	Sand (warm light)	taro-kale salo-pa	PROPUESTA
+Medianoche (azul grisáceo)	Midnight (grayish blue)	kuna-bore	PROPUESTA
+Escritorio {0}	Desktop {0}	meka-tabe {0}	PROPUESTA
+lunes	monday	be-pose loda-kelo	PROPUESTA
+martes	tuesday	du-pose loda-kelo	PROPUESTA
+miércoles	wednesday	ga-pose loda-kelo	PROPUESTA
+jueves	thursday	fo-pose loda-kelo	PROPUESTA
+viernes	friday	sa-pose loda-kelo	PROPUESTA
+sábado	saturday	ku-pose loda-kelo	PROPUESTA
+domingo	sunday	mu-pose loda-kelo	PROPUESTA
+enero	January	be-pose mune-kelo	PROPUESTA
+febrero	February	du-pose mune-kelo	PROPUESTA
+marzo	March	ga-pose mune-kelo	PROPUESTA
+abril	April	fo-pose mune-kelo	PROPUESTA
+mayo	May	sa-pose mune-kelo	PROPUESTA
+junio	June	ku-pose mune-kelo	PROPUESTA
+julio	July	mu-pose mune-kelo	PROPUESTA
+agosto	August	na-pose mune-kelo	PROPUESTA
+septiembre	September	she-pose mune-kelo	PROPUESTA
+octubre	October	be tanu-pose mune-kelo	PROPUESTA
+noviembre	November	be tanu be-pose mune-kelo	PROPUESTA
+diciembre	December	be tanu du-pose mune-kelo	PROPUESTA
+Bloquear pantalla	Lock screen	loke-tabe fadu-kose	GLOSARIO
+Cerrar sesión	Log out	nado-kose	GLOSARIO
+Reiniciar	Restart	pado-telo	GLOSARIO
+Apagar	Shut down	meka-gune	GLOSARIO
+Buscar aplicación…	Search applications…	mado-foma kera-nume…	PROPUESTA
+¿Seguro? Clic para confirmar	Sure? Click to confirm	tare ka? tada-kade ke tare-dare	PROPUESTA
+Hoy	Today	te-loda-kelo	GLOSARIO
+{0}, {1} de {2} de {3}	{0}, {1} {2} {3}	{0}, {1} {2} {3}	PROPUESTA
+OweeLinux	OweeLinux	OweeLinux	PROPUESTA
+el widget falló: %s	the widget failed: %s	mado-foma kare-no: %s	PROPUESTA
+Personal	Personal	nara-pase	GLOSARIO
+Dispositivos	Devices	meka-gume	GLOSARIO
+Sistema	System	meka-gora	GLOSARIO
+Ajustes de OweeLinux	OweeLinux Settings	foma-fena «OweeLinux»	PROPUESTA
+Buscar ajustes…	Search settings…	foma-fena kera-nume…	PROPUESTA
+Esta página no se pudo cargar (mira la terminal).	This page could not be loaded (see the terminal).	kema-le loke-kopa lodu no pode (meka-gora-feke luma-salo).	PROPUESTA
+Conexión: {0}	Connection: {0}	rela: {0}	PROPUESTA
+Dispositivo: {0} ({1})	Device: {0} ({1})	meka: {0} ({1})	PROPUESTA
+Dirección: {0}	Address: {0}	kore-doke: {0}	PROPUESTA
+Sin conexión	No connection	rela no	PROPUESTA
+Desactivar WiFi	Turn WiFi off	«WiFi» meka-gune	PROPUESTA
+Activar WiFi	Turn WiFi on	«WiFi» meka-pado	PROPUESTA
+Redes cercanas	Nearby networks	rela te le	PROPUESTA
+Buscar redes	Search networks	rela kera-nume	PROPUESTA
+Red	Network	rela	GLOSARIO
+No se ven redes (¿buscando?)	No networks seen (searching?)	rela no luma-salo (kera-nume te ka)	PROPUESTA
+{0} · clave + Intro	{0} · password + Enter	{0} · sena-fadu re «Intro»	PROPUESTA
+Silenciado	Muted	sone-nuse	PROPUESTA
+Volumen {0}%	Volume {0}%	sone-gore {0}%	PROPUESTA
+Activar sonido	Turn sound on	sone meka-pado	PROPUESTA
+Batería: {0}% ({1})	Battery: {0}% ({1})	enu-kopa: {0}% ({1})	PROPUESTA
+Batería	Battery	enu-kopa	GLOSARIO
+Carga: {0}%	Charge: {0}%	mude: {0}%	PROPUESTA
+Estado: {0}	Status: {0}	te-dore: {0}	PROPUESTA
+Idioma	Language	reka	GLOSARIO
+Cambia el idioma de todo el sistema. El panel y esta ventana se reinician solos; las apps abiertas cambian cuando las vuelvas a abrir.	Change the language of the whole system. The panel and this window restart by themselves; open apps change when you open them again.	meka-gora reka telo. loke-tabe re kema-le loke-kopa tame bo pado pu; mado-foma bure ke, pu-kelo bure ke telo.	PROPUESTA
+Idioma cambiado. Reiniciando esta ventana…	Language changed. Restarting this window…	reka pe telo. kema-le loke-kopa pado te…	PROPUESTA
+Idioma de la interfaz	Interface language	nara-meka-rela reka	GLOSARIO
+Escribir en otros idiomas	Typing in other languages	gade-no reka beka	GLOSARIO
+Al elegir un idioma se activa su método de escritura (por ejemplo pinyin para chino). Se cambia entre métodos con Ctrl + Espacio. Los métodos se gestionan en Teclado.	Choosing a language turns on its input method (for example pinyin for Chinese). Switch between methods with Ctrl + Space. Methods are managed in Keyboard.	reka delo ke, beka-mode pode-tare. beka-mode telo: «Ctrl + Espacio». beka-mode bo maku-tabe foma-fena.	PROPUESTA
+(sin instalar)	(not installed)	(fena no pe)	PROPUESTA
+Chino (pinyin)	Chinese (Pinyin)	Chino (pinyin)	PROPUESTA
+Japonés (Mozc)	Japanese (Mozc)	Japonés (Mozc)	PROPUESTA
+Coreano (Hangul)	Korean (Hangul)	Coreano (Hangul)	PROPUESTA
+Owee (escritura Owee Script)	Owee (Owee Script writing)	«Owee» (beka «Owee Script»)	PROPUESTA
+Ruso	Russian	Ruso	PROPUESTA
+Japonés	Japanese	Japonés	PROPUESTA
+Coreano	Korean	Coreano	PROPUESTA
+Ucraniano	Ukrainian	Ucraniano	PROPUESTA
+Métodos de escritura	Input methods	beka-mode	PROPUESTA
+Escribir con el método activo desde el principio	Type with the input method active from the start	pado ko beka-mode te kade	PROPUESTA
+Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee	Without this, you must press Ctrl + Space to start typing with pinyin, Mozc or Owee	kema-le no ke, «Ctrl + Espacio» tada-kade moke; pu «pinyin» lo «Mozc» lo «Owee» beka	PROPUESTA
+Autor	Author	beka-nara	GLOSARIO
+Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.	To type in Chinese, Japanese, Korean or Owee. Turning a method on makes you type with it from the start. To type with the normal keyboard: Ctrl + Space, Ctrl + Shift + Space or a click on the keyboard icon in the panel.	«chino» «japonés» «coreano» lo «Owee» beka. beka-mode pode-tare ke, pado ko beka. maku-tabe foma-ko ke to pe: «Ctrl + Espacio» lo «Ctrl + Mayús + Espacio» lo loke-tabe bo maku-tabe sena-gore-po tada-kade.	PROPUESTA
+imagen escritorio wallpaper presentación diapositivas cambiar	image desktop wallpaper slideshow change	salo-sena meka-tabe loke-tabe-lobe loke-pema salo-sena-duma telo	PROPUESTA
+3 horas	3 hours	ga tera-kedo	PROPUESTA
+1 día	1 day	be loda-kelo	PROPUESTA
+{0} de {1} imágenes en la presentación	{0} of {1} images in the slideshow	{0} bo {1} salo-sena bo loke-pema	PROPUESTA
+Modo	Mode	mode	PROPUESTA
+Cambiar de imagen cada	Change the image every	salo-sena telo tera:	PROPUESTA
+Orden aleatorio	Random order	ranu dore	PROPUESTA
+Todas	All	kema-fese	PROPUESTA
+Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.	Slideshow: click images to include or remove them. With none chosen, all are used.	salo-sena-duma: salo-sena tada-kade ke fena lo dopo. delo no ke, kema-fese kade.	PROPUESTA
+Pulsa una imagen para ponerla de fondo.	Click an image to set it as the wallpaper.	salo-sena tada-kade ke loke-tabe-lobe fena.	PROPUESTA
+Una imagen fija	A single fixed image	salo-sena be	PROPUESTA
+Presentación (cambia sola)	Slideshow (changes by itself)	salo-sena-duma (meka-ko telo)	PROPUESTA
+Teclado normal ({0})	Normal keyboard ({0})	maku-tabe foma-ko ({0})	PROPUESTA
+Ajustes del teclado…	Keyboard settings…	maku-tabe foma-fena…	PROPUESTA
+Escribir con	Type with	beka ko	PROPUESTA
+Acceso	Login	nado-bure	PROPUESTA
+acceso inicio de sesión login bloqueo pantalla contraseña automático sddm	login sign in lock screen password automatic sddm	nado-bure fadu-kose loke-tabe sena-fadu meka-ko «sddm»	PROPUESTA
+Cómo se bloquea la pantalla y cómo se entra al encender el equipo.	How the screen locks and how you sign in when the computer starts.	loke-tabe fadu-kose, re meka-mado pado ke nado-bure.	PROPUESTA
+Esperando la clave de administrador…	Waiting for the administrator password…	nara-bade sena-fadu pu-dure te…	PROPUESTA
+Pantalla de bloqueo	Lock screen	loke-tabe fadu-kose	GLOSARIO
+Mostrar el fondo de pantalla al bloquear	Show the wallpaper when locked	fadu-kose ke loke-tabe-lobe loke-pema	PROPUESTA
+Si no, se usa el color del tema	Otherwise the theme colour is used	no ke, dore-seta salo-lafe kade	PROPUESTA
+Bloquear ahora	Lock now	te fadu-kose	PROPUESTA
+Inicio de sesión	Signing in	nado-bure	PROPUESTA
+Entrar sin escribir la contraseña	Sign in without typing the password	sena-fadu beka so nado-bure	PROPUESTA
+Al encender, el equipo entra solo con el usuario elegido. Cualquiera que lo encienda verá tus archivos.	At startup the computer signs in by itself with the chosen user. Anyone who turns it on will see your files.	meka-mado pado ke, nara-kade pe delo ko meka-ko nado-bure. nara pado-meka ke, tu doke-kopa luma-salo.	PROPUESTA
+Falta `pkexec` (polkit).	`pkexec` (polkit) is missing.	«pkexec» («polkit») no mora.	PROPUESTA
+Super + L bloquea al instante. El bloqueo por inactividad y la suspensión se eligen en Energía. Para volver, escribe tu contraseña.	Super + L locks instantly. Locking when idle and suspending are set in Power. To come back, type your password.	«Super» + «L» te fadu-kose. dure-no re sule bo enu foma-fena. pu-kelo to ke, tu sena-fadu beka.	PROPUESTA
+Usuario	User	nara-kade	GLOSARIO
+El escritorio que se abre al entrar	The desktop that opens when you sign in	nado-bure ke, meka-tabe bure	PROPUESTA
+Guardado: se aplica al próximo arranque	Saved: it applies at the next startup	mena-fena pe fese: pu pado-meka ke kade	PROPUESTA
+No se pudo: {0}	It could not be done: {0}	dare no pode: {0}	PROPUESTA
+Este equipo no usa SDDM para iniciar sesión.	This computer does not use SDDM to sign in.	kema-le meka-mado «SDDM» nado-bure ko kade no.	PROPUESTA
+cancelado o sin permiso	cancelled or no permission	kose pe lo pode-no	PROPUESTA
+Bluetooth	Bluetooth	Bluetooth	PROPUESTA
+bluetooth auriculares ratón teclado emparejar inalámbrico	bluetooth headphones mouse keyboard pair wireless	«bluetooth» sone-feke pose-feke maku-tabe rela meka-no rela-sura	PROPUESTA
+Auriculares, ratones, teclados y altavoces inalámbricos.	Wireless headphones, mice, keyboards and speakers.	sone-feke re pose-feke re maku-tabe re sone-meka, rela-sura ko.	PROPUESTA
+Emparejando… (puede pedirte confirmar en el dispositivo)	Pairing… (it may ask you to confirm on the device)	rela-dare te… (meka bo tare-dare nume pode)	PROPUESTA
+Un momento…	Just a moment…	te…	PROPUESTA
+Buscando… (10 s)	Searching… (10 s)	kera-nume te… (be tanu tera-kedo-po-po)	PROPUESTA
+Encendido, el equipo puede conectarse a dispositivos cercanos	On: the computer can connect to nearby devices	meka-pado: meka-mado le meka ko rela-dare pode	PROPUESTA
+Buscar dispositivos	Search for devices	meka kera-nume	PROPUESTA
+Conectado	Connected	rela-dare	PROPUESTA
+Desconectar	Disconnect	rela-bosa	GLOSARIO
+Olvidar	Forget	nuse-dare	PROPUESTA
+Emparejado	Paired	rela-dare pe fese	PROPUESTA
+Disponible	Available	pode-tare	PROPUESTA
+Conectar	Connect	rela-dare	GLOSARIO
+Emparejar	Pair	rela-dare	PROPUESTA
+Desconectado	Disconnected	rela-bosa pe fese	PROPUESTA
+No se encontró `bluetoothctl` (BlueZ).	`bluetoothctl` (BlueZ) was not found.	«bluetoothctl» («BlueZ») no pe kera.	PROPUESTA
+No se encontró ningún adaptador Bluetooth.	No Bluetooth adapter was found.	«Bluetooth» meka no pe kera.	PROPUESTA
+Todavía no hay dispositivos. Pulsa «Buscar dispositivos» con el tuyo en modo de emparejamiento.	No devices yet. Press “Search for devices” with yours in pairing mode.	meka no mora te. «meka kera-nume» tada-kade, tu meka rela-dare mode bo ke.	PROPUESTA
+Dispositivo olvidado	Device forgotten	meka nuse-dare pe fese	PROPUESTA
+Búsqueda terminada	Search finished	kera-nume pe fese	PROPUESTA
+Emparejado y conectado	Paired and connected	rela-dare re rela pe fese	PROPUESTA
+No se pudo emparejar	Could not pair	rela-dare no pode	PROPUESTA
+idioma español inglés owee chino japonés coreano ruso árabe persa hindi urdu indonesio malayo traducción	language spanish english owee chinese japanese korean russian arabic persian hindi urdu indonesian malay translation	reka «español» «inglés» «owee» «chino» «japonés» «coreano» «ruso» «árabe» «persa» «hindi» «urdu» «indonesio» «malayo» telo-reka	PROPUESTA
+Los mismos idiomas en los que puedes escribir (Teclado): 17 idiomas y Owee	The same languages you can type in (Keyboard): 17 languages and Owee	reka se bo beka pode: be tanu mu reka re «Owee»	PROPUESTA
+Árabe	Arabic	Árabe	PROPUESTA
+Persa (farsi)	Persian (Farsi)	Persa (farsi)	PROPUESTA
+Hindi (InScript)	Hindi (InScript)	Hindi (InScript)	PROPUESTA
+Hindi (Bolnagri, fonético)	Hindi (Bolnagri, phonetic)	Hindi (Bolnagri, fonético)	PROPUESTA
+Urdu	Urdu	Urdu	PROPUESTA
+Indonesio	Indonesian	Indonesio	PROPUESTA
+Malayo (jawi)	Malay (Jawi)	Malayo (jawi)	PROPUESTA
+Con dos distribuciones, se cambia de una a otra con Super + Mayús + Espacio o desde el indicador del panel	With two layouts, switch between them with Super + Shift + Space or from the panel indicator	du dore ke, dore telo: «Super» + «Shift» + «Espacio» lo loke-tabe bo pota	PROPUESTA
+Usuarios	Users	nara-kade	PROPUESTA
+usuarios cuentas contraseña administrador añadir borrar	users accounts password administrator add delete	nara-kade sena-fadu nara-bade dapa dopo	PROPUESTA
+Cancelar	Cancel	no	GLOSARIO
+Las personas que usan este equipo. Para crear, borrar o cambiar contraseñas se pide la clave de administrador.	The people who use this computer. Creating, deleting or changing passwords asks for the administrator password.	nara le meka-mado kade. dare lo nuse-dare lo sena-fadu telo ke, nara-bade sena-fadu nume.	PROPUESTA
+Permisos cambiados	Permissions changed	pode telo pe fese	PROPUESTA
+Contraseña de {0}	Password for {0}	{0} sena-fadu	PROPUESTA
+Cambiar	Change	telo	PROPUESTA
+Eliminar a {0}	Delete {0}	{0} nuse-dare	PROPUESTA
+Eliminar	Delete	nuse-dare	GLOSARIO
+Añadir usuario	Add user	nara-kade dapa	PROPUESTA
+Crear	Create	dare	GLOSARIO
+Añadir usuario…	Add user…	nara-kade dapa…	PROPUESTA
+Administrador	Administrator	nara-bade	PROPUESTA
+Escribe una contraseña	Type a password	sena-fadu beka	PROPUESTA
+Las contraseñas no coinciden	The passwords do not match	sena-fadu se no	PROPUESTA
+Contraseña cambiada	Password changed	sena-fadu telo pe fese	PROPUESTA
+Escribe «{0}» para confirmar	Type “{0}” to confirm	«{0}» beka ke tare-dare	PROPUESTA
+Usuario eliminado (con sus archivos)	User deleted (with their files)	nara-kade nuse-dare pe fese (doke-kopa ko)	PROPUESTA
+Escribe el nombre completo	Type the full name	sena-nara fese beka	PROPUESTA
+Usuario: minúsculas, cifras, - y _ (empieza por letra)	User name: lowercase letters, digits, - and _ (start with a letter)	nara-kade sena-nara: «a-z», banu, «-», «_» (reka ko pado)	PROPUESTA
+Ese usuario ya existe	That user already exists	nara-kade le mora pe	PROPUESTA
+Usuario creado	User created	nara-kade dare pe fese	PROPUESTA
+Contraseña…	Password…	sena-fadu…	PROPUESTA
+Contraseña nueva	New password	tame sena-fadu	PROPUESTA
+Repítela	Repeat it	pu-kelo beka	PROPUESTA
+Se borrarán también sus archivos. Escribe su nombre de usuario para confirmar:	Their files will be deleted too. Type their user name to confirm:	doke-kopa re nuse-dare. sena-nara beka ke tare-dare:	PROPUESTA
+Nombre completo	Full name	sena-nara fese	PROPUESTA
+Nombre de usuario	User name	nara-kade sena-nara	PROPUESTA
+Contraseña	Password	sena-fadu	GLOSARIO
+Repite la contraseña	Repeat the password	sena-fadu pu-kelo beka	PROPUESTA
+Usuario estándar	Standard user	nara-kade foma-ko	PROPUESTA
+tú	you	tu	PROPUESTA
+Apagar Bluetooth	Turn Bluetooth off	«Bluetooth» meka-gune	PROPUESTA
+Encender Bluetooth	Turn Bluetooth on	«Bluetooth» meka-pado	PROPUESTA
+Desconectar {0}	Disconnect {0}	{0} rela-bosa	PROPUESTA
+Conectar {0}	Connect {0}	{0} rela-dare	PROPUESTA
+Bluetooth apagado	Bluetooth off	«Bluetooth» meka-gune	PROPUESTA
+Bluetooth: {0}	Bluetooth: {0}	«Bluetooth»: {0}	PROPUESTA
+Bluetooth encendido	Bluetooth on	«Bluetooth» meka-pado	PROPUESTA
