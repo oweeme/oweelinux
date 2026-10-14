@@ -17,6 +17,18 @@ n=0; until timeout 60 flatpak remote-add --system --if-not-exists flathub https:
   n=$((n + 1)); [ "$n" -ge 45 ] && { echo "owee-store: sin red para Flathub (se reintentará en el próximo arranque)"; exit 0; }; sleep 20; done
 # Que las apps Flatpak (libadwaita/GTK) vean el tema y los colores elegidos en Ajustes → Apariencia
 flatpak override --system --filesystem=xdg-config/gtk-4.0:ro --filesystem=xdg-config/gtk-3.0:ro --filesystem=xdg-config/fontconfig:ro
-avisar "Tienda de apps · App store" "Instalando Bazaar… puede tardar unos minutos. / Installing Bazaar… it may take a few minutes."
-timeout 1800 flatpak install --system -y --noninteractive flathub io.github.kolunmi.Bazaar && { touch "$MARK"; echo "owee-store: Bazaar instalado"; avisar "Bazaar instalado · installed" "Búscalo en el lanzador (OweeLinux). / Find it in the launcher."; }
+avisar "Tienda de apps · App store" "Instalando Bazaar… puede tardar varios minutos (verás un aviso al terminar). / Installing Bazaar… it may take several minutes."
+# Instalación a prueba de redes lentas: cada intento puede durar hasta 2 h (nada de matar una descarga que avanza); lo ya bajado se conserva y el siguiente
+# intento continúa donde quedó. Mientras tanto, un aviso cada 10 min dice que sigue trabajando; si se rinde, también lo avisa (nunca silencio).
+ok=0; intento=0
+while [ "$intento" -lt 5 ]; do
+  intento=$((intento + 1)); echo "owee-store: intento $intento de 5"
+  ( m=0; while sleep 600; do m=$((m + 10)); avisar "Tienda de apps · App store" "Sigo instalando Bazaar ($m min)… / Still installing Bazaar ($m min)…"; done ) & vig=$!
+  timeout 7200 flatpak install --system -y --noninteractive flathub io.github.kolunmi.Bazaar; rc=$?
+  kill "$vig" 2>/dev/null; wait "$vig" 2>/dev/null
+  if [ "$rc" -eq 0 ] || flatpak info --system io.github.kolunmi.Bazaar >/dev/null 2>&1; then ok=1; break; fi
+  echo "owee-store: el intento $intento falló (código $rc)"; sleep 30
+done
+if [ "$ok" -eq 1 ]; then touch "$MARK"; echo "owee-store: Bazaar instalado"; avisar "Bazaar instalado · installed" "Búscalo en el lanzador (OweeLinux). / Find it in the launcher."
+else echo "owee-store: no se pudo instalar (se reintentará en el próximo arranque)"; avisar "Tienda de apps · App store" "No se pudo instalar Bazaar (¿sin red?). Se reintentará al reiniciar. / Could not install Bazaar; it will retry on reboot."; fi
 exit 0

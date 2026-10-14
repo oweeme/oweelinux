@@ -7,7 +7,7 @@ ConditionPathExists=!/var/lib/flatpak/.owee-store-ok
 [Service]
 Type=simple
 ExecStart=/usr/libexec/owee/owee-store-setup
-TimeoutStartSec=2000
+TimeoutStartSec=infinity
 Nice=10
 IOSchedulingClass=idle
 
