@@ -47,7 +47,7 @@ class Teclado(Page):
         av = metodos.available(); on = metodos.enabled()
         if av:
             b.append(heading(_("Métodos de escritura")))
-            b.append(Gtk.Label(label=_("Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio."), xalign=0, wrap=True, css_classes=["dim-label"]))
+            b.append(Gtk.Label(label=_("Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel."), xalign=0, wrap=True, css_classes=["dim-label"]))
             for name, text, _langs in av:
                 sw = Gtk.Switch(active=name in on); sw.connect("notify::active", lambda w, _p, n=name: self.toggle_method(n, w.get_active())); b.append(row(text, sw))
             act = Gtk.Switch(active=metodos.active_by_default()); act.connect("notify::active", lambda w, _p: metodos.write_profile(self.cur[0].split("(")[0] if self.cur and self.cur[0] else "us", metodos.enabled(), active=w.get_active()))
@@ -55,8 +55,10 @@ class Teclado(Page):
         return scrolled(b)
 
     def toggle_method(self, name, active):
-        cur = metodos.enabled(); cur = [m for m in cur if m != name] + ([name] if active else [])
-        metodos.write_profile(self.cur[0].split("(")[0] if self.cur and self.cur[0] else "us", cur)
+        """Activar un método (pinyin, Mozc, Owee…) lo deja ACTIVO desde el principio: se escribe con él sin pulsar nada. El teclado normal se recupera con Ctrl + Espacio,
+        con un clic en el icono del teclado del panel o quitando el método."""
+        cur = [m for m in metodos.enabled() if m != name] + ([name] if active else [])
+        metodos.write_profile(self.cur[0].split("(")[0] if self.cur and self.cur[0] else "us", cur, active=bool(cur))
 
     def set(self, idx, key):
         self.cur[idx] = key; keys = [k for k in self.cur if k]

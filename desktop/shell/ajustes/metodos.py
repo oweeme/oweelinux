@@ -40,7 +40,10 @@ def write_profile(layout, methods, active=None):
     out += "[GroupOrder]\n0=Default\n"
     def write_and_start(*_a):
         os.makedirs(os.path.dirname(PROFILE), exist_ok=True); tmp = PROFILE + ".tmp"; open(tmp, "w").write(out); os.replace(tmp, PROFILE)
-        tmp = CONFIG + ".tmp"; open(tmp, "w").write("[Behavior]\nActiveByDefault=" + ("True" if active and len(names) > 1 else "False") + "\n"); os.replace(tmp, CONFIG)
+        tmp = CONFIG + ".tmp"
+        open(tmp, "w").write("[Behavior]\nActiveByDefault=" + ("True" if active and len(names) > 1 else "False") + "\n\n"
+                             "[Hotkey/TriggerKeys]\n0=Control+space\n1=Control+Shift+space\n")      # alternar método: Ctrl+Espacio o Ctrl+Mayús+Espacio (si otro programa o el equipo anfitrión se queda con la primera)
+        os.replace(tmp, CONFIG)
         if have("fcitx5"):
             try: Gio.Subprocess.new(["env", "FCITX_NO_WAYLAND_DIAGNOSE=1", "fcitx5", "-d"], Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE)
             except GLib.Error: pass

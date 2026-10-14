@@ -352,5 +352,6 @@
 "Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "用于输入中文、日文、韩文或 Owee。用 Ctrl + 空格 在输入法之间切换。",
 "Escribir con el método activo desde el principio": "从一开始就使用输入法输入",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "不开启时，需要按 Ctrl + 空格 才能开始用拼音、Mozc 或 Owee 输入",
-"Autor": "作者"
+"Autor": "作者",
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "用于输入中文、日文、韩文或 Owee。启用某种输入法后，会从一开始就用它输入。要使用普通键盘输入：Ctrl + 空格、Ctrl + Shift + 空格，或点击面板上的键盘图标。"
 }

@@ -352,5 +352,6 @@
 "Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "Para escrever em chinês, japonês, coreano ou Owee. Alterne entre métodos com Ctrl + Espaço.",
 "Escribir con el método activo desde el principio": "Escrever com o método ativo desde o início",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Sem isso, é preciso pressionar Ctrl + Espaço para começar a escrever com pinyin, Mozc ou Owee",
-"Autor": "Autor"
+"Autor": "Autor",
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Para escrever em chinês, japonês, coreano ou Owee. Ao ativar um método, você escreve com ele desde o início. Para escrever com o teclado normal: Ctrl + Espaço, Ctrl + Shift + Espaço ou um clique no ícone do teclado do painel."
 }

@@ -352,5 +352,6 @@
 "Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "Zum Schreiben auf Chinesisch, Japanisch, Koreanisch oder Owee. Zwischen den Methoden wechselt man mit Strg + Leertaste.",
 "Escribir con el método activo desde el principio": "Mit aktiver Eingabemethode von Anfang an schreiben",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Ohne dies muss man Strg + Leertaste drücken, um mit Pinyin, Mozc oder Owee zu schreiben",
-"Autor": "Autor"
+"Autor": "Autor",
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Zum Schreiben auf Chinesisch, Japanisch, Koreanisch oder Owee. Wird eine Methode aktiviert, schreibt man von Anfang an mit ihr. Für die normale Tastatur: Strg + Leertaste, Strg + Umschalt + Leertaste oder ein Klick auf das Tastatursymbol im Panel."
 }

@@ -99,6 +99,8 @@ if ls "$OWEE_DEBS"/*.deb >/dev/null 2>&1; then
   # Catálogos de Owee para las apps ya instaladas (KDE, GTK…): LANGUAGE=qow:es / qow@owee:qow:es; lo que el glosario no cubre se ve en español
   python3 "$OWEE_SRC/08_Integracion/herramientas/gettext_rellenar.py" --origen "$R/usr/share/locale/es/LC_MESSAGES" --salida "$R/usr/share/locale" | head -2 || echo "(aviso: sin catálogos de apps en Owee)"
 else echo "(aviso: sin paquetes de Owee: el idioma Owee no estará disponible)"; fi
+# Fondos de pantalla propios (15 paisajes de tecnología, ilusiones y sueños, dibujados con desktop/wallpapers/generar.py): aparecen en Ajustes → Fondo de pantalla
+install -d "$R/usr/share/backgrounds/oweelinux"; cp "$D"/wallpapers/fondos/*.jpg "$R/usr/share/backgrounds/oweelinux/"
 # Tienda de apps: Bazaar (Flatpak). El servicio la instala en el primer arranque con red; Discover (de KDE) se oculta
 install -Dm0644 "$D/session/owee-store.service" "$R/usr/lib/systemd/system/owee-store.service"
 mkdir -p "$ETC/systemd/system/multi-user.target.wants"; ln -sf /usr/lib/systemd/system/owee-store.service "$ETC/systemd/system/multi-user.target.wants/owee-store.service"
