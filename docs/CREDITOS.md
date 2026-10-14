@@ -6,7 +6,7 @@
 - **Fotografías de `docs/wallpaper/*-unsplash.jpg`** (incluida la foto de la carpa koi usada como fondo predeterminado): son fotos de [Unsplash](https://unsplash.com) y se usan bajo la
   [Licencia de Unsplash](https://unsplash.com/license): uso libre (también comercial), modificación y redistribución sin pedir permiso ni dar crédito. La licencia **no** permite vender las fotos tal cual
   ni recopilarlas para montar un servicio que compita con Unsplash; aquí van como fondos incluidos en un sistema operativo, no como colección. Aun así, el crédito de cortesía es a sus autores
-  (el identificador de cada archivo permite encontrar su página): akbar-nemati, antoine-peltier, bub-graphics, carlo-pentimalli, dheeraj-m, frank-zhang, jason-leung, kenneth-cossin, ritz y sora-sagano.
+  (el identificador de cada archivo permite encontrar su página): akbar-nemati, antoine-peltier, bub-graphics, carlo-pentimalli, dheeraj-m, frank-zhang, jason-leung, kenneth-cossin, lucrezia-carnelos, lycheeart, matthew-kirk, ricky-davis, ricky-lk, ritz, slnc, sora-sagano y worachat-sodsri.
   Si algún autor pide retirar su foto, se quita del repositorio y de la siguiente imagen.
 
 ## Idioma Owee

@@ -51,7 +51,7 @@ barra flotante (`docs/INTERFAZ.md`, F6/F7). Sustituye lo trasladado en B1.
 - El `autologin` de SDDM de las imágenes de prueba **no debe** llegar a una imagen real.
 - Cambiar el *initramfs* (Plymouth) exige repetir las pruebas de arranque, actualización y rollback.
 - `look-and-feel` aplica el panel solo a usuarios **sin configuración previa** de Plasma.
-- Los 6 fondos de koi son ilustraciones propias del autor (SVG); las fotos de `docs/wallpaper` son de terceros (Unsplash) y su licencia debe revisarse antes de distribuirlas.
+- Los 6 fondos de koi son ilustraciones propias del autor (SVG); las fotos de `docs/wallpaper` son de terceros (Unsplash, licencia que permite redistribuirlas como fondos; ver `docs/CREDITOS.md`).
 
 ## Resultado de B1 (2026-10-12)
 Imagen ostree con el branding (`tools/ostree-proto/overlay-branding.sh`, script `brand-shots.py` para las capturas).
@@ -72,5 +72,5 @@ No se tocó el initramfs ni el kernel, así que no se repitieron las pruebas de 
 **Hallazgos del método:**
 - Para capturar el login **no** sirve `loginctl terminate-user`: el ayudante de SDDM se cae ("Process crashed") y queda sin pantalla. Se quita el autologin en la VM y se reinicia SDDM.
 - Los accesos del escritorio y las apps recomendadas del perfil antiguo no se trasladaron (usan `apt`).
-- El fondo por defecto es una foto de koi; **revisar su licencia** antes de distribuirla (las fotos de `docs/wallpaper` proceden de Unsplash).
+- El fondo por defecto es una foto de koi; licencia de Unsplash (permite uso y redistribución; ver `docs/CREDITOS.md`).
 - **Pendiente:** B2 (Plymouth y GRUB), B3 (pulido), B4 (identidad nueva).
