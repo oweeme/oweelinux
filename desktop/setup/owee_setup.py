@@ -27,15 +27,15 @@ def style():
     for k in ("win", "fg", "pop", "entry", "key", "keyh", "line", "dim"): css = css.replace("@%s@" % k, pal[k])
     css = css.replace("@acc@", pal["accent"]).replace("@onacc@", pal["on"])
     prov = Gtk.CssProvider(); prov.load_from_data(css.encode()); Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-    Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", pal["mode"] == "dark")
+    Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", pal["mode"] == "dark"); Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])
 
 def zones():
     out = []
     try:
         for l in open("/usr/share/zoneinfo/zone1970.tab", encoding="utf-8"):
-            if not l.startswith("#"): out.append(l.split("\t")[2])
+            if not l.startswith("#"): out.append(l.rstrip("\n").split("\t")[2])
     except OSError: pass
-    return sorted(set(out)) or ["UTC"]
+    return ["UTC"] + sorted(set(out))
 
 def current_tz():
     try: return open("/etc/timezone").read().strip() or "UTC"
@@ -111,6 +111,7 @@ class Setup(Gtk.Application):
     def show(self, i):
         self.page = i; self.stack.set_visible_child_name(str(i)); self.err.set_text(""); self.back.set_sensitive(i > 0)
         self.next.set_label(_("Terminar") if i == len(self.pages) - 1 else _("Siguiente"))
+        if i == len(self.pages) - 1: self.full.grab_focus()
 
     def go(self, d):
         if d > 0 and self.page == len(self.pages) - 1: self.finish(); return
