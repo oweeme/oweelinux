@@ -25,7 +25,7 @@ python3 -m pywayland.scanner -o "$R/usr/lib/owee/wlgen" -i \
   /usr/share/wayland-protocols/staging/ext-foreign-toplevel-list/ext-foreign-toplevel-list-v1.xml 2>&1 | tail -1
 chroot "$R" localedef -i es_ES -f UTF-8 es_ES.UTF-8 2>/dev/null || echo "(aviso: sin locale es_ES)"   # escribe en /usr/lib/locale (la parte inmutable)
 # Calculadora propia (desktop/apps/calculadora) + icono + lanzador
-for f in owee_calc.py calc_engine.py; do install -Dm0755 "$D/apps/calculadora/$f" "$R/usr/libexec/owee/apps/calculadora/$f"; done
+for f in "$D"/apps/calculadora/*.py; do case "$(basename "$f")" in test_*) continue;; esac; install -Dm0755 "$f" "$R/usr/libexec/owee/apps/calculadora/$(basename "$f")"; done      # todos los módulos (owee_calc, calc_engine, calc_owee…)
 install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-calc.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-calc.svg"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-calc.desktop" <<'EOD'
 [Desktop Entry]
@@ -39,7 +39,7 @@ Categories=Utility;Calculator;
 Keywords=calculadora;suma;matemáticas;
 EOD
 # Capturadora propia (reemplaza a Spectacle): capturas con editor, vídeo con audio y cámara, modo presentación
-for f in owee_capture.py core.py editor.py overlay.py camera.py; do install -Dm0755 "$D/apps/capturadora/$f" "$R/usr/libexec/owee/apps/capturadora/$f"; done
+for f in "$D"/apps/capturadora/*.py; do install -Dm0755 "$f" "$R/usr/libexec/owee/apps/capturadora/$(basename "$f")"; done
 install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-capture.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-capture.svg"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-capture.desktop" <<'EOD'
 [Desktop Entry]
@@ -94,7 +94,8 @@ if ls "$OWEE_DEBS"/*.deb >/dev/null 2>&1; then
   python3 "$D/../tools/i18n/build_owee_catalog.py" "$OWEE_SRC" "$R/usr/share/owee/i18n" || echo "(aviso: sin catálogos de Owee)"
   # Cifras Owee (owee-numerals): la fuente se instala, pero la regla que las impone a TODO el sistema NO (la activa Ajustes → Idioma solo con «Owee (Owee Script)», por usuario)
   install -Dm0644 "$OWEE_SRC/08_Integracion/linux/fontconfig/60-owee-numerals.conf" "$R/usr/share/owee/fontconfig/60-owee-numerals.conf"
-  rm -f "$R/etc/fonts/conf.d/60-owee-numerals.conf" "$R/usr/etc/fonts/conf.d/60-owee-numerals.conf"
+  rm -rf "$R/etc/fonts"; rm -f "$R/usr/etc/fonts/conf.d/60-owee-numerals.conf"      # ostree exige /etc vacío (la configuración va en /usr/etc)
+  [ -z "$(ls -A "$R/etc" 2>/dev/null)" ] || echo "(AVISO: /etc no está vacío: $(ls -A "$R/etc"))"
   # Catálogos de Owee para las apps ya instaladas (KDE, GTK…): LANGUAGE=qow:es / qow@owee:qow:es; lo que el glosario no cubre se ve en español
   python3 "$OWEE_SRC/08_Integracion/herramientas/gettext_rellenar.py" --origen "$R/usr/share/locale/es/LC_MESSAGES" --salida "$R/usr/share/locale" | head -2 || echo "(aviso: sin catálogos de apps en Owee)"
 else echo "(aviso: sin paquetes de Owee: el idioma Owee no estará disponible)"; fi
