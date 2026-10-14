@@ -25,7 +25,8 @@ print(f"LANG={owee_i18n.LANG} páginas={n}/{len(owee_settings.PAGES)} errores={e
 sys.exit(1 if errs else 0)
 '''
 bad = 0
-for lang in ("es", "en", "pt", "fr", "de", "ru", "zh", "ja", "qow", "qow@owee"):
+sys.path.insert(0, os.path.join(D, "shell")); import owee_i18n
+for lang in [c for c, _n, _l in owee_i18n.LANGS]:
     with tempfile.TemporaryDirectory() as tmp:
         os.makedirs(tmp + "/owee"); json.dump({"lang": lang}, open(tmp + "/owee/settings.json", "w"))
         r = subprocess.run([sys.executable, "-c", CHILD, D], env={**os.environ, "XDG_CONFIG_HOME": tmp}, capture_output=True, text=True, timeout=120)

@@ -17,12 +17,13 @@ LANGS = [  # (código, nombre en su propio idioma, locale del sistema): la ÚNIC
 LANG_INFO = {
     "es": ("latam", None, False), "en": ("us", None, False), "pt": ("br", None, False), "fr": ("fr", None, False), "de": ("de", None, False), "it": ("it", None, False),
     "ru": ("us,ru", None, False), "uk": ("us,ua", None, False), "zh": ("us", "pinyin", False), "ja": ("jp", "mozc", False), "ko": ("us", "hangul", False),
-    "ar": ("us,ara", None, True), "fa": ("us,ir", None, True), "hi": ("us,in", None, False), "ur": ("us,pk", None, True), "id": ("us", None, False), "ms": ("us", None, False),
+    "ar": ("us,ara", None, True), "fa": ("us,ir", None, True), "hi": ("us,in", None, False), "ur": ("us,pk", None, True), "id": ("us", None, False), "ms": ("us,my", None, False),
     "qow": ("us", "owee", False), "qow@owee": ("us", "owee", False),
 }
 def all_layouts(): return sorted({k for v in LANG_INFO.values() for k in v[0].split(",")} | {"us(intl)"})
 def layout_for(code): return LANG_INFO.get(code, ("us",))[0]
 def method_for(code): return LANG_INFO.get(code, ("us", None))[1]
+NATIVE_SCRIPT = {"ru", "uk", "ar", "fa", "hi", "ur"}          # idiomas que no se escriben con letras latinas: al elegirlos queda activa su distribución propia (la última)
 def is_rtl(code): return LANG_INFO.get(code, ("us", None, False))[2]
 SETTINGS = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
 HERE = os.path.dirname(os.path.realpath(__file__))

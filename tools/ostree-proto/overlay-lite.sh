@@ -79,7 +79,7 @@ python3 - "$R" "$D/i18n" <<'PYEOF'
 import json, os, sys
 R, cat = sys.argv[1], sys.argv[2]
 SRC = {"owee-settings.desktop": "Ajustes de OweeLinux", "owee-calc.desktop": "Calculadora", "owee-capture.desktop": "Capturadora"}
-LOC = {"en": "en", "pt": "pt", "fr": "fr", "de": "de", "ru": "ru", "zh": "zh_CN", "ja": "ja"}
+LOC = {lg: lg for lg in ("en", "pt", "fr", "de", "it", "ru", "uk", "ja", "ko", "ar", "fa", "hi", "ur", "id", "ms")}; LOC["zh"] = "zh_CN"
 for f, es in SRC.items():
     p = os.path.join(R, "usr/share/applications", f)
     if not os.path.exists(p): continue

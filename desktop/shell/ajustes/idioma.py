@@ -63,8 +63,8 @@ class Idioma(Page):
         lay = owee_i18n.layout_for(code); keys = lay.split(",")
         cur = owee_keys.state()[0]
         if all(x.split("(")[0] in teclado.BASES for x in cur) and (set(cur) <= set(owee_i18n.all_layouts()) or len(cur) == 1):          # solo se cambia si el teclado actual es uno de los nuestros (no uno puesto a mano)
-            owee_keys.apply(keys, len(keys) - 1)                    # con dos (p. ej. US + árabe) queda activo el del propio idioma; Super + Mayús + Espacio vuelve al otro
-        metodos.write_profile(keys[-1], methods, active=bool(want) and len(methods) > 0)
+            owee_keys.apply(keys, len(keys) - 1 if code in owee_i18n.NATIVE_SCRIPT else 0)       # con dos (p. ej. US + árabe) queda activa la del propio idioma si no es latino; Super + Mayús + Espacio cambia a la otra
+        metodos.write_profile(keys[0], methods, active=bool(want) and len(methods) > 0)
         set_numerals(code == "qow@owee")
         self.app.change(lang=code)                                    # el panel vigila settings.json y se reinicia con el idioma nuevo
         self.note.set_text(_("Idioma cambiado. Reiniciando esta ventana…"))
