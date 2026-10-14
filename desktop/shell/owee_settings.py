@@ -40,6 +40,7 @@ switch { background-color: @line@; } separator { background-color: @line@; min-w
 label.dim-label { color: @dim@; opacity: 1; } .navgroup { color: @dim@; opacity: 1; }
 scale trough { background-color: @line@; }
 .card { background-color: @pop@; }
+label.tick { background: @acc@; color: @onacc@; border-radius: 999px; min-width: 20px; min-height: 20px; margin: 4px; font-weight: bold; }
 """
 
 class App(Gtk.Application):

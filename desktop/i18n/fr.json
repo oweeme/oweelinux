@@ -353,5 +353,20 @@
 "Escribir con el método activo desde el principio": "Écrire avec la méthode de saisie active dès le départ",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Sans cela, il faut appuyer sur Ctrl + Espace pour écrire avec pinyin, Mozc ou Owee",
 "Autor": "Auteur",
-"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Pour écrire en chinois, japonais, coréen ou Owee. Activer une méthode permet d'écrire avec elle dès le départ. Pour écrire avec le clavier normal : Ctrl + Espace, Ctrl + Maj + Espace ou un clic sur l'icône du clavier du tableau de bord."
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Pour écrire en chinois, japonais, coréen ou Owee. Activer une méthode permet d'écrire avec elle dès le départ. Pour écrire avec le clavier normal : Ctrl + Espace, Ctrl + Maj + Espace ou un clic sur l'icône du clavier du tableau de bord.",
+"imagen escritorio wallpaper presentación diapositivas cambiar": "image bureau fond d'écran diaporama changer",
+"3 horas": "3 heures",
+"1 día": "1 jour",
+"{0} de {1} imágenes en la presentación": "{0} images sur {1} dans le diaporama",
+"Modo": "Mode",
+"Cambiar de imagen cada": "Changer d'image toutes les",
+"Orden aleatorio": "Ordre aléatoire",
+"Todas": "Toutes",
+"Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.": "Diaporama : cliquez sur les images pour les inclure ou les retirer. Sans aucune sélection, toutes sont utilisées.",
+"Pulsa una imagen para ponerla de fondo.": "Cliquez sur une image pour la mettre en fond d'écran.",
+"Una imagen fija": "Une seule image fixe",
+"Presentación (cambia sola)": "Diaporama (change tout seul)",
+"Teclado normal ({0})": "Clavier normal ({0})",
+"Ajustes del teclado…": "Paramètres du clavier…",
+"Escribir con": "Écrire avec"
 }

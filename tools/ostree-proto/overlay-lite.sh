@@ -8,7 +8,7 @@ R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
 for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
-for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_desktops.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_desktops.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
 # en ~/.config/owee/widgets); los ejemplos se dejan aparte para copiarlos y cambiarlos.
@@ -23,6 +23,9 @@ mkdir -p "$ETC/systemd/user"; for u in waybar.service mako.service; do ln -sfn /
 rm -rf "$R/usr/lib/owee/wlgen"; mkdir -p "$R/usr/lib/owee/wlgen"
 python3 -m pywayland.scanner -o "$R/usr/lib/owee/wlgen" -i \
   /usr/share/wayland-protocols/staging/ext-foreign-toplevel-list/ext-foreign-toplevel-list-v1.xml 2>&1 | tail -1
+# Estado de ventanas (wlr-foreign-toplevel-management): el XML va en el repositorio (Debian no lo trae); necesita wayland.xml y se importa como paquete «wlgen.…»
+python3 -m pywayland.scanner -o "$R/usr/lib/owee/wlgen" -i /usr/share/wayland/wayland.xml "$D/shell/protocols/wlr-foreign-toplevel-management-unstable-v1.xml" 2>&1 | tail -1
+touch "$R/usr/lib/owee/wlgen/__init__.py"
 chroot "$R" localedef -i es_ES -f UTF-8 es_ES.UTF-8 2>/dev/null || echo "(aviso: sin locale es_ES)"   # escribe en /usr/lib/locale (la parte inmutable)
 # Calculadora propia (desktop/apps/calculadora) + icono + lanzador
 for f in "$D"/apps/calculadora/*.py; do case "$(basename "$f")" in test_*) continue;; esac; install -Dm0755 "$f" "$R/usr/libexec/owee/apps/calculadora/$(basename "$f")"; done      # todos los módulos (owee_calc, calc_engine, calc_owee…)

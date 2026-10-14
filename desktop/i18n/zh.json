@@ -353,5 +353,20 @@
 "Escribir con el método activo desde el principio": "从一开始就使用输入法输入",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "不开启时，需要按 Ctrl + 空格 才能开始用拼音、Mozc 或 Owee 输入",
 "Autor": "作者",
-"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "用于输入中文、日文、韩文或 Owee。启用某种输入法后，会从一开始就用它输入。要使用普通键盘输入：Ctrl + 空格、Ctrl + Shift + 空格，或点击面板上的键盘图标。"
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "用于输入中文、日文、韩文或 Owee。启用某种输入法后，会从一开始就用它输入。要使用普通键盘输入：Ctrl + 空格、Ctrl + Shift + 空格，或点击面板上的键盘图标。",
+"imagen escritorio wallpaper presentación diapositivas cambiar": "图片 桌面 壁纸 幻灯片 切换",
+"3 horas": "3 小时",
+"1 día": "1 天",
+"{0} de {1} imágenes en la presentación": "幻灯片中有 {0}/{1} 张图片",
+"Modo": "模式",
+"Cambiar de imagen cada": "每隔多久更换图片",
+"Orden aleatorio": "随机顺序",
+"Todas": "全部",
+"Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.": "幻灯片：点击图片即可加入或移除。若一张都没选，则使用全部图片。",
+"Pulsa una imagen para ponerla de fondo.": "点击一张图片即可设为壁纸。",
+"Una imagen fija": "固定的一张图片",
+"Presentación (cambia sola)": "幻灯片（自动切换）",
+"Teclado normal ({0})": "普通键盘（{0}）",
+"Ajustes del teclado…": "键盘设置…",
+"Escribir con": "输入方式"
 }

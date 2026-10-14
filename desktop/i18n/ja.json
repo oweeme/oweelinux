@@ -353,5 +353,20 @@
 "Escribir con el método activo desde el principio": "最初から入力方式を有効にして入力する",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "オフの場合は、Ctrl + スペース を押してからピンイン・Mozc・Owee で入力します",
 "Autor": "作者",
-"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "中国語・日本語・韓国語・Owee で入力するための設定です。入力方式を有効にすると、最初からその方式で入力します。通常のキーボード入力に戻すには、Ctrl + スペース、Ctrl + Shift + スペース、またはパネルのキーボードアイコンをクリックします。"
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "中国語・日本語・韓国語・Owee で入力するための設定です。入力方式を有効にすると、最初からその方式で入力します。通常のキーボード入力に戻すには、Ctrl + スペース、Ctrl + Shift + スペース、またはパネルのキーボードアイコンをクリックします。",
+"imagen escritorio wallpaper presentación diapositivas cambiar": "画像 デスクトップ 壁紙 スライドショー 切り替え",
+"3 horas": "3 時間",
+"1 día": "1 日",
+"{0} de {1} imágenes en la presentación": "スライドショーに {0} / {1} 枚",
+"Modo": "モード",
+"Cambiar de imagen cada": "画像を切り替える間隔",
+"Orden aleatorio": "ランダムな順序",
+"Todas": "すべて",
+"Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.": "スライドショー: 画像をクリックして追加・削除します。何も選ばない場合はすべて使われます。",
+"Pulsa una imagen para ponerla de fondo.": "画像をクリックすると壁紙に設定されます。",
+"Una imagen fija": "固定の 1 枚",
+"Presentación (cambia sola)": "スライドショー（自動で切り替え）",
+"Teclado normal ({0})": "通常のキーボード（{0}）",
+"Ajustes del teclado…": "キーボードの設定…",
+"Escribir con": "入力方式"
 }

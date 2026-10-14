@@ -19,6 +19,7 @@ from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
 from owee_i18n import _
 CSS_TEMPLATE = """
 window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
+window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
 menubutton.owee-widget > button, menubutton.owee-widget > button label { background: transparent; background-image: none; color: @fg@; border: none; box-shadow: none; padding: 0 2px; min-height: 0; }
@@ -164,11 +165,12 @@ class Launcher:
     def __init__(self):
         inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); inner.append(Gtk.Label(label=_("OweeLinux")))
         self.btn = Gtk.MenuButton(child=inner, has_frame=False); self.btn.add_css_class("launcher")
-        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False
+        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False; self.stale = False
+        Gio.AppInfoMonitor.get().connect("changed", lambda m: setattr(self, "stale", True))      # se instaló o quitó una app: la lista se reconstruye al abrir
 
     def toggled(self, pop, _):
         if not pop.get_visible(): return
-        if not self.built: self.build()
+        if not self.built or self.stale: self.build(); self.stale = False
         self.entry.set_text(""); self.list.invalidate_filter(); self.entry.grab_focus()
 
     def build(self):
@@ -256,6 +258,71 @@ class Clock:
             self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(_('{0}, {1} de {2} de {3}', DIAS[n.get_day_of_week() - 1].capitalize(), n.get_day_of_month(), MESES[n.get_month() - 1], n.get_year()))
         return True
 
+class InputIndicator:
+    """Indicador del teclado en el panel: muestra con qué escribes ahora (US, ES, 拼 pinyin, あ Mozc, 한 Hangul, Ow Owee) y, al hacer clic, deja elegir entre el teclado normal y los métodos
+    activados en Ajustes → Teclado. Habla con Fcitx5 por `fcitx5-remote` (asíncrono, con límite de tiempo); sin Fcitx5 no aparece."""
+    SHORT = {"pinyin": "拼", "mozc": "あ", "hangul": "한", "owee": "Ow"}
+    def __init__(self):
+        self.label = Gtk.Label(label="…"); self.btn = Gtk.MenuButton(has_frame=False, child=self.label); self.btn.add_css_class("owee-widget"); self.btn.set_visible(False)
+        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _x: p.get_visible() and self.build())
+        self.cur = ""
+        if GLib.find_program_in_path("fcitx5-remote"): self.poll(); GLib.timeout_add_seconds(2, self.poll)
+
+    def poll(self):
+        try:
+            p = Gio.Subprocess.new(["timeout", "-k", "1", "2", "fcitx5-remote", "-n"], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE)
+            p.communicate_utf8_async(None, None, self.got)
+        except GLib.Error: pass
+        return True
+
+    def got(self, p, res):
+        try: _ok, out, _e = p.communicate_utf8_finish(res)
+        except GLib.Error: return
+        name = (out or "").strip()
+        if not name:                                   # Fcitx5 solo dice el método de la ventana ENFOCADA; sin ventana enfocada se muestra el último conocido o el que se usará al enfocar una
+            name = self.last or self.guess()
+        else: self.last = name
+        self.cur = name; self.btn.set_visible(bool(name))
+        if name: self.label.set_text(self.short(name)); self.btn.set_tooltip_text(self.nice(name))
+
+    last = ""
+    def guess(self):
+        from ajustes import metodos
+        items = metodos.read_items()
+        if not items: return "keyboard-us"
+        return items[1] if metodos.active_by_default() and len(items) > 1 else items[0]
+
+    def short(self, name): return name[9:].split("(")[0].upper()[:3] if name.startswith("keyboard-") else self.SHORT.get(name, name[:2])
+    def nice(self, name):
+        if name.startswith("keyboard-"): return _("Teclado normal ({0})", name[9:].upper())
+        from ajustes import metodos
+        return next((t for n, t, _l in metodos.CATALOG if n == name), name)
+
+    def build(self):
+        from ajustes import metodos
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
+        box.append(Gtk.Label(label=_("Escribir con"), xalign=0, css_classes=["heading"], margin_start=6, margin_bottom=2))
+        for name in (metodos.read_items() or ["keyboard-us"]):
+            row = Gtk.Box(spacing=10); row.append(Gtk.Label(label=self.short(name), width_chars=3)); lab = Gtk.Label(label=self.nice(name), xalign=0, hexpand=True); row.append(lab)
+            if name == self.cur: row.append(Gtk.Label(label="✓"))
+            b = Gtk.Button(child=row, has_frame=False); b.add_css_class("owee-row"); b.connect("clicked", lambda _b, n=name: self.choose(n)); box.append(b)
+        box.append(Gtk.Separator(margin_top=4, margin_bottom=4))
+        more = Gtk.Button(label=_("Ajustes del teclado…"), has_frame=False); more.add_css_class("owee-row"); more.connect("clicked", lambda _b: (self.pop.popdown(), self.settings())); box.append(more)
+        self.pop.set_child(box)
+
+    def choose(self, name):
+        self.pop.popdown()
+        try: Gio.Subprocess.new(["fcitx5-remote", "-s", name], Gio.SubprocessFlags.STDERR_SILENCE)
+        except GLib.Error: pass
+        GLib.timeout_add(300, lambda: (self.poll(), False)[1])
+
+    def settings(self):
+        for p in ("/usr/libexec/owee/owee_settings.py", os.path.join(os.path.dirname(os.path.abspath(__file__)), "owee_settings.py")):
+            if os.path.exists(p):
+                try: Gio.Subprocess.new([p], Gio.SubprocessFlags.NONE)
+                except GLib.Error: pass
+                return
+
 class Panel(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.PanelPrototype")
 
@@ -287,13 +354,26 @@ class Panel(Gtk.Application):
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from owee_tray import Tray
             self.tray = Tray(); right.append(self.tray.box)
         except Exception as e: print("[tray] desactivada:", e, flush=True)
+        self.input = InputIndicator(); right.append(self.input.btn)       # con qué teclado/método escribes
         self.widgets = load_widgets(right)
         self.power = PowerMenu(); right.append(self.power.btn)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
         self.tick(); GLib.timeout_add_seconds(1, self.tick)
+        self.win = win; self.compact = False
+        try:                                           # con una ventana maximizada el panel se pega a los bordes y pierde las esquinas (como la barra de menús de macOS)
+            from owee_windows import WindowWatcher
+            self.watcher = WindowWatcher(self.set_compact)
+        except Exception as e: print("[ventanas] desactivado:", e, flush=True)
         win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
         GLib.timeout_add_seconds(40, lambda: (mem("40 s tras abrir"), False)[1])
+
+    def set_compact(self, on):
+        """Modo compacto: sin margen ni esquinas redondeadas mientras la ventana activa está maximizada o a pantalla completa."""
+        self.compact = bool(on)
+        for e, m in ((LS.Edge.TOP, 6), (LS.Edge.LEFT, 8), (LS.Edge.RIGHT, 8)): LS.set_margin(self.win, e, 0 if on else m)
+        (self.win.add_css_class if on else self.win.remove_css_class)("compact")
+        if os.environ.get("OWEE_DEBUG_LAYOUT"): print("[compacto]", on, flush=True)
 
     def corner_action(self, name):
         """Acciones de las esquinas activas (Ajustes → Escritorios)."""

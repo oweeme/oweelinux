@@ -1,10 +1,21 @@
 """Ajustes del escritorio Lite compartidos por el panel y la app de ajustes: ~/.config/owee/settings.json
-{"theme": "koi"|"claro"|"pizarra"|"niebla"|"crepusculo"|"arena"|"medianoche", "mode": "dark"|"light" (lo fija el tema), "accent": "#RRGGBB", "wallpaper": "/ruta/imagen", "clock_hours": "24"|"12", "clock_seconds": bool, "clock_date": bool}. Si falta o está dañado se usan los valores de fábrica (nunca falla)."""
+{"wallpaper_mode": "single"|"slideshow", "slideshow": [rutas], "slideshow_minutes": N, "slideshow_shuffle": bool, "theme": "koi"|"claro"|"pizarra"|"niebla"|"crepusculo"|"arena"|"medianoche", "mode": "dark"|"light" (lo fija el tema), "accent": "#RRGGBB", "wallpaper": "/ruta/imagen", "clock_hours": "24"|"12", "clock_seconds": bool, "clock_date": bool}. Si falta o está dañado se usan los valores de fábrica (nunca falla)."""
 import json, os
 from owee_i18n import _
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"lang": "", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
+DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
 ACCENTS = [(_("Teal"), "#2A9D8F"), (_("Coral"), "#F06548"), (_("Azul"), "#3B82C4"), (_("Violeta"), "#8B6FD6"), (_("Dorado"), "#D9A441"), (_("Verde"), "#5BA85B")]
+
+WALLPAPER_DIRS = ["/usr/share/backgrounds/oweelinux", os.path.expanduser("~/Pictures/Wallpapers"), os.path.expanduser("~/Imágenes/Fondos"), os.path.expanduser("~/.local/share/owee/wallpapers")]
+DEFAULT_WALLPAPER = "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg"
+
+def wallpaper_files():
+    """Todas las imágenes de las carpetas de fondos (las del sistema y las del usuario), en orden de nombre."""
+    import glob
+    out = []
+    for d in WALLPAPER_DIRS:
+        for ext in ("jpg", "jpeg", "png", "webp"): out += sorted(glob.glob(os.path.join(d, "*." + ext)))
+    return out
 
 def load():
     d = dict(DEFAULTS)
@@ -12,6 +23,11 @@ def load():
         j = json.load(open(PATH))
         if j.get("mode") in ("dark", "light"): d["mode"] = j["mode"]
         if isinstance(j.get("lang"), str): d["lang"] = j["lang"]
+        if j.get("wallpaper_mode") in ("single", "slideshow"): d["wallpaper_mode"] = j["wallpaper_mode"]            # fondo fijo o presentación de imágenes
+        if isinstance(j.get("slideshow"), list): d["slideshow"] = [x for x in j["slideshow"] if isinstance(x, str)]
+        try: d["slideshow_minutes"] = max(1, min(1440, int(j.get("slideshow_minutes", d["slideshow_minutes"]))))
+        except (TypeError, ValueError): pass
+        if isinstance(j.get("slideshow_shuffle"), bool): d["slideshow_shuffle"] = j["slideshow_shuffle"]
         if j.get("theme") in THEMES: d["theme"] = j["theme"]; d["mode"] = THEMES[j["theme"]]["mode"]
         a = str(j.get("accent", ""))
         if len(a) == 7 and a[0] == "#": int(a[1:], 16); d["accent"] = a

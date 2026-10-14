@@ -353,5 +353,20 @@
 "Escribir con el método activo desde el principio": "Type with the input method active from the start",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Without this, you must press Ctrl + Space to start typing with pinyin, Mozc or Owee",
 "Autor": "Author",
-"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "To type in Chinese, Japanese, Korean or Owee. Turning a method on makes you type with it from the start. To type with the normal keyboard: Ctrl + Space, Ctrl + Shift + Space or a click on the keyboard icon in the panel."
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "To type in Chinese, Japanese, Korean or Owee. Turning a method on makes you type with it from the start. To type with the normal keyboard: Ctrl + Space, Ctrl + Shift + Space or a click on the keyboard icon in the panel.",
+"imagen escritorio wallpaper presentación diapositivas cambiar": "image desktop wallpaper slideshow change",
+"3 horas": "3 hours",
+"1 día": "1 day",
+"{0} de {1} imágenes en la presentación": "{0} of {1} images in the slideshow",
+"Modo": "Mode",
+"Cambiar de imagen cada": "Change the image every",
+"Orden aleatorio": "Random order",
+"Todas": "All",
+"Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.": "Slideshow: click images to include or remove them. With none chosen, all are used.",
+"Pulsa una imagen para ponerla de fondo.": "Click an image to set it as the wallpaper.",
+"Una imagen fija": "A single fixed image",
+"Presentación (cambia sola)": "Slideshow (changes by itself)",
+"Teclado normal ({0})": "Normal keyboard ({0})",
+"Ajustes del teclado…": "Keyboard settings…",
+"Escribir con": "Type with"
 }

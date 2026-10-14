@@ -3,7 +3,7 @@
 # PANEL (python | waybar | none) y OWEE_PANEL_PATH (para iterar sin reconstruir la imagen) se pueden fijar en /etc/owee/panel.conf
 PANEL=python
 [ -f /etc/owee/panel.conf ] && . /etc/owee/panel.conf
-/usr/libexec/owee/owee-wallpaper &
+/usr/libexec/owee/owee-wallpaper --daemon &          # fondo fijo o presentación de imágenes (Ajustes → Fondo de pantalla)
 mako &
 command -v fcitx5 >/dev/null && FCITX_NO_WAYLAND_DIAGNOSE=1 fcitx5 -d --replace >/dev/null 2>&1 &   # métodos de escritura (Ajustes → Teclado / Idioma)
 /usr/libexec/owee/owee-apply-theme &             # tema de fábrica para apps GTK/Qt en el primer arranque de un usuario

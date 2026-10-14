@@ -353,5 +353,20 @@
 "Escribir con el método activo desde el principio": "Печатать с включённым способом ввода с самого начала",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Без этого нужно нажать Ctrl + Пробел, чтобы начать ввод с пиньинь, Mozc или Owee",
 "Autor": "Автор",
-"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Для набора текста на китайском, японском, корейском или Owee. После включения способа ввода набор идёт с ним с самого начала. Чтобы печатать обычной клавиатурой: Ctrl + Пробел, Ctrl + Shift + Пробел или щелчок по значку клавиатуры на панели."
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Для набора текста на китайском, японском, корейском или Owee. После включения способа ввода набор идёт с ним с самого начала. Чтобы печатать обычной клавиатурой: Ctrl + Пробел, Ctrl + Shift + Пробел или щелчок по значку клавиатуры на панели.",
+"imagen escritorio wallpaper presentación diapositivas cambiar": "изображение рабочий стол обои слайд-шоу сменять",
+"3 horas": "3 часа",
+"1 día": "1 день",
+"{0} de {1} imágenes en la presentación": "{0} из {1} изображений в слайд-шоу",
+"Modo": "Режим",
+"Cambiar de imagen cada": "Менять изображение каждые",
+"Orden aleatorio": "Случайный порядок",
+"Todas": "Все",
+"Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.": "Слайд-шоу: щёлкайте изображения, чтобы добавить или убрать их. Если ничего не выбрано, используются все.",
+"Pulsa una imagen para ponerla de fondo.": "Щёлкните изображение, чтобы установить его как обои.",
+"Una imagen fija": "Одно неподвижное изображение",
+"Presentación (cambia sola)": "Слайд-шоу (меняется само)",
+"Teclado normal ({0})": "Обычная клавиатура ({0})",
+"Ajustes del teclado…": "Настройки клавиатуры…",
+"Escribir con": "Печатать с помощью"
 }

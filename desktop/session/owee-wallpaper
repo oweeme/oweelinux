@@ -1,8 +1,41 @@
-#!/bin/sh
-# Cambia el fondo de pantalla: owee-wallpaper [IMAGEN]. Sin argumento usa la de ~/.config/owee/settings.json (o la de fábrica).
-S="${XDG_CONFIG_HOME:-$HOME/.config}/owee/settings.json"
-IMG="$1"
-[ -z "$IMG" ] && [ -f "$S" ] && IMG=$(jq -r '.wallpaper // empty' "$S" 2>/dev/null)
-[ -f "$IMG" ] || IMG=/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg
-pkill -x swaybg 2>/dev/null
-exec swaybg -c '#102019' -i "$IMG" -m fill
+#!/usr/bin/env python3
+"""Fondo de pantalla de OweeLinux (swaybg).
+  owee-wallpaper --daemon     se queda en marcha: aplica el fondo de ~/.config/owee/settings.json y, en modo «presentación», cambia de imagen cada N minutos
+                              (todas las de las carpetas de fondos, o solo las elegidas); vigila el archivo y reacciona al instante a los cambios de Ajustes.
+  owee-wallpaper IMAGEN       pone esa imagen y termina (sin tocar los ajustes).
+El cambio es sin parpadeo: se lanza el swaybg nuevo y 0,6 s después se cierra el anterior."""
+import os, random, subprocess, sys, time
+for d in (os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell"), "/usr/libexec/owee"): sys.path.append(d)      # primero el código fuente (desarrollo), después el instalado
+import owee_config as cfgmod
+
+def show(path, old):
+    if not os.path.isfile(path): path = cfgmod.DEFAULT_WALLPAPER
+    new = subprocess.Popen(["swaybg", "-c", "#102019", "-i", path, "-m", "fill"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    time.sleep(0.6)
+    if old and old.poll() is None:
+        old.terminate()
+        try: old.wait(timeout=3)
+        except subprocess.TimeoutExpired: old.kill()
+    return new
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1] != "--daemon":
+        subprocess.run(["pkill", "-x", "swaybg"]); os.execvp("swaybg", ["swaybg", "-c", "#102019", "-i", sys.argv[1], "-m", "fill"])
+    subprocess.run(["pkill", "-x", "swaybg"]); proc = None; last_mtime = None; due = 0; order = []; idx = -1; current = None
+    while True:
+        try: mt = os.stat(cfgmod.PATH).st_mtime
+        except OSError: mt = 0
+        cfg = cfgmod.load(); now = time.time(); changed = mt != last_mtime; last_mtime = mt
+        if cfg["wallpaper_mode"] == "slideshow":
+            pool = [f for f in (cfg["slideshow"] or cfgmod.wallpaper_files()) if os.path.isfile(f)] or cfgmod.wallpaper_files()
+            if changed or now >= due or current not in pool:
+                if changed or not order or set(order) != set(pool): order = list(pool); random.shuffle(order) if cfg["slideshow_shuffle"] else order.sort(); idx = -1
+                idx = (idx + 1) % len(order); path = order[idx]
+                if path != current or proc is None or proc.poll() is not None: proc = show(path, proc); current = path
+                due = now + cfg["slideshow_minutes"] * float(os.environ.get("OWEE_SLIDESHOW_SECONDS_PER_MINUTE", "60"))      # (la variable solo sirve para probar)
+        else:
+            path = cfg["wallpaper"]
+            if changed or proc is None or proc.poll() is not None or current != path: proc = show(path, proc); current = path
+        time.sleep(2)
+
+if __name__ == "__main__": main()

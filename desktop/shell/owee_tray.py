@@ -45,7 +45,9 @@ class TrayItem:
     def got_props(self, conn, res):
         try: p = conn.call_finish(res).unpack()[0]
         except GLib.Error: return                              # la app no responde: se deja el último icono
-        self.status = p.get("Status", "Active"); self.btn.set_visible(self.status != "Passive")
+        self.status = p.get("Status", "Active")
+        if str(p.get("Id", "")).lower().startswith("fcitx"): self.btn.set_visible(False); return           # Fcitx5: el indicador del panel (con menú propio) lo reemplaza
+        self.btn.set_visible(self.status != "Passive")
         tip = p.get("ToolTip")
         self.btn.set_tooltip_text((tip[2] if tip and tip[2] else None) or p.get("Title") or self.bus)
         icon = p.get("IconName") or ""

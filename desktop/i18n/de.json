@@ -353,5 +353,20 @@
 "Escribir con el método activo desde el principio": "Mit aktiver Eingabemethode von Anfang an schreiben",
 "Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Ohne dies muss man Strg + Leertaste drücken, um mit Pinyin, Mozc oder Owee zu schreiben",
 "Autor": "Autor",
-"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Zum Schreiben auf Chinesisch, Japanisch, Koreanisch oder Owee. Wird eine Methode aktiviert, schreibt man von Anfang an mit ihr. Für die normale Tastatur: Strg + Leertaste, Strg + Umschalt + Leertaste oder ein Klick auf das Tastatursymbol im Panel."
+"Para escribir en chino, japonés, coreano u Owee. Al activar un método se escribe con él desde el principio. Para escribir con el teclado normal: Ctrl + Espacio, Ctrl + Mayús + Espacio o un clic en el icono del teclado del panel.": "Zum Schreiben auf Chinesisch, Japanisch, Koreanisch oder Owee. Wird eine Methode aktiviert, schreibt man von Anfang an mit ihr. Für die normale Tastatur: Strg + Leertaste, Strg + Umschalt + Leertaste oder ein Klick auf das Tastatursymbol im Panel.",
+"imagen escritorio wallpaper presentación diapositivas cambiar": "Bild Schreibtisch Hintergrund Diashow wechseln",
+"3 horas": "3 Stunden",
+"1 día": "1 Tag",
+"{0} de {1} imágenes en la presentación": "{0} von {1} Bildern in der Diashow",
+"Modo": "Modus",
+"Cambiar de imagen cada": "Bild wechseln alle",
+"Orden aleatorio": "Zufällige Reihenfolge",
+"Todas": "Alle",
+"Presentación: pulsa las imágenes para incluirlas o quitarlas. Sin ninguna elegida, se usan todas.": "Diashow: Auf Bilder klicken, um sie aufzunehmen oder zu entfernen. Ohne Auswahl werden alle verwendet.",
+"Pulsa una imagen para ponerla de fondo.": "Auf ein Bild klicken, um es als Hintergrund zu setzen.",
+"Una imagen fija": "Ein festes Bild",
+"Presentación (cambia sola)": "Diashow (wechselt selbst)",
+"Teclado normal ({0})": "Normale Tastatur ({0})",
+"Ajustes del teclado…": "Tastatureinstellungen …",
+"Escribir con": "Schreiben mit"
 }

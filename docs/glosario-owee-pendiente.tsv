@@ -1,6 +1,7 @@
 en	es	owee
  and copied to the clipboard	 y copiada al portapapeles	
 (not installed)	(sin instalar)	
+1 day	1 día	
 1 hour	1 hora	
 1 minute	1 minuto	
 10 minutes	10 minutos	
@@ -8,6 +9,7 @@ en	es	owee
 15 minutes	15 minutos	
 2 minutes	2 minutos	
 24 hours	24 horas	
+3 hours	3 horas	
 3 seconds	3 segundos	
 30 minutes	30 minutos	
 5 minutes	5 minutos	
@@ -15,9 +17,11 @@ en	es	owee
 90° to the left	90° a la izquierda	
 90° to the right	90° a la derecha	
 `wlr-randr` was not found.	No se encontró `wlr-randr`.	
+A single fixed image	Una imagen fija	
 Acceleration	Aceleración	
 Accent color	Color de acento	
 Adaptive (normal)	Adaptativa (normal)	
+All	Todas	
 Alt + drag	Alt + arrastrar	
 April	abril	
 Arrow	Flecha	
@@ -29,6 +33,7 @@ Camera not available	Cámara no disponible
 Camera: 	Cámara: 	
 Capture an area	Captura de una zona	
 Capture the screen	Capturar la pantalla	
+Change the image every	Cambiar de imagen cada	
 Change time zone	Cambiar zona horaria	
 Changing…	Cambiando…	
 Check for and install updates	Buscar e instalar actualizaciones	
@@ -87,6 +92,7 @@ July	julio
 June	junio	
 Keep	Mantener	
 Key repeat	Repetición de teclas	
+Keyboard settings…	Ajustes del teclado…	
 keys combinations super	teclas combinaciones super	
 Koi (dark)	Koi (oscuro)	
 Korean	Coreano	
@@ -103,6 +109,7 @@ Memory	Memoria
 Microphone	Micrófono	
 Midnight (grayish blue)	Medianoche (azul grisáceo)	
 Mist (light gray)	Niebla (gris claro)	
+Mode	Modo	
 monday	lunes	
 Mute	Silenciar	
 Muted	Silenciado	
@@ -144,6 +151,7 @@ Previous desktop	Escritorio anterior
 Print Screen	Impr. Pant.	
 Processor	Procesador	
 Profile	Perfil	
+Random order	Orden aleatorio	
 Recording saved	Grabación guardada	
 Recording saved: 	Grabación guardada: 	
 Rectangle	Rectángulo	
@@ -174,6 +182,7 @@ Shift	Mayús
 Show or hide the camera	Mostrar u ocultar la cámara	
 Show seconds	Mostrar segundos	
 Slate (dark gray)	Pizarra (gris oscuro)	
+Slideshow (changes by itself)	Presentación (cambia sola)	
 Space	Espacio	
 Spanish (Latin America)	Español (Latinoamérica)	
 Spanish (Spain)	Español (España)	
@@ -202,6 +211,7 @@ Turn WiFi off	Desactivar WiFi
 Turn WiFi on	Activar WiFi	
 Twilight (violet)	Crepúsculo (violeta)	
 Type and press Enter	Escribe y pulsa Intro	
+Type with	Escribir con	
 Ukrainian	Ucraniano	
 Undo (Ctrl+Z)	Deshacer (Ctrl+Z)	
 unknown error	error desconocido	
