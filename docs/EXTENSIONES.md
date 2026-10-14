@@ -148,8 +148,23 @@ Capturadora: la ventana principal se cierra y se vuelve a crear tras capturar/gr
 - **Panel compacto** (`owee_windows.py`, protocolo `wlr-foreign-toplevel-management` v3, XML transcrito en `desktop/shell/protocols/`): con la ventana ACTIVA maximizada o a pantalla completa, el panel se pega a los
   bordes, sin margen ni esquinas (como la barra de menús de macOS) y vuelve a flotar al restaurar. Si faltan los enlaces de pywayland, el panel se queda flotante sin romperse.
 - **Fondos con presentación** (`session/owee-wallpaper --daemon`): modo «Una imagen fija» o «Presentación» (cada 1 min…1 día, aleatoria u ordenada, con TODAS las imágenes o solo las elegidas); Ajustes → Fondo de pantalla solo guarda
-  en `settings.json` y el demonio lo aplica al instante, sin parpadeo. 15 fondos propios en `desktop/wallpapers/fondos/` (`generar.py`); créditos en `docs/CREDITOS.md`.
+  en `settings.json` y el demonio lo aplica al instante, sin parpadeo. 25 fondos propios en `desktop/wallpapers/fondos/`: 15 paisajes (`generar.py`) y **10 de carpas** hechas con la carpa del logo, con otros colores, cantidades (de 1 a 12) y tamaños (`generar_koi.py`); sin fotos de terceros.
 - **Lanzador**: la lista de apps se reconstruye cuando se instala una (p. ej. Bazaar al terminar su instalación en el primer arranque).
+
+## Bluetooth, Usuarios y Acceso (Ajustes, probado en VM con simuladores / el ayudante como root)
+- **Bluetooth** (`ajustes/bluetooth.py`, BlueZ con `bluetoothctl`): encender/apagar, lista de dispositivos (conectado / emparejado / disponible), conectar, desconectar, olvidar, buscar y emparejar. Todo asíncrono y con límite de
+  tiempo; sin adaptador lo dice y no hace nada. **Widget del panel** `40-bluetooth.py` (oculto sin adaptador; clic: encender/apagar y conectar dispositivos ya emparejados). Probado con `tools/ostree-proto/mock-bluetoothctl`;
+  **sin hardware Bluetooth real no se pudo probar** el emparejamiento, el audio (`libspa-0.2-bluetooth`) ni los dispositivos con PIN.
+- **Usuarios** (`ajustes/usuarios.py`): lista de cuentas (UID 1000–59999), crear, cambiar contraseña, hacer administrador, eliminar con sus archivos (pide escribir el nombre). Todo lo que cambia cuentas pasa por
+  `/usr/libexec/owee/owee-account-helper` con `pkexec` (política `org.oweelinux.accounts`, `auth_admin_keep`): solo órdenes cerradas, nombres validados, **contraseñas por la entrada estándar (nunca en argumentos)**, no toca
+  cuentas de sistema, no borra al que lo invoca ni deja el equipo sin administradores (grupo `sudo`). El ayudante se probó como root en la VM (crear, clave, administrador sí/no, errores); **el camino con `pkexec` y la ventana de
+  contraseña se verifica con la imagen nueva** (la anterior no traía `pkexec`).
+- **Acceso** (`ajustes/acceso.py`): pantalla de bloqueo con los **colores del tema** y, si quieres, el fondo de pantalla (`session/owee-lock` sobre `swaylock`; lo usan Super + L, el menú de apagado, la inactividad y suspender) y
+  el **inicio de sesión de SDDM**: entrar sin contraseña con un usuario y una sesión (`/etc/sddm.conf.d/30-owee-autologin.conf`, vía el ayudante). El tiempo de bloqueo sigue en Energía. Probado: bloquear y desbloquear en la VM.
+- **Cuentas en línea** (Google, Nextcloud…) **no** se incluyen: pesan (KDE las trae con KAccounts) y no son necesarias para un escritorio ligero; se pueden usar desde el navegador o las apps.
+
+## Teclado en uso: distribuciones, indicador y `owee-layout` (probado en VM)
+Ver `docs/IDIOMAS.md`: tabla única de idiomas, teclados árabe/persa/hindi/urdu/indonesio/malayo, `Super + Mayús + Espacio`, indicador del panel con la distribución activa.
 
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
