@@ -1,6 +1,6 @@
 """Bluetooth (BlueZ, con `bluetoothctl`): encender/apagar, ver los dispositivos conocidos, conectar, desconectar, olvidar y buscar nuevos para emparejarlos.
 Ninguna orden se espera en el hilo de la interfaz (todas pasan por `run`, con límite de tiempo). Sin adaptador, la página lo dice y no hace nada más."""
-import re
+import os, re
 import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib
@@ -30,7 +30,10 @@ class Bluetooth(Page):
         return scrolled(self.b)
 
     def refresh(self):
-        if hasattr(self, "holder") and have("bluetoothctl") and not self.busy: run(["bluetoothctl", "show"], self.on_show)
+        if not (hasattr(self, "holder") and have("bluetoothctl") and not self.busy): return
+        try: hay = bool(os.listdir(os.environ.get("OWEE_BT_SYSFS", "/sys/class/bluetooth")))      # sin adaptador no se espera a bluetoothctl
+        except OSError: hay = False
+        self.on_show("", 1) if not hay else run(["bluetoothctl", "show"], self.on_show)
 
     def clear(self):
         while (c := self.holder.get_first_child()): self.holder.remove(c)

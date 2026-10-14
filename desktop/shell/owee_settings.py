@@ -11,6 +11,7 @@ from gi.repository import Gtk, Gio, GLib, Gdk
 import owee_config
 from ajustes.base import Page
 from owee_i18n import _, N_
+import owee_i18n as _i18n; _i18n.apply_direction()
 
 PAGES = ["apariencia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "actualizaciones", "acerca"]
 GROUPS = ["Personal", "Dispositivos", "Sistema"]          # códigos internos (cada página dice a qué grupo pertenece); se traducen al mostrarlos

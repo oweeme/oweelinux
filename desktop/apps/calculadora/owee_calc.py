@@ -11,6 +11,7 @@ import calc_engine as eng
 import calc_owee as ow
 import owee_i18n
 from owee_i18n import _
+import owee_i18n as _i18n; _i18n.apply_direction()
 try: import owee_config
 except Exception: owee_config = None
 

@@ -10,6 +10,10 @@ def bt(*a, t=4):
     try: return subprocess.run(["bluetoothctl", *a], capture_output=True, text=True, timeout=t)
     except (OSError, subprocess.TimeoutExpired): return None
 me = os.path.abspath(sys.argv[0])
+def hay_adaptador():                    # sin adaptador no se llama a bluetoothctl (esperaría al servicio): se oculta al instante. OWEE_BT_SYSFS cambia la carpeta (pruebas)
+    try: return bool(os.listdir(os.environ.get("OWEE_BT_SYSFS", "/sys/class/bluetooth")))
+    except OSError: return False
+if not hay_adaptador(): print(json.dumps({"hidden": True})); sys.exit(0)
 if len(sys.argv) > 2 and sys.argv[1] in ("connect", "disconnect") and re.fullmatch(r"[0-9A-Fa-f:]{17}", sys.argv[2]): bt(sys.argv[1], sys.argv[2], t=20)
 elif len(sys.argv) > 1 and sys.argv[1] == "toggle":
     r = bt("show"); bt("power", "off" if r and "Powered: yes" in r.stdout else "on")

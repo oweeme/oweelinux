@@ -17,6 +17,7 @@ import json, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import owee_config, owee_i18n
 from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
 from owee_i18n import _
+import owee_i18n as _i18n; _i18n.apply_direction()
 import owee_keys
 CSS_TEMPLATE = """
 window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }

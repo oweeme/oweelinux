@@ -19,6 +19,7 @@ except Exception: owee_config = None
 import editor as ed
 import overlay as ov
 from owee_i18n import _
+import owee_i18n as _i18n; _i18n.apply_direction()
 
 CSS = """
 window.cap { background: @bg@; color: @fg@; }

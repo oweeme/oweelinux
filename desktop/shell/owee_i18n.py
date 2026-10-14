@@ -81,3 +81,10 @@ def installed_locales():
     try: out = subprocess.run(["locale", "-a"], capture_output=True, text=True, timeout=5).stdout
     except Exception: return set()
     return {l.lower().replace("utf8", "utf-8") for l in out.split()}
+
+def apply_direction():
+    """Dirección del texto según el idioma elegido (no según un LANG heredado): derecha→izquierda en árabe, persa y urdu. Llamar después de importar Gtk."""
+    import gi
+    gi.require_version("Gtk", "4.0")
+    from gi.repository import Gtk
+    Gtk.Widget.set_default_direction(Gtk.TextDirection.RTL if is_rtl(LANG) else Gtk.TextDirection.LTR)
