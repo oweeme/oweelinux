@@ -113,13 +113,14 @@ Si F3d falla (hay corrupción), se detiene todo hasta resolverlo.
 - [ ] **Puerta de entrada (go/no-go):** labwc funciona con la Nvidia Pascal del Dell G3. Si no, se evalúa alternativa antes de escribir nada
 - [ ] Panel, lanzador, ajustes rápidos, notificaciones, bloqueo, panel de estado del sistema
 - [ ] Segunda sesión en SDDM; Plasma sigue disponible
+- **Avance (2026-10-14, probado en VM salvo lo que se indica en `docs/EXTENSIONES.md` e `IDIOMAS.md`):** panel con indicador de teclado, calendario, WiFi, volumen, batería, bandeja y modo compacto; lanzador; notificaciones (mako con estilo propio); **bloqueo de pantalla** (`owee-lock`/swaylock con colores del tema; Super+L); sesión Lite en SDDM con inicio automático opcional; fondos con presentación; 17 idiomas + Owee con teclado coherente; Bluetooth, Usuarios, Acceso. **Falta:** go/no-go con la Nvidia Pascal, medidas de RAM/arranque contra Plasma, sesión de 8 h, multimonitor/HiDPI, árabe/persa/urdu de derecha a izquierda revisado a fondo, Bluetooth con hardware real.
 
 **Verificación:** RAM en reposo y *login → escritorio* medidos contra Plasma (misma máquina, 5 repeticiones); sesión de 8 horas sin cierres; multimonitor y HiDPI; si el shell falla, el usuario vuelve a Plasma desde el login.
 
 ## F7 — Apps propias
 - [ ] **`owee-capture`**: captura y grabación (región, anotaciones, anclar a pantalla, audio, cámara, OCR, GIF) sobre protocolos estándar de Wayland/PipeWire
 - [ ] Formato `owee-app` (manifest + permisos vía portales de Flatpak) y plantilla "hola mundo" en JS/QML
-- [ ] Ajustes del sistema propios (los imprescindibles)
+- [x] Ajustes del sistema propios: 17 páginas (apariencia, fondo, escritorios, idioma, pantalla, sonido, **Bluetooth**, teclado, ratón, energía, fecha, **usuarios**, **acceso**, aplicaciones, atajos, actualizaciones, acerca de); calculadora y capturadora también hechas
 
 **Verificación:** lista de aceptación por app; "hola mundo" en menos de 20 líneas, instalable en un click; una app que pide un permiso que no declaró **falla** (prueba negativa).
 
