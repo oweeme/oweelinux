@@ -7,8 +7,8 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
-for f in owee_panel.py wl_toplevels.py owee_tray.py owee_config.py owee_i18n.py owee_desktops.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_desktops.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
 # en ~/.config/owee/widgets); los ejemplos se dejan aparte para copiarlos y cambiarlos.
@@ -66,7 +66,7 @@ Name=Modo presentación
 Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --present
 EOD
 # Apps de KDE que OweeLinux reemplaza con las propias: se ocultan del lanzador (siguen instaladas por si otra app las llama)
-for f in org.kde.kcalc.desktop org.kde.spectacle.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
+for f in org.kde.kcalc.desktop org.kde.spectacle.desktop org.kde.discover.desktop org.kde.discover.urlhandler.desktop org.kde.discover.notifier.desktop org.kde.discover.flatpak.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
 # ---- Idiomas: catálogos de la interfaz, locales del sistema, fuentes y teclados (docs/EXTENSIONES.md → Idiomas)
 install -d "$R/usr/share/owee/i18n"; cp "$D"/i18n/*.json "$R/usr/share/owee/i18n/"
 for l in es_ES en_US pt_BR fr_FR de_DE ru_RU zh_CN ja_JP; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
@@ -99,6 +99,9 @@ if ls "$OWEE_DEBS"/*.deb >/dev/null 2>&1; then
   # Catálogos de Owee para las apps ya instaladas (KDE, GTK…): LANGUAGE=qow:es / qow@owee:qow:es; lo que el glosario no cubre se ve en español
   python3 "$OWEE_SRC/08_Integracion/herramientas/gettext_rellenar.py" --origen "$R/usr/share/locale/es/LC_MESSAGES" --salida "$R/usr/share/locale" | head -2 || echo "(aviso: sin catálogos de apps en Owee)"
 else echo "(aviso: sin paquetes de Owee: el idioma Owee no estará disponible)"; fi
+# Tienda de apps: Bazaar (Flatpak). El servicio la instala en el primer arranque con red; Discover (de KDE) se oculta
+install -Dm0644 "$D/session/owee-store.service" "$R/usr/lib/systemd/system/owee-store.service"
+mkdir -p "$ETC/systemd/system/multi-user.target.wants"; ln -sf /usr/lib/systemd/system/owee-store.service "$ETC/systemd/system/multi-user.target.wants/owee-store.service"
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

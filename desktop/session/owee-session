@@ -17,6 +17,8 @@ if [ -n "$LOC" ] && locale -a 2>/dev/null | grep -qix "$(echo "$LOC" | sed 's/UT
 # Escribir en otros idiomas: Fcitx5 (pinyin, Mozc, Owee…). Las apps GTK y Qt lo usan por el protocolo nativo de Wayland (text-input): NO se fijan GTK_IM_MODULE ni QT_IM_MODULE
 # (con ellas, Fcitx5 avisa «Wayland Diagnose» y no hacen falta; probado con GTK4 y Kate). XMODIFIERS solo sirve a las apps de X11 (XWayland).
 if command -v fcitx5 >/dev/null; then export XMODIFIERS=@im=fcitx; unset GTK_IM_MODULE QT_IM_MODULE; fi
+# Apps Flatpak (Bazaar y las que se instalen): sus lanzadores e iconos están en /var/lib/flatpak y ~/.local/share/flatpak
+export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
 # En una máquina virtual no hay GPU: gráficos por software (en hardware real NO se tocan)
 if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
 # Ajustes opcionales de la máquina (p. ej. en una VM: WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo)

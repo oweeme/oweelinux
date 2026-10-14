@@ -1,0 +1,15 @@
+[Unit]
+Description=Tienda de apps de OweeLinux (Bazaar, Flatpak)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/var/lib/flatpak/.owee-store-ok
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/owee/owee-store-setup
+TimeoutStartSec=2000
+Nice=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=multi-user.target

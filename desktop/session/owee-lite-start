@@ -6,6 +6,7 @@ PANEL=python
 /usr/libexec/owee/owee-wallpaper &
 mako &
 command -v fcitx5 >/dev/null && FCITX_NO_WAYLAND_DIAGNOSE=1 fcitx5 -d --replace >/dev/null 2>&1 &   # métodos de escritura (Ajustes → Teclado / Idioma)
+/usr/libexec/owee/owee-apply-theme &             # tema de fábrica para apps GTK/Qt en el primer arranque de un usuario
 /usr/libexec/owee/owee-apply-display &           # resolución y escala guardadas en Ajustes
 /usr/libexec/owee/owee-idle &                    # bloqueo y suspensión por inactividad (Ajustes → Energía)
 for a in /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1; do [ -x "$a" ] && { "$a" & break; }; done   # ventana de contraseña para tareas de administrador

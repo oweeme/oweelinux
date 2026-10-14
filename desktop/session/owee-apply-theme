@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# Aplica el tema elegido (o el de fábrica) a las apps GTK, Qt/KDE y a las barras de ventana: escribe gtk.css, settings.ini, kdeglobals y el tema de labwc.
+# Se ejecuta al iniciar sesión SOLO si falta algún archivo (primer arranque de un usuario nuevo): así Bazaar, Dolphin, Kate… salen con el tema desde el primer día,
+# no solo después de pasar por Ajustes → Apariencia. Sin pantalla: no necesita GTK abierto.
+import os, sys
+for d in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell")): sys.path.append(d)
+home = os.path.expanduser("~")
+need = [".config/gtk-4.0/gtk.css", ".config/kdeglobals", ".local/share/themes/Owee-Tema/openbox-3/themerc"]
+if "--force" not in sys.argv and all(os.path.exists(os.path.join(home, p)) for p in need): sys.exit(0)
+try:
+    import owee_config
+    import owee_theme as ap
+    cfg = owee_config.load()
+    ap.write_gtk_prefs(cfg["mode"]); ap.write_gtk_css(cfg); ap.write_qt_scheme(cfg); ap.write_window_theme(cfg)
+except Exception as e:
+    print("owee-apply-theme:", e, file=sys.stderr)
