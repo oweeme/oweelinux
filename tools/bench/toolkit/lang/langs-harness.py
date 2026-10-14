@@ -1,7 +1,7 @@
 import importlib.util, os, shutil, subprocess, sys, time
 spec = importlib.util.spec_from_file_location("gui", "/home/oweeme/Dev/oweelinux/tools/ostree-proto/gui-boot-test.py")
 gui = importlib.util.module_from_spec(spec); spec.loader.exec_module(gui)
-S = "/tmp/claude-1000/-home-oweeme-Dev-oweelinux/ce821fa2-09f6-4251-ae33-663f0f83b66f/scratchpad/srv"
+S = "/tmp/owee-srv"
 http = subprocess.Popen(["python3", "-m", "http.server", "8003", "--bind", "127.0.0.1", "--directory", S], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 W = "/home/oweeme/.cache/oweelinux/vm/litediag"; os.makedirs(W, exist_ok=True); os.chdir(W)
 for f in ("ser.sock", "mon.sock"):
