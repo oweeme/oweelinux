@@ -2,6 +2,13 @@
 # Tienda de apps de OweeLinux: Bazaar (Flatpak, de Flathub). Se ejecuta UNA vez, en segundo plano y con red (servicio owee-store.service); no retrasa el arranque.
 # Las apps Flatpak viven en /var/lib/flatpak (la parte persistente): el sistema inmutable (/usr) no se toca. Si no hay red, se reintenta en el siguiente arranque.
 set -u
+# Avisa con una notificación a las sesiones abiertas (el servicio corre como root, sin sesión propia)
+avisar() {
+  for d in /run/user/*; do
+    [ -S "$d/bus" ] || continue; u=$(id -nu "$(basename "$d")" 2>/dev/null) || continue
+    runuser -u "$u" -- env DBUS_SESSION_BUS_ADDRESS="unix:path=$d/bus" XDG_RUNTIME_DIR="$d" notify-send -a OweeLinux -i system-software-install "$1" "$2" 2>/dev/null || true
+  done
+}
 MARK=/var/lib/flatpak/.owee-store-ok
 [ -e "$MARK" ] && exit 0
 command -v flatpak >/dev/null || { echo "owee-store: falta flatpak"; exit 0; }
@@ -10,5 +17,6 @@ n=0; until timeout 60 flatpak remote-add --system --if-not-exists flathub https:
   n=$((n + 1)); [ "$n" -ge 45 ] && { echo "owee-store: sin red para Flathub (se reintentará en el próximo arranque)"; exit 0; }; sleep 20; done
 # Que las apps Flatpak (libadwaita/GTK) vean el tema y los colores elegidos en Ajustes → Apariencia
 flatpak override --system --filesystem=xdg-config/gtk-4.0:ro --filesystem=xdg-config/gtk-3.0:ro --filesystem=xdg-config/fontconfig:ro
-timeout 1800 flatpak install --system -y --noninteractive flathub io.github.kolunmi.Bazaar && touch "$MARK" && echo "owee-store: Bazaar instalado"
+avisar "Tienda de apps · App store" "Instalando Bazaar… puede tardar unos minutos. / Installing Bazaar… it may take a few minutes."
+timeout 1800 flatpak install --system -y --noninteractive flathub io.github.kolunmi.Bazaar && { touch "$MARK"; echo "owee-store: Bazaar instalado"; avisar "Bazaar instalado · installed" "Búscalo en el lanzador (OweeLinux). / Find it in the launcher."; }
 exit 0
