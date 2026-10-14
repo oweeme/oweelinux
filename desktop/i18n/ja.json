@@ -454,5 +454,20 @@
 "Conectar {0}": "{0} を接続",
 "Bluetooth apagado": "Bluetooth オフ",
 "Bluetooth: {0}": "Bluetooth: {0}",
-"Bluetooth encendido": "Bluetooth オン"
+"Bluetooth encendido": "Bluetooth オン",
+"Bienvenido a OweeLinux": "OweeLinux へようこそ",
+"Vamos a dejar el equipo listo en unos pasos.": "いくつかの手順でコンピューターの準備をします。",
+"Elige tu teclado": "キーボードを選んでください",
+"Elige tu zona horaria": "タイムゾーンを選んでください",
+"Crea tu cuenta": "アカウントを作成してください",
+"Serás el administrador de este equipo.": "あなたがこのコンピューターの管理者になります。",
+"Preparando tu equipo…": "コンピューターを準備しています…",
+"No se pudo terminar: {0}": "完了できませんでした: {0}",
+"Atrás": "戻る",
+"Siguiente": "次へ",
+"Terminar": "完了",
+"Listo. Cargando la pantalla de inicio de sesión…": "完了しました。ログイン画面を読み込んでいます…",
+"Elige tu idioma": "言語を選んでください",
+"Distribución del teclado": "キーボード配列",
+"Escribe aquí para probar tu teclado": "ここに入力してキーボードを試せます"
 }

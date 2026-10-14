@@ -4,7 +4,8 @@ Reglas: solo estas órdenes, argumentos validados estrictamente, las contraseña
 (UID < 1000), ni se borra al usuario que lo invoca, ni se deja el equipo sin administradores.
 Uso:  add USUARIO "Nombre completo" [admin]   (clave por stdin)      passwd USUARIO   (clave por stdin)
       delete USUARIO [keephome]               admin USUARIO on|off   rename USUARIO "Nombre completo"
-      autologin USUARIO SESION.desktop | off"""
+      autologin USUARIO SESION.desktop | off
+      firstboot USUARIO "Nombre completo" IDIOMA DISTRIBUCIONES INDICE ZONA   (clave por stdin; solo el usuario owee-setup, una vez, sin otros usuarios)"""
 import grp, os, pwd, re, subprocess, sys
 NAME = re.compile(r"^[a-z_][a-z0-9_-]{0,30}$"); SESSION = re.compile(r"^[A-Za-z0-9_.-]{1,64}\.desktop$"); ADMIN = "sudo"; GROUPS = ["audio", "video", "plugdev", "netdev"]
 SDDM = "/etc/sddm.conf.d/30-owee-autologin.conf"
@@ -60,6 +61,41 @@ elif op == "admin" and len(a) == 3 and a[2] in ("on", "off"):
         if admins() <= {u.pw_name}: die("es el único administrador: déjalo como está")
         sh("gpasswd", "-d", u.pw_name, ADMIN)
 elif op == "rename" and len(a) == 3: u = human(a[1]); sh("usermod", "-c", full(a[2]), u.pw_name)
+elif op == "firstboot" and len(a) == 7:
+    import json, shutil
+    DONE = "/var/lib/owee/firstboot-done"
+    if caller() != "owee-setup": die("solo el asistente de primer arranque puede hacer esto")
+    if os.path.exists(DONE) or any(1000 <= p.pw_uid < 60000 for p in pwd.getpwall()): die("este equipo ya está configurado")
+    name, fn, lang, lays, idx, tz = a[1], full(a[2]), a[3], a[4], a[5], a[6]
+    if not NAME.match(name): die("nombre de usuario no válido (minúsculas, cifras, - y _; empieza por letra)")
+    sys.path.insert(0, "/usr/libexec/owee"); sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell"))
+    import owee_i18n
+    if lang not in {c for c, _n, _l in owee_i18n.LANGS}: die("idioma no válido")
+    allowed = set(owee_i18n.all_layouts()) | {"latam", "es", "pt", "gb", "kr", "jp", "us(intl)", "in(bolnagri)"}
+    lay = [x for x in lays.split(",") if x]
+    if not (1 <= len(lay) <= 4) or any(x not in allowed for x in lay): die("distribución de teclado no válida")
+    if not idx.isdigit() or int(idx) >= len(lay): die("distribución activa no válida")
+    if not re.fullmatch(r"[A-Za-z0-9_+-]+(/[A-Za-z0-9_+-]+)*", tz) or not os.path.isfile("/usr/share/zoneinfo/" + tz): die("zona horaria no válida")
+    pw = password()
+    sh("groupadd", "-f", ADMIN); groups = [g for g in GROUPS if any(x.gr_name == g for x in grp.getgrall())]
+    sh("useradd", "-m", "-s", "/bin/bash", "-c", fn, "-G", ",".join(groups + [ADMIN]), name); sh("chpasswd", stdin=f"{name}:{pw}\n")
+    u = pwd.getpwnam(name); cfg = os.path.join(u.pw_dir, ".config"); os.makedirs(os.path.join(cfg, "owee"), exist_ok=True); os.makedirs(os.path.join(cfg, "labwc"), exist_ok=True)
+    key = lay[int(idx)]; base, _s, var = key.partition("(")
+    json.dump({"lang": lang, "layouts": lay, "layout_idx": int(idx)}, open(os.path.join(cfg, "owee", "settings.json"), "w"), indent=1)
+    open(os.path.join(cfg, "labwc", "environment"), "w").write(f"XKB_DEFAULT_LAYOUT={base}\n" + (f"XKB_DEFAULT_VARIANT={var.rstrip(')')}\n" if var else ""))
+    for root, dirs, files in os.walk(cfg):
+        for n in dirs + files: os.chown(os.path.join(root, n), u.pw_uid, u.pw_gid)
+    os.chown(cfg, u.pw_uid, u.pw_gid)
+    tmp = "/etc/localtime.tmp"; (os.path.lexists(tmp) and os.remove(tmp)); os.symlink("/usr/share/zoneinfo/" + tz, tmp); os.replace(tmp, "/etc/localtime"); open("/etc/timezone", "w").write(tz + "\n")
+    loc = next(l for c, _n, l in owee_i18n.LANGS if c == lang)
+    open("/etc/default/locale", "w").write(f"LANG={loc}\n")
+    open("/etc/default/keyboard", "w").write(f'XKBLAYOUT="{base}"\nXKBVARIANT="{var.rstrip(")")}"\nXKBOPTIONS=""\nBACKSPACE="guess"\n')
+    os.makedirs("/var/lib/sddm", exist_ok=True)
+    open("/var/lib/sddm/state.conf", "w").write(f"[Last]\nSession=/usr/share/wayland-sessions/owee-lite.desktop\nUser={name}\n")
+    os.makedirs(os.path.dirname(DONE), exist_ok=True); open(DONE, "w").write("listo\n")
+    try: os.remove("/etc/sddm.conf.d/05-owee-setup.conf")
+    except OSError: pass
+    subprocess.Popen(["systemd-run", "--no-block", "--on-active=3", "systemctl", "restart", "sddm.service"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 elif op == "autologin" and len(a) in (2, 3):
     os.makedirs(os.path.dirname(SDDM), exist_ok=True)
     if a[1] == "off": text = "[Autologin]\nUser=\nSession=\n"

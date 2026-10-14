@@ -2,6 +2,7 @@
 # Reconstruye la imagen COMPLETA de pruebas: Debian 13 + Plasma + firmware + branding B1 + firma de actualizaciones.
 # Se ejecuta DENTRO del pod (usa la caché apt-cacher-ng y las claves de prueba de gen-test-keys.sh).
 # Resultado en DIR_TRABAJO: rootfs/, repo/ y pub/ (release 1 FIRMADA) y disk.img.
+# OWEE_TEST_USER=0 construye la imagen «real»: sin usuario de pruebas; el primer arranque abre el asistente que crea tu cuenta.
 # Uso: build-image-full.sh DIR_TRABAJO
 set -euo pipefail
 W=${1:?uso: $0 DIR_TRABAJO}; HERE=$(cd "$(dirname "$0")" && pwd); R=$W/rootfs
@@ -11,7 +12,7 @@ export OWEE_SIGN_KEY=$(gpg --homedir "$OWEE_GNUPGHOME" --list-keys --with-colons
 mkdir -p "$W"
 date +%T | sed 's/^/[inicio] /'
 "$HERE/build-rootfs-plasma.sh" "$R"; date +%T | sed 's/^/[rootfs] /'
-OWEE_TEST_USER=1 OWEE_HEALTH_STABLE=20 "$HERE/prepare-rootfs.sh" "$R" >/dev/null
+OWEE_TEST_USER=${OWEE_TEST_USER:-1} OWEE_HEALTH_STABLE=20 "$HERE/prepare-rootfs.sh" "$R" >/dev/null
 "$HERE/overlay-branding.sh" "$R" /work
 "$HERE/build-owee-debs.sh" || echo "(aviso: sin los paquetes del idioma Owee)"
 [ -x "$HERE/overlay-lite.sh" ] && "$HERE/overlay-lite.sh" "$R" /work

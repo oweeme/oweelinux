@@ -454,5 +454,20 @@
 "Conectar {0}": "Hubungkan {0}",
 "Bluetooth apagado": "Bluetooth mati",
 "Bluetooth: {0}": "Bluetooth: {0}",
-"Bluetooth encendido": "Bluetooth menyala"
+"Bluetooth encendido": "Bluetooth menyala",
+"Bienvenido a OweeLinux": "Selamat datang di OweeLinux",
+"Vamos a dejar el equipo listo en unos pasos.": "Mari siapkan komputer Anda dalam beberapa langkah.",
+"Elige tu teclado": "Pilih papan ketik Anda",
+"Elige tu zona horaria": "Pilih zona waktu Anda",
+"Crea tu cuenta": "Buat akun Anda",
+"Serás el administrador de este equipo.": "Anda akan menjadi administrator komputer ini.",
+"Preparando tu equipo…": "Menyiapkan komputer Anda…",
+"No se pudo terminar: {0}": "Tidak bisa diselesaikan: {0}",
+"Atrás": "Kembali",
+"Siguiente": "Berikutnya",
+"Terminar": "Selesai",
+"Listo. Cargando la pantalla de inicio de sesión…": "Selesai. Memuat layar masuk…",
+"Elige tu idioma": "Pilih bahasa Anda",
+"Distribución del teclado": "Tata letak papan ketik",
+"Escribe aquí para probar tu teclado": "Ketik di sini untuk mencoba papan ketik"
 }

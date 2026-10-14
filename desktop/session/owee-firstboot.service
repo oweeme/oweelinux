@@ -1,0 +1,12 @@
+[Unit]
+Description=Decide si SDDM abre el asistente de primer arranque de OweeLinux
+Before=display-manager.service sddm.service
+DefaultDependencies=no
+After=local-fs.target systemd-sysusers.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/owee/owee-firstboot
+
+[Install]
+WantedBy=sysinit.target

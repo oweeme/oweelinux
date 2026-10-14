@@ -454,5 +454,20 @@
 "Conectar {0}": "{0} को कनेक्ट करें",
 "Bluetooth apagado": "ब्लूटूथ बंद",
 "Bluetooth: {0}": "ब्लूटूथ: {0}",
-"Bluetooth encendido": "ब्लूटूथ चालू"
+"Bluetooth encendido": "ब्लूटूथ चालू",
+"Bienvenido a OweeLinux": "OweeLinux में आपका स्वागत है",
+"Vamos a dejar el equipo listo en unos pasos.": "कुछ ही चरणों में कंप्यूटर तैयार करते हैं।",
+"Elige tu teclado": "अपना कीबोर्ड चुनें",
+"Elige tu zona horaria": "अपना समय क्षेत्र चुनें",
+"Crea tu cuenta": "अपना खाता बनाएँ",
+"Serás el administrador de este equipo.": "आप इस कंप्यूटर के एडमिनिस्ट्रेटर होंगे।",
+"Preparando tu equipo…": "कंप्यूटर तैयार हो रहा है…",
+"No se pudo terminar: {0}": "पूरा नहीं हो सका: {0}",
+"Atrás": "पीछे",
+"Siguiente": "आगे",
+"Terminar": "समाप्त",
+"Listo. Cargando la pantalla de inicio de sesión…": "हो गया। लॉगिन स्क्रीन लोड हो रही है…",
+"Elige tu idioma": "अपनी भाषा चुनें",
+"Distribución del teclado": "कीबोर्ड लेआउट",
+"Escribe aquí para probar tu teclado": "कीबोर्ड जाँचने के लिए यहाँ लिखें"
 }

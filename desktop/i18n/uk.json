@@ -454,5 +454,20 @@
 "Conectar {0}": "Підключити {0}",
 "Bluetooth apagado": "Bluetooth вимкнено",
 "Bluetooth: {0}": "Bluetooth: {0}",
-"Bluetooth encendido": "Bluetooth увімкнено"
+"Bluetooth encendido": "Bluetooth увімкнено",
+"Bienvenido a OweeLinux": "Ласкаво просимо до OweeLinux",
+"Vamos a dejar el equipo listo en unos pasos.": "Налаштуємо комп'ютер за кілька кроків.",
+"Elige tu teclado": "Оберіть клавіатуру",
+"Elige tu zona horaria": "Оберіть часовий пояс",
+"Crea tu cuenta": "Створіть обліковий запис",
+"Serás el administrador de este equipo.": "Ви станете адміністратором цього комп'ютера.",
+"Preparando tu equipo…": "Підготовка комп'ютера…",
+"No se pudo terminar: {0}": "Не вдалося завершити: {0}",
+"Atrás": "Назад",
+"Siguiente": "Далі",
+"Terminar": "Завершити",
+"Listo. Cargando la pantalla de inicio de sesión…": "Готово. Завантажується екран входу…",
+"Elige tu idioma": "Оберіть мову",
+"Distribución del teclado": "Розкладка клавіатури",
+"Escribe aquí para probar tu teclado": "Введіть тут, щоб перевірити клавіатуру"
 }

@@ -454,5 +454,20 @@
 "Conectar {0}": "连接 {0}",
 "Bluetooth apagado": "蓝牙已关闭",
 "Bluetooth: {0}": "蓝牙：{0}",
-"Bluetooth encendido": "蓝牙已开启"
+"Bluetooth encendido": "蓝牙已开启",
+"Bienvenido a OweeLinux": "欢迎使用 OweeLinux",
+"Vamos a dejar el equipo listo en unos pasos.": "只需几步，就能让电脑准备就绪。",
+"Elige tu teclado": "选择键盘",
+"Elige tu zona horaria": "选择时区",
+"Crea tu cuenta": "创建你的账户",
+"Serás el administrador de este equipo.": "你将成为这台电脑的管理员。",
+"Preparando tu equipo…": "正在准备你的电脑…",
+"No se pudo terminar: {0}": "无法完成设置：{0}",
+"Atrás": "上一步",
+"Siguiente": "下一步",
+"Terminar": "完成",
+"Listo. Cargando la pantalla de inicio de sesión…": "完成。正在加载登录界面…",
+"Elige tu idioma": "选择语言",
+"Distribución del teclado": "键盘布局",
+"Escribe aquí para probar tu teclado": "在此输入以测试键盘"
 }

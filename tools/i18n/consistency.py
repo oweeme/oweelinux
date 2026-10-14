@@ -37,6 +37,9 @@ for k in sorted(layouts - used):
     if k not in ALIAS: errs.append(f"la distribución «{k}» de Teclado no tiene un idioma de interfaz")
 for c in ("ar", "fa", "ur"):
     if not owee_i18n.is_rtl(c): errs.append(f"{c} debería ser de derecha a izquierda")
+sh = open(os.path.join(R, "desktop", "session", "owee-locale"), encoding="utf-8").read()
+for c, _n, loc in owee_i18n.LANGS:
+    if f"{c}) LOC={loc};" not in sh.replace("  ", " ").replace(" )", ")") and f"{c}) LOC={loc}" not in re.sub(r"\s+", " ", sh): errs.append(f"{c}: owee-locale no tiene el locale {loc}")
 cat = os.path.join(R, "desktop", "i18n")
 for c in codes:
     if c == "es": continue

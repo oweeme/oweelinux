@@ -454,5 +454,20 @@
 "Conectar {0}": "Conectar {0}",
 "Bluetooth apagado": "Bluetooth desligado",
 "Bluetooth: {0}": "Bluetooth: {0}",
-"Bluetooth encendido": "Bluetooth ligado"
+"Bluetooth encendido": "Bluetooth ligado",
+"Bienvenido a OweeLinux": "Boas-vindas ao OweeLinux",
+"Vamos a dejar el equipo listo en unos pasos.": "Vamos deixar o computador pronto em poucos passos.",
+"Elige tu teclado": "Escolha o seu teclado",
+"Elige tu zona horaria": "Escolha o seu fuso horário",
+"Crea tu cuenta": "Crie a sua conta",
+"Serás el administrador de este equipo.": "Você será o administrador deste computador.",
+"Preparando tu equipo…": "Preparando o seu computador…",
+"No se pudo terminar: {0}": "Não foi possível concluir: {0}",
+"Atrás": "Voltar",
+"Siguiente": "Avançar",
+"Terminar": "Concluir",
+"Listo. Cargando la pantalla de inicio de sesión…": "Pronto. Carregando a tela de login…",
+"Elige tu idioma": "Escolha o seu idioma",
+"Distribución del teclado": "Layout do teclado",
+"Escribe aquí para probar tu teclado": "Digite aqui para testar o teclado"
 }

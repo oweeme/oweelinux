@@ -1,0 +1,4 @@
+#!/bin/sh
+/usr/libexec/owee/owee-wallpaper &
+python3 /usr/libexec/owee/setup/owee_setup.py
+kill %1 2>/dev/null

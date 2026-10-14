@@ -454,5 +454,20 @@
 "Conectar {0}": "الاتصال بـ {0}",
 "Bluetooth apagado": "بلوتوث متوقف",
 "Bluetooth: {0}": "بلوتوث: {0}",
-"Bluetooth encendido": "بلوتوث قيد التشغيل"
+"Bluetooth encendido": "بلوتوث قيد التشغيل",
+"Bienvenido a OweeLinux": "مرحبًا بك في OweeLinux",
+"Vamos a dejar el equipo listo en unos pasos.": "لنجهّز جهازك في بضع خطوات.",
+"Elige tu teclado": "اختر لوحة المفاتيح",
+"Elige tu zona horaria": "اختر المنطقة الزمنية",
+"Crea tu cuenta": "أنشئ حسابك",
+"Serás el administrador de este equipo.": "ستكون مسؤول هذا الجهاز.",
+"Preparando tu equipo…": "جارٍ تجهيز جهازك…",
+"No se pudo terminar: {0}": "تعذّر الإكمال: {0}",
+"Atrás": "السابق",
+"Siguiente": "التالي",
+"Terminar": "إنهاء",
+"Listo. Cargando la pantalla de inicio de sesión…": "تم. جارٍ تحميل شاشة تسجيل الدخول…",
+"Elige tu idioma": "اختر لغتك",
+"Distribución del teclado": "تخطيط لوحة المفاتيح",
+"Escribe aquí para probar tu teclado": "اكتب هنا لتجربة لوحة المفاتيح"
 }

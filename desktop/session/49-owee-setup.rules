@@ -1,0 +1,5 @@
+// El asistente de primer arranque (usuario de sistema owee-setup) puede llamar al ayudante de cuentas sin clave: el propio ayudante solo le deja
+// crear UN usuario, una vez, y mientras no haya ninguno (ver owee-account-helper, orden «firstboot»).
+polkit.addRule(function (action, subject) {
+    if (action.id == "org.oweelinux.accounts" && subject.user == "owee-setup") return polkit.Result.YES;
+});

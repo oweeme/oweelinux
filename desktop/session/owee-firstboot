@@ -1,0 +1,12 @@
+#!/bin/sh
+# Se ejecuta en cada arranque, antes de SDDM: si el equipo NO tiene ningún usuario (y el asistente no terminó), SDDM entra solo al asistente de primer arranque (usuario de sistema
+# `owee-setup`, sesión `owee-setup`); si ya hay usuarios, quita esa entrada y SDDM muestra el inicio de sesión normal. Nunca falla: sin esto el equipo arranca al login.
+C=/etc/sddm.conf.d/05-owee-setup.conf
+mkdir -p /var/lib/owee /etc/sddm.conf.d
+humans=$(awk -F: '$3 >= 1000 && $3 < 60000' /etc/passwd | wc -l)
+if [ ! -e /var/lib/owee/firstboot-done ] && [ "$humans" -eq 0 ] && id owee-setup >/dev/null 2>&1; then
+  printf '[Autologin]\nUser=owee-setup\nSession=owee-setup.desktop\nRelogin=false\n' > "$C"
+else
+  rm -f "$C"
+fi
+exit 0

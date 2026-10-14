@@ -454,5 +454,20 @@
 "Conectar {0}": "{0} rela-dare",
 "Bluetooth apagado": "«Bluetooth» meka-gune",
 "Bluetooth: {0}": "«Bluetooth»: {0}",
-"Bluetooth encendido": "«Bluetooth» meka-pado"
+"Bluetooth encendido": "«Bluetooth» meka-pado",
+"Bienvenido a OweeLinux": "reme ko «OweeLinux»",
+"Vamos a dejar el equipo listo en unos pasos.": "meka-mado pado-foma fena, pa-lare no",
+"Elige tu teclado": "maku-tabe delo",
+"Elige tu zona horaria": "tera-kore delo",
+"Crea tu cuenta": "nara-kade dare",
+"Serás el administrador de este equipo.": "tu meka-mado bade",
+"Preparando tu equipo…": "meka-mado fena te…",
+"No se pudo terminar: {0}": "dare no pode: {0}",
+"Atrás": "pe",
+"Siguiente": "pu",
+"Terminar": "fese",
+"Listo. Cargando la pantalla de inicio de sesión…": "fese. nado-bure loke-tabe fena te…",
+"Elige tu idioma": "reka delo",
+"Distribución del teclado": "maku-tabe dore",
+"Escribe aquí para probar tu teclado": "kema-le beka, maku-tabe mede"
 }

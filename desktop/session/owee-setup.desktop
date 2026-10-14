@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=OweeLinux (primer arranque)
+Comment=Asistente que crea tu cuenta la primera vez
+Exec=/usr/libexec/owee/owee-setup-session
+Type=Application
+DesktopNames=OweeLite

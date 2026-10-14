@@ -454,5 +454,20 @@
 "Conectar {0}": "Connect {0}",
 "Bluetooth apagado": "Bluetooth off",
 "Bluetooth: {0}": "Bluetooth: {0}",
-"Bluetooth encendido": "Bluetooth on"
+"Bluetooth encendido": "Bluetooth on",
+"Bienvenido a OweeLinux": "Welcome to OweeLinux",
+"Vamos a dejar el equipo listo en unos pasos.": "Let's get your computer ready in a few steps.",
+"Elige tu teclado": "Choose your keyboard",
+"Elige tu zona horaria": "Choose your time zone",
+"Crea tu cuenta": "Create your account",
+"Serás el administrador de este equipo.": "You will be the administrator of this computer.",
+"Preparando tu equipo…": "Getting your computer ready…",
+"No se pudo terminar: {0}": "Setup could not finish: {0}",
+"Atrás": "Back",
+"Siguiente": "Next",
+"Terminar": "Finish",
+"Listo. Cargando la pantalla de inicio de sesión…": "Done. Loading the sign-in screen…",
+"Elige tu idioma": "Choose your language",
+"Distribución del teclado": "Keyboard layout",
+"Escribe aquí para probar tu teclado": "Type here to test your keyboard"
 }

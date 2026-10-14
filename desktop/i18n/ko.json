@@ -454,5 +454,20 @@
 "Conectar {0}": "{0} 연결",
 "Bluetooth apagado": "블루투스 꺼짐",
 "Bluetooth: {0}": "블루투스: {0}",
-"Bluetooth encendido": "블루투스 켜짐"
+"Bluetooth encendido": "블루투스 켜짐",
+"Bienvenido a OweeLinux": "OweeLinux에 오신 것을 환영합니다",
+"Vamos a dejar el equipo listo en unos pasos.": "몇 단계만 거치면 컴퓨터가 준비됩니다.",
+"Elige tu teclado": "키보드를 고르세요",
+"Elige tu zona horaria": "시간대를 고르세요",
+"Crea tu cuenta": "계정을 만드세요",
+"Serás el administrador de este equipo.": "이 컴퓨터의 관리자가 됩니다.",
+"Preparando tu equipo…": "컴퓨터를 준비하는 중…",
+"No se pudo terminar: {0}": "완료하지 못했습니다: {0}",
+"Atrás": "이전",
+"Siguiente": "다음",
+"Terminar": "마침",
+"Listo. Cargando la pantalla de inicio de sesión…": "완료되었습니다. 로그인 화면을 불러오는 중…",
+"Elige tu idioma": "언어를 고르세요",
+"Distribución del teclado": "키보드 배열",
+"Escribe aquí para probar tu teclado": "여기에 입력해 키보드를 시험해 보세요"
 }

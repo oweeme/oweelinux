@@ -7,13 +7,20 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
 # en ~/.config/owee/widgets); los ejemplos se dejan aparte para copiarlos y cambiarlos.
 for f in "$D"/widgets/sistema/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets/$(basename "$f")"; done
 install -Dm0644 "$D/session/org.oweelinux.accounts.policy" "$R/usr/share/polkit-1/actions/org.oweelinux.accounts.policy"      # Ajustes → Usuarios/Acceso: pkexec pide la clave de administrador
+# Primer arranque (docs/EXTENSIONES.md → Primer arranque): sesión propia de SDDM con el asistente, usuario de sistema `owee-setup`, regla polkit y servicio que decide cada arranque
+install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
+install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
+install -Dm0644 "$D/session/owee-setup.sysusers" "$R/usr/lib/sysusers.d/owee-setup.conf"; install -Dm0644 "$D/session/owee-setup.tmpfiles" "$R/usr/lib/tmpfiles.d/owee-setup.conf"
+install -Dm0644 "$D/session/49-owee-setup.rules" "$R/usr/share/polkit-1/rules.d/49-owee-setup.rules"
+install -Dm0644 "$D/session/owee-firstboot.service" "$R/usr/lib/systemd/system/owee-firstboot.service"
+mkdir -p "$R/usr/lib/systemd/system/sysinit.target.wants"; ln -sf ../owee-firstboot.service "$R/usr/lib/systemd/system/sysinit.target.wants/owee-firstboot.service"
 for f in "$D"/widgets/ejemplos/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets-ejemplos/$(basename "$f")"; done
 python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" >/dev/null; python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" "#17231e" Owee-Light >/dev/null
 install -Dm0644 "$D/theme/themerc" "$R/usr/share/themes/Owee/openbox-3/themerc"; install -Dm0644 "$D/theme/themerc-light" "$R/usr/share/themes/Owee-Light/openbox-3/themerc"

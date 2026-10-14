@@ -1,0 +1,8 @@
+#!/bin/sh
+# Sesión del asistente de primer arranque: labwc a pantalla completa con el asistente y nada más. Al cerrarse el asistente, la sesión termina.
+export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite
+[ -n "$HOME" ] && mkdir -p "$HOME/.config/owee"
+if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
+S="${HOME:-/tmp}/.config/owee/settings.json"; L=""; [ -f "$S" ] && command -v jq >/dev/null && L=$(jq -r '.lang // empty' "$S" 2>/dev/null)
+. /usr/libexec/owee/owee-locale 2>/dev/null; owee_locale "$L"
+exec labwc -S /usr/libexec/owee/owee-setup-run
