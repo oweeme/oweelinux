@@ -163,6 +163,15 @@ Capturadora: la ventana principal se cierra y se vuelve a crear tras capturar/gr
   el **inicio de sesión de SDDM**: entrar sin contraseña con un usuario y una sesión (`/etc/sddm.conf.d/30-owee-autologin.conf`, vía el ayudante). El tiempo de bloqueo sigue en Energía. Probado: bloquear y desbloquear en la VM.
 - **Cuentas en línea** (Google, Nextcloud…) **no** se incluyen: pesan (KDE las trae con KAccounts) y no son necesarias para un escritorio ligero; se pueden usar desde el navegador o las apps.
 
+## Primer arranque (imagen «real», sin usuario de pruebas)
+Una imagen construida con `OWEE_TEST_USER=0` (`tools/ostree-proto/build-image-full.sh`) **no trae ningún usuario**. En cada arranque `owee-firstboot.service` (antes de SDDM) mira si el equipo tiene usuarios (UID 1000–59999) y si
+existe `/var/lib/owee/firstboot-done`; si no hay ninguno, escribe `/etc/sddm.conf.d/05-owee-setup.conf` y SDDM entra solo, como el usuario de sistema `owee-setup` (sysusers), a la sesión **`owee-setup`**: labwc a pantalla completa con
+`desktop/setup/owee_setup.py` y nada más. El asistente pide **idioma → teclado (con casilla de prueba) → zona horaria → tu cuenta** (nombre, usuario, contraseña dos veces) y llama a `owee-account-helper firstboot` con `pkexec`
+(regla polkit `49-owee-setup.rules`: solo `owee-setup`, sin clave). El ayudante **solo acepta esa orden del usuario `owee-setup`, una vez y mientras no haya otro usuario**; crea tu usuario como administrador (grupo `sudo`), escribe tu
+`settings.json` (idioma y teclado) y el entorno de labwc, la zona horaria (`/etc/localtime`), `/etc/default/locale` y `/etc/default/keyboard`, deja el último usuario y sesión de SDDM, marca el fin y reinicia SDDM a los 3 s: aparece el
+inicio de sesión normal con tu usuario. Prueba del asistente: `OWEE_SETUP_WINDOWED=1 OWEE_SETUP_DRYRUN=1 python3 desktop/setup/owee_setup.py` (ventana normal, sin crear nada).
+**Probado en VM:** el asistente completo en modo simulación (4 páginas, validaciones, argumentos que enviaría) y las protecciones del ayudante. **El flujo real de punta a punta (SDDM → asistente → usuario → login) se verifica con la imagen real.**
+
 ## Teclado en uso: distribuciones, indicador y `owee-layout` (probado en VM)
 Ver `docs/IDIOMAS.md`: tabla única de idiomas, teclados árabe/persa/hindi/urdu/indonesio/malayo, `Super + Mayús + Espacio`, indicador del panel con la distribución activa.
 
