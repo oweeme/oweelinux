@@ -166,11 +166,45 @@ class Launcher:
         inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); inner.append(Gtk.Label(label=_("OweeLinux")))
         self.btn = Gtk.MenuButton(child=inner, has_frame=False); self.btn.add_css_class("launcher")
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False; self.stale = False
-        Gio.AppInfoMonitor.get().connect("changed", lambda m: setattr(self, "stale", True))      # se instaló o quitó una app: la lista se reconstruye al abrir
+        self.sig = None
+
+    @staticmethod
+    def app_dirs():
+        """Carpetas de lanzadores (.desktop): la del usuario y las de XDG_DATA_DIRS (incluye las de Flatpak). Existan o no todavía."""
+        home = os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
+        dirs = [home] + [d for d in (os.environ.get("XDG_DATA_DIRS") or "/usr/local/share:/usr/share").split(":") if d]
+        out = []
+        for d in dirs:
+            a = os.path.join(d, "applications")
+            if a not in out: out.append(a)
+        return out
+
+    def signature(self):
+        """«Huella» barata de las carpetas (fecha de modificación): cambia cuando se instala o quita una app, incluso si la carpeta no existía al arrancar el panel."""
+        sig = []
+        for d in self.app_dirs():
+            try: sig.append(os.stat(d).st_mtime_ns)
+            except OSError: sig.append(0)
+        return tuple(sig)
+
+    def scan(self):
+        """Lista de apps leída directamente de los .desktop (no de la caché de GLib, que puede quedarse desactualizada si una carpeta se crea después de arrancar)."""
+        seen, apps = set(), []
+        for d in self.app_dirs():
+            try: names = sorted(os.listdir(d))
+            except OSError: continue
+            for n in names:
+                if not n.endswith(".desktop") or n in seen: continue
+                seen.add(n)
+                try: a = Gio.DesktopAppInfo.new_from_filename(os.path.join(d, n))
+                except Exception: a = None
+                if a and a.should_show(): apps.append(a)
+        return sorted(apps, key=lambda a: a.get_name().lower())
 
     def toggled(self, pop, _):
         if not pop.get_visible(): return
-        if not self.built or self.stale: self.build(); self.stale = False
+        sig = self.signature()
+        if not self.built or sig != self.sig: self.build(); self.sig = sig
         self.entry.set_text(""); self.list.invalidate_filter(); self.entry.grab_focus()
 
     def build(self):
@@ -179,7 +213,7 @@ class Launcher:
         self.entry = Gtk.SearchEntry(placeholder_text=_("Buscar aplicación…")); box.append(self.entry)
         self.list = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=True)
         self.list.set_filter_func(self.visible_row); self.list.connect("row-activated", lambda l, r: self.launch(r.app))
-        for a in sorted((a for a in Gio.AppInfo.get_all() if a.should_show()), key=lambda a: a.get_name().lower()):
+        for a in self.scan():
             row = Gtk.ListBoxRow(); row.app = a; row.key = (a.get_name() + " " + (a.get_generic_name() or "") + " " + (a.get_keywords() and " ".join(a.get_keywords()) or "")).lower()
             h = Gtk.Box(spacing=10)
             img = Gtk.Image.new_from_gicon(a.get_icon()) if a.get_icon() else Gtk.Image(); img.set_pixel_size(24)
