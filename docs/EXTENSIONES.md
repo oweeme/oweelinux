@@ -141,6 +141,16 @@ Al elegir uno, Ajustes → Apariencia escribe **todo** a partir de la misma pale
 Probado con Dolphin (tema Arena) y los siete temas en Ajustes. No probado: LibreOffice, Firefox y apps con tema propio.
 Capturadora: la ventana principal se cierra y se vuelve a crear tras capturar/grabar (si solo se oculta o minimiza, labwc la vuelve a mostrar sin barra de título).
 
+## Panel: indicador de teclado, modo compacto y fondos (probado en VM)
+- **Indicador del teclado** (`InputIndicator` en `owee_panel.py`): muestra con qué escribes (US, ES, 拼, あ, 한, Ow) y su menú deja elegir entre el teclado normal y los métodos activados (pinyin, Mozc, Hangul, Owee):
+  `fcitx5-remote -s <método>`. Reemplaza al icono de Fcitx5 de la bandeja (que se oculta). Fcitx5 solo informa del método de la ventana enfocada: sin ventana enfocada se muestra el último conocido.
+  Flujo probado en Kate: Owee → glifos, US → texto normal, pinyin → 你好, cambiando desde el panel.
+- **Panel compacto** (`owee_windows.py`, protocolo `wlr-foreign-toplevel-management` v3, XML transcrito en `desktop/shell/protocols/`): con la ventana ACTIVA maximizada o a pantalla completa, el panel se pega a los
+  bordes, sin margen ni esquinas (como la barra de menús de macOS) y vuelve a flotar al restaurar. Si faltan los enlaces de pywayland, el panel se queda flotante sin romperse.
+- **Fondos con presentación** (`session/owee-wallpaper --daemon`): modo «Una imagen fija» o «Presentación» (cada 1 min…1 día, aleatoria u ordenada, con TODAS las imágenes o solo las elegidas); Ajustes → Fondo de pantalla solo guarda
+  en `settings.json` y el demonio lo aplica al instante, sin parpadeo. 15 fondos propios en `desktop/wallpapers/fondos/` (`generar.py`); créditos en `docs/CREDITOS.md`.
+- **Lanzador**: la lista de apps se reconstruye cuando se instala una (p. ej. Bazaar al terminar su instalación en el primer arranque).
+
 ## Qué hace falta para que los dos lenguajes sean de primera
 - **JavaScript sin Node** = **GJS** (`gjs` 1.82 en Debian 13): se añade a la imagen (~11 MB de descarga). Ya está en `packages-plasma.txt`.
 - Una **biblioteca pequeña `owee`** con la misma API en Python y en JavaScript (notificar, leer ajustes, D-Bus, tema) para que
