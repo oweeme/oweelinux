@@ -351,5 +351,6 @@
 "Métodos de escritura": "Input methods",
 "Para escribir en chino, japonés, coreano u Owee. Cambia entre métodos con Ctrl + Espacio.": "To type in Chinese, Japanese, Korean or Owee. Switch between methods with Ctrl + Space.",
 "Escribir con el método activo desde el principio": "Type with the input method active from the start",
-"Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Without this, you must press Ctrl + Space to start typing with pinyin, Mozc or Owee"
+"Sin esto, hay que pulsar Ctrl + Espacio para empezar a escribir con pinyin, Mozc u Owee": "Without this, you must press Ctrl + Space to start typing with pinyin, Mozc or Owee",
+"Autor": "Author"
 }

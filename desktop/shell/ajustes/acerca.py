@@ -30,6 +30,7 @@ class Acerca(Page):
         head = Gtk.Box(spacing=16, margin_bottom=8); head.append(Gtk.Image(icon_name="owee-logo", pixel_size=64))
         v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, valign=Gtk.Align.CENTER); v.append(Gtk.Label(label=o.get("PRETTY_NAME", "OweeLinux"), xalign=0, css_classes=["title"]))
         v.append(Gtk.Label(label=_("Escritorio Lite · Python + GTK4 · GPLv3"), xalign=0, css_classes=["dim-label"])); head.append(v); b.append(head)
+        b.append(row(_("Autor"), Gtk.Label(label="Hector Martinez", selectable=True)))
         b.append(row(_("Sitio web"), Gtk.LinkButton.new_with_label("https://www.oweeme.com", "www.oweeme.com")))
         du = shutil.disk_usage("/var" if os.path.exists("/var") else "/")
         for k, val in ((_("Equipo"), platform.node()), (_("Procesador"), cpu()), (_("Memoria"), mem()), (_("Disco (datos)"), _('{0:.0f} GB libres de {1:.0f} GB', du.free / 2**30, du.total / 2**30)),

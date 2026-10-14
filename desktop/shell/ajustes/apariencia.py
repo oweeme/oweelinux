@@ -12,12 +12,17 @@ from owee_i18n import _
 def notify_running_apps(mode):
     """Avisa a las apps YA abiertas: las de Qt/KDE (señal KGlobalSettings: releen kdeglobals y repintan), las de GTK4/libadwaita y el portal (gsettings color-scheme)
     y a labwc (variante clara u oscura del tema de ventanas)."""
-    if have("gdbus"): run(["gdbus", "emit", "--session", "--object-path", "/KGlobalSettings", "--signal", "org.kde.KGlobalSettings.notifyChange", "0", "0"])
+    # Apps Qt6/KDE (KF6): vigilan ~/.config/kdeglobals con KConfigWatcher, que escucha esta señal de D-Bus (grupo → claves cambiadas); sin ella solo leen el archivo al abrirse
+    if have("gdbus"):
+        keys = "[b'BackgroundNormal', b'BackgroundAlternate', b'ForegroundNormal', b'ForegroundInactive', b'ForegroundActive', b'DecorationFocus', b'DecorationHover']"
+        groups = ["Colors:Window", "Colors:View", "Colors:Button", "Colors:Selection", "Colors:Tooltip", "Colors:Complementary", "Colors:Header"]
+        arg = "{" + ", ".join(f"'{g}': {keys}" for g in groups) + ", 'General': [b'ColorScheme', b'AccentColor'], 'Icons': [b'Theme']}"
+        run(["gdbus", "emit", "--session", "--object-path", "/kconfig/kdeglobals", "--signal", "org.kde.kconfig.notify.ConfigChanged", arg])
+        for t in ("0", "2", "4"):     # señal clásica de KDE (la que repinta de verdad a Dolphin/Kate abiertos): 0 = paleta, 2 = estilo (repinta la barra de herramientas), 4 = iconos
+            run(["gdbus", "emit", "--session", "--object-path", "/KGlobalSettings", "--signal", "org.kde.KGlobalSettings.notifyChange", t, "0"])
     if have("gsettings"):
         run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", "prefer-dark" if mode == "dark" else "prefer-light"])
     rcxml.set_values([("theme/name", "Owee-Tema")])
-
-def _rgbs(h): return "%d,%d,%d" % tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
 class Apariencia(Page):
     title = _("Apariencia"); icon = "owee-set-appearance"; group = "Personal"; order = 10; keywords = _("tema claro oscuro color acento gris paleta")

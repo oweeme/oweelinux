@@ -6,6 +6,8 @@ import owee_config
 
 SCHEME_DIRS = ["/usr/share/color-schemes", os.path.expanduser("~/.local/share/color-schemes")]
 
+def _rgbs(h): return "%d,%d,%d" % tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
 def write_gtk_prefs(mode):
     for v in ("3.0", "4.0"):
         d = os.path.expanduser(f"~/.config/gtk-{v}"); os.makedirs(d, exist_ok=True); p = os.path.join(d, "settings.ini")
@@ -38,6 +40,8 @@ def write_qt_scheme(cfg):
         for k, v in vals.items(): cp.set(sec, k, _rgbs(v))
     if not cp.has_section("General"): cp.add_section("General")
     cp.set("General", "ColorScheme", "OweeLinux-" + pal["theme"]); cp.set("General", "AccentColor", _rgbs(acc))
+    if not cp.has_section("Icons"): cp.add_section("Icons")
+    cp.set("Icons", "Theme", "breeze-dark" if mode == "dark" else "breeze")         # iconos claros sobre fondo oscuro (y al revés): sin esto los iconos de las apps de KDE no se ven
     os.makedirs(os.path.dirname(dst), exist_ok=True); tmp = dst + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f: cp.write(f, space_around_delimiters=False)
     os.replace(tmp, dst); return True

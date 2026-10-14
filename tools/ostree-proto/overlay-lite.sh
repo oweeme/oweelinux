@@ -66,7 +66,7 @@ Name=Modo presentación
 Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --present
 EOD
 # Apps de KDE que OweeLinux reemplaza con las propias: se ocultan del lanzador (siguen instaladas por si otra app las llama)
-for f in org.kde.kcalc.desktop org.kde.spectacle.desktop org.kde.discover.desktop org.kde.discover.urlhandler.desktop org.kde.discover.notifier.desktop org.kde.discover.flatpak.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
+for f in org.kde.systemsettings.desktop kdesystemsettings.desktop systemsettings.desktop org.kde.kinfocenter.desktop org.kde.kcalc.desktop org.kde.spectacle.desktop org.kde.discover.desktop org.kde.discover.urlhandler.desktop org.kde.discover.notifier.desktop org.kde.discover.flatpak.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
 # ---- Idiomas: catálogos de la interfaz, locales del sistema, fuentes y teclados (docs/EXTENSIONES.md → Idiomas)
 install -d "$R/usr/share/owee/i18n"; cp "$D"/i18n/*.json "$R/usr/share/owee/i18n/"
 for l in es_ES en_US pt_BR fr_FR de_DE ru_RU zh_CN ja_JP; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
