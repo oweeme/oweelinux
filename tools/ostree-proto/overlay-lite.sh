@@ -15,6 +15,7 @@ install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644
 for f in "$D"/widgets/sistema/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets/$(basename "$f")"; done
 install -Dm0644 "$D/session/org.oweelinux.accounts.policy" "$R/usr/share/polkit-1/actions/org.oweelinux.accounts.policy"      # Ajustes → Usuarios/Acceso: pkexec pide la clave de administrador
 # Primer arranque (docs/EXTENSIONES.md → Primer arranque): sesión propia de SDDM con el asistente, usuario de sistema `owee-setup`, regla polkit y servicio que decide cada arranque
+install -Dm0644 "$D/session/labwc-setup/rc.xml" "$R/usr/share/owee/labwc-setup/rc.xml"; install -Dm0644 "$D/session/labwc-setup/autostart" "$R/usr/share/owee/labwc-setup/autostart"
 install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
 install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
 install -Dm0644 "$D/session/owee-setup.sysusers" "$R/usr/lib/sysusers.d/owee-setup.conf"; install -Dm0644 "$D/session/owee-setup.tmpfiles" "$R/usr/lib/tmpfiles.d/owee-setup.conf"

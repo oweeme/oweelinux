@@ -64,7 +64,7 @@ try:
     for w, quiero in (("10-red.py", "owee-network-wired"), ("20-volumen.py", "owee-volume-high 40%"), ("30-bateria.py", "owee-battery-20 17%")):
         t = sh(f"{W_ENV} python3 /var/home/oweeuser/.config/owee/widgets/{w} | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('icon'), d.get('text'))\"", "W", 30) or ""
         check(f"widget {w}: texto esperado '{quiero}'", quiero in t, t.strip("|"))
-    lay = sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-300", "L") or "{}"
+    lay = sh("grep -h '\\[layout\\]' /run/user/1000/owee-panel.log | tail -1 | cut -c10-300", "L") or "{}"
     coords = json.loads(lay.rstrip("|") or "{}"); print("posiciones:", coords, flush=True)
     check("el panel muestra los tres widgets", all(k in coords for k in ("10-red", "20-volumen", "30-bateria")))
     q = Qmp(); vm.screenshot(os.path.join(out, "sistema-0.png"))

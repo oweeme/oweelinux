@@ -12,8 +12,8 @@ command -v fcitx5 >/dev/null && FCITX_NO_WAYLAND_DIAGNOSE=1 fcitx5 -d --replace 
 /usr/libexec/owee/owee-idle &                    # bloqueo y suspensión por inactividad (Ajustes → Energía)
 for a in /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1; do [ -x "$a" ] && { "$a" & break; }; done   # ventana de contraseña para tareas de administrador
 case "$PANEL" in
-  python) python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > /tmp/owee-panel.log 2>&1 & ;;
-  waybar) waybar -c /etc/xdg/waybar/config.jsonc -s /etc/xdg/waybar/style.css > /tmp/owee-waybar.log 2>&1 & ;;
+  python) python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > "${XDG_RUNTIME_DIR:-/tmp}/owee-panel.log" 2>&1 & ;;
+  waybar) waybar -c /etc/xdg/waybar/config.jsonc -s /etc/xdg/waybar/style.css > "${XDG_RUNTIME_DIR:-/tmp}/owee-waybar.log" 2>&1 & ;;
   none) ;;
 esac
 wait

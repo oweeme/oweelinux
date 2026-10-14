@@ -57,7 +57,7 @@ try:
     sh(U + "sh -c 'rm -f /tmp/sni.log; nohup python3 /tmp/mock-sni.py >/tmp/sni.out 2>&1 &' ; sleep 1", "S", 30)
     time.sleep(10)
     check("el panel registró la app (registrado)", "registrado" in (sh("cat /tmp/sni.log", "R", 30) or ""), sh("cat /tmp/sni.log /tmp/sni.out | head -3", "R2", 30))
-    lay = json.loads((sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-400", "L") or "{}").rstrip("|") or "{}"); print("posiciones:", lay, flush=True)
+    lay = json.loads((sh("grep -h '\\[layout\\]' /run/user/1000/owee-panel.log | tail -1 | cut -c10-400", "L") or "{}").rstrip("|") or "{}"); print("posiciones:", lay, flush=True)
     check("aparece el icono en la bandeja", "tray" in lay); vm.screenshot(os.path.join(out, "bandeja.png"))
     if "tray" in lay:
         q.click(*lay["tray"]); time.sleep(2)
@@ -67,7 +67,7 @@ try:
         log = sh("cat /tmp/sni.log", "G", 30) or ""
         check("clic izquierdo llama a Activate", "Activate" in log, log); check("clic derecho llama a ContextMenu", "ContextMenu" in log, log)
     sh("pkill -f mock-sni.py", "K", 30); time.sleep(6)
-    lay2 = json.loads((sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-400", "L2") or "{}").rstrip("|") or "{}")
+    lay2 = json.loads((sh("grep -h '\\[layout\\]' /run/user/1000/owee-panel.log | tail -1 | cut -c10-400", "L2") or "{}").rstrip("|") or "{}")
     check("al morir la app el icono desaparece", "tray" not in lay2); vm.screenshot(os.path.join(out, "bandeja-sin.png"))
     print("memoria del panel:", sh("pid=$(pgrep -f owee_panel.py | tail -1); awk '/^(Pss|Rss):/{printf \"%s=%dMB \", $1, $2/1024}' /proc/$pid/smaps_rollup", "M"))
 finally:

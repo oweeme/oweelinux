@@ -5,4 +5,4 @@ export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite
 if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
 S="${HOME:-/tmp}/.config/owee/settings.json"; L=""; [ -f "$S" ] && command -v jq >/dev/null && L=$(jq -r '.lang // empty' "$S" 2>/dev/null)
 . /usr/libexec/owee/owee-locale 2>/dev/null; owee_locale "$L"
-exec labwc -S /usr/libexec/owee/owee-setup-run
+exec labwc -C /usr/share/owee/labwc-setup -S /usr/libexec/owee/owee-setup-run

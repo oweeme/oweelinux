@@ -2,6 +2,7 @@
 """Consola INTERACTIVA de depuración sobre una imagen: arranca la VM con la sesión Lite y atiende órdenes que se dejan como archivos en ~/.cache/oweelinux/vm/shell/cmd.N
 (texto = orden como root; «#key k», «#click x y», «#shot nombre», «#quit»); la salida queda en out.N. Se ejecuta en el HOST.
 Abre el lanzador con el ratón, escribe "konsole" con el teclado, pulsa Intro y comprueba que la app arrancó.
+OWEE_REAL_BOOT=1: no crea el usuario ni el inicio automático de pruebas (para probar el primer arranque de una imagen «real»).
 Uso: vm-shell.py DISCO.img DIR_SALIDA"""
 import importlib.util, json, os, shutil, socket, subprocess, sys, time
 here = os.path.dirname(os.path.abspath(__file__)); repo = os.path.abspath(os.path.join(here, "..", ".."))
@@ -47,7 +48,7 @@ try:
     vm.run("systemctl stop sddm; loginctl terminate-user oweeuser; systemctl stop user@1000.service; sleep 3; pkill -9 -u oweeuser; sleep 1; echo MARK_ST=ok", "ST", 90)
     vm.run("mkdir -p /etc/owee /etc/systemd/user /tmp/ps/BAT0; "
                       "printf 'WLR_RENDERER=pixman\\nWLR_NO_HARDWARE_CURSORS=1\\nGSK_RENDERER=cairo\\n' > /etc/environment; "
-           "printf '[Autologin]\\nUser=oweeuser\\nSession=owee-lite.desktop\\n\\n[General]\\nDisplayServer=x11\\n' > /etc/sddm.conf.d/10-owee-test.conf; systemctl start sddm; echo MARK_X=ok", "X", 120)
+           + ("" if os.environ.get("OWEE_REAL_BOOT") else "printf '[Autologin]\\nUser=oweeuser\\nSession=owee-lite.desktop\\n\\n[General]\\nDisplayServer=x11\\n' > /etc/sddm.conf.d/10-owee-test.conf; ") + "systemctl start sddm; echo MARK_X=ok", "X", 120)
     time.sleep(45)
     q = Qmp(); time.sleep(2)
     import glob

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- labwc del asistente de primer arranque: lo mínimo (sin atajos, sin panel); el asistente va a pantalla completa. -->
+<labwc_config>
+  <core><gap>0</gap></core>
+  <keyboard><default /></keyboard>
+  <mouse><default /></mouse>
+</labwc_config>

@@ -71,16 +71,16 @@ try:
     QT = "QT_QPA_PLATFORM=wayland WAYLAND_DISPLAY=wayland-0 "
     F(QT + "sh -c 'nohup dolphin > /tmp/dolphin.log 2>&1 &'", "DO"); time.sleep(10); vm.screenshot(os.path.join(out, "esc-1.png"))
     key("meta_l-2"); time.sleep(2.5); c = cur(); check("Super+2 va al escritorio 2 (y lo anota)", c == "2", c); vm.screenshot(os.path.join(out, "esc-2.png"))
-    lay = json.loads((sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-400", "L") or "{}").rstrip("|") or "{}")
+    lay = json.loads((sh("grep -h '\\[layout\\]' /run/user/1000/owee-panel.log | tail -1 | cut -c10-400", "L") or "{}").rstrip("|") or "{}")
     q.click(280, 22); time.sleep(2); vm.screenshot(os.path.join(out, "esc-panel.png")); c = cur(); check("clic en el punto 3 del panel va al escritorio 3 (wtype)", c == "3", c)
     key("meta_l-shift-3"); time.sleep(2); c = cur(); check("Super+Mayús+3 manda la ventana al escritorio 3 y la sigue", c == "3", c)
     key("meta_l-1"); time.sleep(2)
     key("meta_l-tab"); time.sleep(2); vm.screenshot(os.path.join(out, "esc-vista.png")); key("esc"); time.sleep(1)
     # puntos del panel: los dos primeros botones tras el lanzador
-    print("dots:", F("grep -h 'dots' /tmp/owee-panel.log | tail -1", "DT"))
+    print("dots:", F("grep -h 'dots' /run/user/1000/owee-panel.log | tail -1", "DT"))
     mv = lambda v: q.cmd("input-send-event", events=[{"type": "abs", "data": {"axis": "x", "value": v}}, {"type": "abs", "data": {"axis": "y", "value": v}}])
     mv(8000); time.sleep(0.5); mv(60); time.sleep(0.3); mv(40); time.sleep(2.5); vm.screenshot(os.path.join(out, "esc-esquina.png"))
-    print("PLOG:", sh("grep -i -E \"esquina|escritorios|Traceback|File \" /tmp/owee-panel.log | head -8 | cut -c1-200", "PL", 30))
+    print("PLOG:", sh("grep -i -E \"esquina|escritorios|Traceback|File \" /run/user/1000/owee-panel.log | head -8 | cut -c1-200", "PL", 30))
 finally:
     vm.kill(); http.kill()
 print("PASA todo" if res and all(res) else "HAY FALLOS"); sys.exit(0 if res and all(res) else 1)

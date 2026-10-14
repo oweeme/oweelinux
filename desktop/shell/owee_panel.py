@@ -2,7 +2,7 @@
 """Panel superior de OweeLinux Lite — PROTOTIPO de riesgos (v0.0): Python + GTK4 + gtk4-layer-shell.
 Muestra: lanzador de aplicaciones (búsqueda), reloj y fecha centrados y los WIDGETS (scripts: volumen, red, batería, los del usuario...).
 Regla de diseño (docs/ESCRITORIO.md): llamadas D-Bus asíncronas; el panel nunca se bloquea esperando a un servicio.
-Al arrancar escribe en /tmp/owee-panel.log su memoria (Rss/Pss) para medirla."""
+Al arrancar escribe en $XDG_RUNTIME_DIR/owee-panel.log su memoria (Rss/Pss) para medirla."""
 import os, sys, time
 
 # gtk4-layer-shell debe cargarse ANTES que libwayland; con Python eso exige LD_PRELOAD (si no, el panel sale como

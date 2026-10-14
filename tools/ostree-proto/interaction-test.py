@@ -56,7 +56,7 @@ try:
            "printf 'PANEL=python\\nOWEE_PANEL_PATH=/tmp/owee_panel.py\\nexport OWEE_DEBUG_LAYOUT=1 PATH=/tmp/gjs/usr/bin:$PATH LD_LIBRARY_PATH=/tmp/gjs/usr/lib/x86_64-linux-gnu GI_TYPELIB_PATH=/tmp/gjs/usr/lib/x86_64-linux-gnu/gjs/girepository-1.0\\n' > /etc/owee/panel.conf; "
            "printf '[Autologin]\\nUser=oweeuser\\nSession=owee-lite.desktop\\n\\n[General]\\nDisplayServer=x11\\n' > /etc/sddm.conf.d/10-owee-test.conf; systemctl start sddm; echo MARK_X=ok", "X", 180)
     time.sleep(50)
-    lay = sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-300", "L")
+    lay = sh("grep -h '\\[layout\\]' /run/user/1000/owee-panel.log | tail -1 | cut -c10-300", "L")
     coords = json.loads((lay or "{}").rstrip("|") or "{}"); print("posiciones:", coords, flush=True)
     check("el panel informa de la posición de sus widgets", bool(coords))
     q = Qmp(); vm.screenshot(os.path.join(out, "interaccion-0.png"))

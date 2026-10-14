@@ -59,7 +59,7 @@ try:
     time.sleep(40)
     time.sleep(40)
     q = Qmp(); time.sleep(3)
-    pos = json.loads((sh("grep -h '\\[layout\\]' /tmp/owee-panel.log | tail -1 | cut -c10-400", "L") or "{}").rstrip("|") or "{}"); print("posiciones:", pos, flush=True)
+    pos = json.loads((sh("grep -h '\\[layout\\]' /run/user/1000/owee-panel.log | tail -1 | cut -c10-400", "L") or "{}").rstrip("|") or "{}"); print("posiciones:", pos, flush=True)
     check("el widget de red aparece", "10-red" in pos)
     if "10-red" in pos:
         x, y = pos["10-red"]; q.click(x, y); time.sleep(2.5); vm.screenshot(os.path.join(out, "wifi-lista.png"))

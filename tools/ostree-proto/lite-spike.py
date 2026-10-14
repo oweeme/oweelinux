@@ -46,7 +46,7 @@ def variant(name, disk, out, work):
         r["usada_mb"] = vm.run("echo MARK_M=$(free -m | awk '/Mem:/{print $3}')", "M", 30)
         r["pss"] = vm.run("echo MARK_S=$(for p in $(pgrep -f '" + PROCS[name] + "'); do n=$(cat /proc/$p/comm); a=$(awk '/^Pss:/{print $2}' /proc/$p/smaps_rollup 2>/dev/null); echo \"$n:$((a/1024))\"; done | sort | awk -F: '{s[$1]+=$2} END{for(k in s) printf \"%s=%dMB \", k, s[k]}')", "S", 60)
         if name != "plasma":
-            r["panel_log"] = vm.run("echo MARK_L=$(grep -h -E 'mem|NM|UPower|Error|Traceback|rror' /tmp/owee-panel.log /tmp/owee-waybar.log 2>/dev/null | tail -4 | tr '\\n' '|' | cut -c1-260)", "L", 30)
+            r["panel_log"] = vm.run("echo MARK_L=$(grep -h -E 'mem|NM|UPower|Error|Traceback|rror' /run/user/1000/owee-panel.log /tmp/owee-waybar.log 2>/dev/null | tail -4 | tr '\\n' '|' | cut -c1-260)", "L", 30)
             r["procesos"] = vm.run("echo MARK_PS=$(ps -eo rss,args | grep -E 'waybar|owee_panel|labwc|mako|swaybg' | grep -v grep | awk '{printf \"%s:%dMB \", $2, $1/1024}' | cut -c1-300)", "PS", 30)
             vm.run(f"({U}WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland konsole > /tmp/foot.log 2>&1 &); echo MARK_F=ok", "F", 30); time.sleep(14)
             r["foot"] = vm.run("echo MARK_FO=$(pgrep -c konsole) $(head -c 160 /tmp/foot.log | tr '\\n' '|')", "FO", 30)
