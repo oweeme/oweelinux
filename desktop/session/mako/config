@@ -28,3 +28,7 @@ default-timeout=0
 
 [mode=silencio]
 invisible=1
+
+# Fcitx5 avisa «Wayland Diagnose» porque labwc no admite que le envíe la distribución del teclado; no afecta a escribir (la distribución la fija Ajustes → Teclado)
+[summary="Wayland Diagnose"]
+invisible=1
