@@ -5,11 +5,25 @@ Idiomas con catálogo propio de Owee: «qow» (romano) y «qow@owee» (escritura
 El idioma se lee UNA vez al arrancar (las apps se reinician al cambiarlo)."""
 import json, os
 
-LANGS = [  # (código, nombre en su propio idioma, locale del sistema, familia de teclado/IM)
+LANGS = [  # (código, nombre en su propio idioma, locale del sistema): la ÚNICA lista de idiomas; Idioma, Teclado, Métodos de escritura y la sesión salen de aquí
     ("es", "Español", "es_ES.UTF-8"), ("en", "English", "en_US.UTF-8"), ("pt", "Português", "pt_BR.UTF-8"), ("fr", "Français", "fr_FR.UTF-8"), ("de", "Deutsch", "de_DE.UTF-8"),
-    ("ru", "Русский", "ru_RU.UTF-8"), ("zh", "中文（简体）", "zh_CN.UTF-8"), ("ja", "日本語", "ja_JP.UTF-8"),
+    ("it", "Italiano", "it_IT.UTF-8"), ("ru", "Русский", "ru_RU.UTF-8"), ("uk", "Українська", "uk_UA.UTF-8"), ("zh", "中文（简体）", "zh_CN.UTF-8"), ("ja", "日本語", "ja_JP.UTF-8"),
+    ("ko", "한국어", "ko_KR.UTF-8"), ("ar", "العربية", "ar_SA.UTF-8"), ("fa", "فارسی", "fa_IR.UTF-8"), ("hi", "हिन्दी", "hi_IN.UTF-8"), ("ur", "اردو", "ur_PK.UTF-8"),
+    ("id", "Bahasa Indonesia", "id_ID.UTF-8"), ("ms", "Bahasa Melayu", "ms_MY.UTF-8"),
     ("qow", "Owee (romano)", "qow_BO.UTF-8"), ("qow@owee", "Owee (Owee Script)", "qow_BO.UTF-8"),
 ]
+# Para cada idioma: distribución(es) de teclado XKB que se ponen al elegirlo (la primera es la principal; con dos, Alt + Mayús alterna), método de escritura de Fcitx5 que se
+# activa desde el principio (None = solo el teclado) y si se escribe de derecha a izquierda. Cada distribución debe existir en ajustes/teclado.py (lo comprueba tools/i18n/smoke.py).
+LANG_INFO = {
+    "es": ("latam", None, False), "en": ("us", None, False), "pt": ("br", None, False), "fr": ("fr", None, False), "de": ("de", None, False), "it": ("it", None, False),
+    "ru": ("us,ru", None, False), "uk": ("us,ua", None, False), "zh": ("us", "pinyin", False), "ja": ("jp", "mozc", False), "ko": ("us", "hangul", False),
+    "ar": ("us,ara", None, True), "fa": ("us,ir", None, True), "hi": ("us,in", None, False), "ur": ("us,pk", None, True), "id": ("us", None, False), "ms": ("us", None, False),
+    "qow": ("us", "owee", False), "qow@owee": ("us", "owee", False),
+}
+def all_layouts(): return sorted({k for v in LANG_INFO.values() for k in v[0].split(",")} | {"us(intl)"})
+def layout_for(code): return LANG_INFO.get(code, ("us",))[0]
+def method_for(code): return LANG_INFO.get(code, ("us", None))[1]
+def is_rtl(code): return LANG_INFO.get(code, ("us", None, False))[2]
 SETTINGS = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
 HERE = os.path.dirname(os.path.realpath(__file__))
 CAT_DIRS = [os.path.join(HERE, "..", "i18n"), "/usr/share/owee/i18n"]

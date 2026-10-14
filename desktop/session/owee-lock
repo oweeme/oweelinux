@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""Bloquea la pantalla con swaylock usando los colores del tema y, si se quiere (Ajustes → Acceso), el fondo de pantalla. Lo usan el atajo Super + L, el menú de apagado,
+la inactividad (owee-idle) y la suspensión. Si ya hay un bloqueo, no hace nada."""
+import os, subprocess, sys
+for d in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell")): sys.path.append(d)
+import owee_config
+if subprocess.run(["pgrep", "-x", "swaylock"], stdout=subprocess.DEVNULL).returncode == 0: sys.exit(0)
+c = owee_config.load(); p = owee_config.palette(c); h = lambda x: x.lstrip("#")[:6]
+args = ["swaylock", "-f", "-c", h(p["win"]), "--indicator-radius", "90", "--indicator-thickness", "8", "--inside-color", h(p["pop"]) + "d9", "--inside-clear-color", h(p["pop"]) + "d9",
+        "--inside-ver-color", h(p["pop"]) + "d9", "--inside-wrong-color", "F06548d9", "--ring-color", h(p["accent"]), "--ring-ver-color", h(p["accent"]), "--ring-clear-color", h(p["dim"]),
+        "--ring-wrong-color", "F06548", "--key-hl-color", h(p["fg"]), "--bs-hl-color", "F06548", "--line-color", "00000000", "--separator-color", "00000000", "--text-color", h(p["fg"]),
+        "--text-clear-color", h(p["fg"]), "--text-ver-color", h(p["fg"]), "--text-wrong-color", h(p["fg"])]
+wp = c.get("wallpaper") or owee_config.DEFAULT_WALLPAPER
+if c.get("lock_wallpaper", True) and os.path.isfile(wp): args += ["-i", wp, "-s", "fill"]
+os.execvp("swaylock", args)

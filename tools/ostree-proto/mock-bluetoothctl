@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+# `bluetoothctl` FALSO para pruebas (mismo formato de salida que BlueZ): adaptador y 3 dispositivos, con estado guardado en /tmp/mock-bt.json.
+import json, os, sys
+F = "/tmp/mock-bt.json"
+def load():
+    try: return json.load(open(F))
+    except (OSError, ValueError): return {"powered": True, "dev": {"AA:BB:CC:00:00:01": ["Auriculares Owee", True, True], "AA:BB:CC:00:00:02": ["Ratón inalámbrico", True, False], "AA:BB:CC:00:00:03": ["Altavoz de la sala", False, False]}}
+def save(s): json.dump(s, open(F, "w")); os.chmod(F, 0o666)
+a = [x for x in sys.argv[1:] if x not in ("--timeout",) and not x.isdigit()]; s = load()
+if os.environ.get("MOCK_BT_NONE"): print("No default controller available"); sys.exit(1)
+if a[:1] == ["show"]: print("Controller 00:11:22:33:44:55 (public)\n\tName: owee\n\tPowered: " + ("yes" if s["powered"] else "no") + "\n\tDiscoverable: no")
+elif a[:1] == ["devices"]:
+    for m, (n, paired, c) in s["dev"].items():
+        if a[1:] != ["Paired"] or paired: print(f"Device {m} {n}")
+elif a[:1] == ["info"] and a[1] in s["dev"]: n, p, c = s["dev"][a[1]]; print(f"Device {a[1]} (public)\n\tName: {n}\n\tAlias: {n}\n\tIcon: audio-headset\n\tPaired: {'yes' if p else 'no'}\n\tTrusted: {'yes' if p else 'no'}\n\tConnected: {'yes' if c else 'no'}")
+elif a[:1] == ["power"]: s["powered"] = a[1] == "on"; save(s); print("Changing power " + a[1] + " succeeded")
+elif a[:1] == ["connect"] and a[1] in s["dev"]: s["dev"][a[1]][2] = True; save(s); print("Connection successful")
+elif a[:1] == ["disconnect"] and a[1] in s["dev"]: s["dev"][a[1]][2] = False; save(s); print("Successful disconnected")
+elif a[:1] == ["pair"] and a[1] in s["dev"]: s["dev"][a[1]][1] = True; save(s); print("Pairing successful")
+elif a[:1] == ["trust"]: print("trust succeeded")
+elif a[:1] == ["remove"] and a[1] in s["dev"]: s["dev"][a[1]][1] = False; s["dev"][a[1]][2] = False; save(s); print("Device has been removed")
+elif a[:2] == ["scan", "on"]: import time; time.sleep(1); print("Discovery started")
+else: sys.exit(1)

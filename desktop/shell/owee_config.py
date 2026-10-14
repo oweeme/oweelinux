@@ -3,7 +3,7 @@
 import json, os
 from owee_i18n import _
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
+DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
 ACCENTS = [(_("Teal"), "#2A9D8F"), (_("Coral"), "#F06548"), (_("Azul"), "#3B82C4"), (_("Violeta"), "#8B6FD6"), (_("Dorado"), "#D9A441"), (_("Verde"), "#5BA85B")]
 
 WALLPAPER_DIRS = ["/usr/share/backgrounds/oweelinux", os.path.expanduser("~/Pictures/Wallpapers"), os.path.expanduser("~/Imágenes/Fondos"), os.path.expanduser("~/.local/share/owee/wallpapers")]
@@ -23,6 +23,9 @@ def load():
         j = json.load(open(PATH))
         if j.get("mode") in ("dark", "light"): d["mode"] = j["mode"]
         if isinstance(j.get("lang"), str): d["lang"] = j["lang"]
+        if isinstance(j.get("layouts"), list): d["layouts"] = [x for x in j["layouts"] if isinstance(x, str)][:4]       # distribuciones de teclado elegidas (la activa es layouts[layout_idx])
+        if isinstance(j.get("lock_wallpaper"), bool): d["lock_wallpaper"] = j["lock_wallpaper"]
+        if isinstance(j.get("layout_idx"), int): d["layout_idx"] = j["layout_idx"]
         if j.get("wallpaper_mode") in ("single", "slideshow"): d["wallpaper_mode"] = j["wallpaper_mode"]            # fondo fijo o presentación de imágenes
         if isinstance(j.get("slideshow"), list): d["slideshow"] = [x for x in j["slideshow"] if isinstance(x, str)]
         try: d["slideshow_minutes"] = max(1, min(1440, int(j.get("slideshow_minutes", d["slideshow_minutes"]))))

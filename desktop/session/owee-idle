@@ -7,7 +7,7 @@ if [ -f "$S" ]; then
 fi
 pkill -x swayidle 2>/dev/null
 set --
-[ "$LOCK" -gt 0 ] 2>/dev/null && set -- "$@" timeout $((LOCK * 60)) 'swaylock -f -c 102019'
+[ "$LOCK" -gt 0 ] 2>/dev/null && set -- "$@" timeout $((LOCK * 60)) /usr/libexec/owee/owee-lock
 [ "$SUSP" -gt 0 ] 2>/dev/null && set -- "$@" timeout $((SUSP * 60)) 'systemctl suspend'
-[ $# -gt 0 ] && exec swayidle -w "$@" before-sleep 'swaylock -f -c 102019'
+[ $# -gt 0 ] && exec swayidle -w "$@" before-sleep /usr/libexec/owee/owee-lock
 exit 0

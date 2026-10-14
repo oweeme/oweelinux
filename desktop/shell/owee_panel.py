@@ -17,6 +17,7 @@ import json, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import owee_config, owee_i18n
 from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
 from owee_i18n import _
+import owee_keys
 CSS_TEMPLATE = """
 window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
@@ -243,7 +244,7 @@ class Launcher:
 
 class PowerMenu:
     """Botón de sesión: Bloquear, Cerrar sesión, Reiniciar, Apagar (con iconos propios). Reiniciar y Apagar piden un segundo clic para confirmar."""
-    ACTIONS = [("owee-lock", _("Bloquear pantalla"), ["swaylock", "-f", "-c", "102019"], False),
+    ACTIONS = [("owee-lock", _("Bloquear pantalla"), ["/usr/libexec/owee/owee-lock"], False),
                ("owee-logout", _("Cerrar sesión"), ["labwc", "--exit"], False),
                ("owee-restart", _("Reiniciar"), ["systemctl", "reboot"], True),
                ("owee-power", _("Apagar"), ["systemctl", "poweroff"], True)]
@@ -253,7 +254,7 @@ class PowerMenu:
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
         self.rows = []
         for icon, text, cmd, confirm in self.ACTIONS:
-            if cmd[0] == "swaylock" and not GLib.find_program_in_path("swaylock"): continue
+            if cmd[0].endswith("owee-lock") and not GLib.find_program_in_path("swaylock"): continue
             lab = Gtk.Label(label=text, xalign=0, hexpand=True); row = Gtk.Box(spacing=10); row.append(Gtk.Image(icon_name=icon, pixel_size=18)); row.append(lab)
             b = Gtk.Button(child=row, has_frame=False); b.add_css_class("owee-row"); b.connect("clicked", self.clicked, cmd, confirm, lab, text, pop)
             box.append(b); self.rows.append((lab, text))
@@ -326,23 +327,35 @@ class InputIndicator:
         if not items: return "keyboard-us"
         return items[1] if metodos.active_by_default() and len(items) > 1 else items[0]
 
-    def short(self, name): return name[9:].split("(")[0].upper()[:3] if name.startswith("keyboard-") else self.SHORT.get(name, name[:2])
+    def short(self, name): return owee_keys.short(owee_keys.active()) if name.startswith("keyboard-") else self.SHORT.get(name, name[:2])
     def nice(self, name):
-        if name.startswith("keyboard-"): return _("Teclado normal ({0})", name[9:].upper())
+        if name.startswith("keyboard-"): return _("Teclado normal ({0})", self.layout_name(owee_keys.active()))
         from ajustes import metodos
         return next((t for n, t, _l in metodos.CATALOG if n == name), name)
+
+    def layout_name(self, key):
+        from ajustes.teclado import LAYOUTS
+        return next((n for l, v, n in LAYOUTS if (f"{l}({v})" if v else l) == key), key)
 
     def build(self):
         from ajustes import metodos
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
         box.append(Gtk.Label(label=_("Escribir con"), xalign=0, css_classes=["heading"], margin_start=6, margin_bottom=2))
-        for name in (metodos.read_items() or ["keyboard-us"]):
-            row = Gtk.Box(spacing=10); row.append(Gtk.Label(label=self.short(name), width_chars=3)); lab = Gtk.Label(label=self.nice(name), xalign=0, hexpand=True); row.append(lab)
-            if name == self.cur: row.append(Gtk.Label(label="✓"))
-            b = Gtk.Button(child=row, has_frame=False); b.add_css_class("owee-row"); b.connect("clicked", lambda _b, n=name: self.choose(n)); box.append(b)
+        lst, idx = owee_keys.state(); kbd = self.cur.startswith("keyboard-") or not self.cur
+        def add(short, text, on, mark):
+            row = Gtk.Box(spacing=10); row.append(Gtk.Label(label=short, width_chars=3)); row.append(Gtk.Label(label=text, xalign=0, hexpand=True))
+            if mark: row.append(Gtk.Label(label="✓"))
+            b = Gtk.Button(child=row, has_frame=False); b.add_css_class("owee-row"); b.connect("clicked", lambda _b: on()); box.append(b)
+        for i, key in enumerate(lst): add(owee_keys.short(key), _("Teclado normal ({0})", self.layout_name(key)), lambda i=i: self.choose_layout(i), kbd and i == idx)
+        for name in metodos.read_items():
+            if not name.startswith("keyboard-"): add(self.short(name), self.nice(name), lambda n=name: self.choose(n), name == self.cur)
         box.append(Gtk.Separator(margin_top=4, margin_bottom=4))
         more = Gtk.Button(label=_("Ajustes del teclado…"), has_frame=False); more.add_css_class("owee-row"); more.connect("clicked", lambda _b: (self.pop.popdown(), self.settings())); box.append(more)
         self.pop.set_child(box)
+
+    def choose_layout(self, i):
+        """Otra distribución del teclado normal: la cambia labwc (owee_keys) y Fcitx5 vuelve a su teclado base."""
+        self.pop.popdown(); owee_keys.select(i); self.choose("keyboard-us")
 
     def choose(self, name):
         self.pop.popdown()
@@ -417,7 +430,7 @@ class Panel(Gtk.Application):
         elif name == "calendar": self.clock.btn.popup()
         elif name == "next": owee_desktops.go(owee_desktops.current() % owee_desktops.desktop_count() + 1)
         elif name == "prev": owee_desktops.go((owee_desktops.current() - 2) % owee_desktops.desktop_count() + 1)
-        elif name == "lock": Gio.Subprocess.new(["swaylock", "-f", "-c", "102019"], Gio.SubprocessFlags.NONE)
+        elif name == "lock": Gio.Subprocess.new(["/usr/libexec/owee/owee-lock"], Gio.SubprocessFlags.NONE)
         elif name == "capture": Gio.Subprocess.new(["/usr/libexec/owee/apps/capturadora/owee_capture.py"], Gio.SubprocessFlags.NONE)
 
     def apply_settings(self):

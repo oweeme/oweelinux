@@ -1,0 +1,4 @@
+#!/bin/sh
+# Cambia a la siguiente distribución de teclado de las elegidas en Ajustes → Teclado (atajo Super + Mayús + Espacio). «owee-layout get» dice cuál está activa.
+for d in /usr/libexec/owee "$(dirname "$0")/../shell"; do [ -f "$d/owee_keys.py" ] && exec python3 "$d/owee_keys.py" "${1:-next}"; done
+echo "owee-layout: falta owee_keys.py" >&2; exit 1

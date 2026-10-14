@@ -12,7 +12,7 @@ def pretty(k): return " + ".join(NICE.get(p, p) for p in k.replace("XF86", "").s
 def describe(act):
     n = act.get("name"); c = act.get("command", "")
     if n == "Execute":
-        for key, txt in (("action org.oweelinux.PanelPrototype launcher", _("Abrir el lanzador")), ("action org.oweelinux.PanelPrototype calendar", _("Abrir el calendario")), ("foot", _("Terminal")), ("dolphin", _("Archivos")), ("swaylock", _("Bloquear la pantalla")),
+        for key, txt in (("action org.oweelinux.PanelPrototype launcher", _("Abrir el lanzador")), ("action org.oweelinux.PanelPrototype calendar", _("Abrir el calendario")), ("foot", _("Terminal")), ("dolphin", _("Archivos")), ("owee-lock", _("Bloquear la pantalla")),
                          ("owee_capture.py --shot region", _("Captura de una zona")), ("owee_capture.py --shot full", _("Captura de pantalla")), ("--record", _("Grabar la pantalla (otra vez = parar)")), ("--present", _("Modo presentación (dibujar)")), ("--camera", _("Mostrar u ocultar la cámara")), ("owee_capture.py", _("Capturadora")), ("grim -g", _("Captura de una zona")), ("grim", _("Captura de pantalla")), ("set-volume", _("Volumen")), ("set-mute", _("Silenciar")), ("brightnessctl", _("Brillo"))):
             if key in c: return txt + (" ↑" if "5%+" in c else " ↓" if "5%-" in c else "")
         return "Ejecutar: " + c[:40]

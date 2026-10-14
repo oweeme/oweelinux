@@ -6,7 +6,7 @@ from .base import config_home, run, have
 
 PROFILE = os.path.join(config_home(), "fcitx5", "profile")
 CATALOG = [  # (nombre en fcitx5, texto, idiomas que lo sugieren)
-    ("pinyin", _("Chino (pinyin)"), ("zh",)), ("mozc", _("Japonés (Mozc)"), ("ja",)), ("hangul", _("Coreano (Hangul)"), ()), ("owee", _("Owee (escritura Owee Script)"), ("qow", "qow@owee")),
+    ("pinyin", _("Chino (pinyin)"), ("zh",)), ("mozc", _("Japonés (Mozc)"), ("ja",)), ("hangul", _("Coreano (Hangul)"), ("ko",)), ("owee", _("Owee (escritura Owee Script)"), ("qow", "qow@owee")),
 ]
 
 def available():
@@ -33,9 +33,9 @@ def write_profile(layout, methods, active=None):
     configuración) y al salir reescribe el archivo con lo que tiene en memoria: por eso primero se le pide salir, luego se escribe el perfil y por último se vuelve a lanzar."""
     from gi.repository import Gio, GLib
     if active is None: active = active_by_default()
-    first = "keyboard-" + (layout or "us").split(",")[0]
+    base = (layout or "us").split(",")[0].split("(")[0]; first = "keyboard-" + (base if base == "jp" else "us")        # la distribución real la pone labwc (owee_keys); Fcitx5 solo necesita la base de los métodos
     names = [first] + [m for m in methods if m != first]
-    out = f"[Groups/0]\nName=Default\nDefault Layout={(layout or 'us').split(',')[0]}\nDefaultIM={first}\n\n"
+    out = f"[Groups/0]\nName=Default\nDefault Layout={first[9:]}\nDefaultIM={first}\n\n"
     for i, n in enumerate(names): out += f"[Groups/0/Items/{i}]\nName={n}\nLayout=\n\n"
     out += "[GroupOrder]\n0=Default\n"
     def write_and_start(*_a):

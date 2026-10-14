@@ -12,7 +12,7 @@ import owee_config
 from ajustes.base import Page
 from owee_i18n import _, N_
 
-PAGES = ["apariencia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "teclado", "raton", "energia", "fechahora", "aplicaciones", "atajos", "actualizaciones", "acerca"]
+PAGES = ["apariencia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "actualizaciones", "acerca"]
 GROUPS = ["Personal", "Dispositivos", "Sistema"]          # códigos internos (cada página dice a qué grupo pertenece); se traducen al mostrarlos
 _NOMBRES_DE_GRUPO = (N_("Personal"), N_("Dispositivos"), N_("Sistema"))                   # solo para que el extractor de textos los vea
 CSS = b"""
@@ -57,7 +57,7 @@ class App(Gtk.Application):
 
     def change(self, **kw):
         """Cambia ajustes visuales (modo, acento, fondo): guarda settings.json y avisa a las páginas que lo escuchan."""
-        self.cfg.update(kw); owee_config.save(self.cfg); self.style()
+        self.cfg = {**owee_config.load(), **kw}; owee_config.save(self.cfg); self.style()      # se relee antes de guardar: otras partes (teclado, panel) también escriben en settings.json
         for fn in self.listeners: fn(kw)
 
     def do_activate(self):

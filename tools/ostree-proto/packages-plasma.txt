@@ -118,3 +118,9 @@ fcitx5-frontend-gtk4
 fcitx5-frontend-qt6
 systemd-resolved
 ca-certificates
+bluez
+libspa-0.2-bluetooth
+rfkill
+sudo
+pkexec
+polkitd

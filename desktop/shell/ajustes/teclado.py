@@ -8,38 +8,24 @@ from . import rcxml, metodos
 from owee_i18n import _
 
 LAYOUTS = [("us", "", _("Inglés (EE. UU.)")), ("latam", "", _("Español (Latinoamérica)")), ("es", "", _("Español (España)")), ("us", "intl", _("Inglés (EE. UU., internacional)")),
-           ("br", "", _("Portugués (Brasil)")), ("pt", "", _("Portugués (Portugal)")), ("fr", "", _("Francés")), ("de", "", _("Alemán")), ("it", "", _("Italiano")), ("gb", "", _("Inglés (Reino Unido)")),
-           ("ru", "", _("Ruso")), ("jp", "", _("Japonés")), ("kr", "", _("Coreano")), ("ua", "", _("Ucraniano"))]
-ENV = os.path.join(config_home(), "labwc", "environment")
+           ("gb", "", _("Inglés (Reino Unido)")), ("br", "", _("Portugués (Brasil)")), ("pt", "", _("Portugués (Portugal)")), ("fr", "", _("Francés")), ("de", "", _("Alemán")),
+           ("it", "", _("Italiano")), ("ru", "", _("Ruso")), ("ua", "", _("Ucraniano")), ("jp", "", _("Japonés")), ("kr", "", _("Coreano")), ("ara", "", _("Árabe")),
+           ("ir", "", _("Persa (farsi)")), ("in", "", _("Hindi (InScript)")), ("in", "bolnagri", _("Hindi (Bolnagri, fonético)")), ("pk", "", _("Urdu")),
+           ("id", "", _("Indonesio")), ("my", "", _("Malayo (jawi)"))]            # el malayo en letras latinas se escribe con «Inglés (EE. UU.)»; chino, japonés (Mozc) y coreano (Hangul) usan además un método de escritura (Métodos)
+BASES = {l for l, _v, _n in LAYOUTS}
+import owee_keys
 KEYS = [f"{l}({v})" if v else l for l, v, _n in LAYOUTS]
-
-def read_env():
-    d = {}
-    try:
-        for line in open(ENV):
-            m = re.match(r"\s*([A-Z_]+)=(.*)", line)
-            if m: d[m.group(1)] = m.group(2).strip()
-    except OSError: pass
-    return d
-
-def write_env(upd):
-    d = read_env(); d.update(upd); os.makedirs(os.path.dirname(ENV), exist_ok=True); tmp = ENV + ".tmp"
-    open(tmp, "w").write("".join(f"{k}={v}\n" for k, v in d.items() if v != "")); os.replace(tmp, ENV)
-
-def split_layout(spec):
-    """'latam,us' + variantes → lista de claves 'latam', 'us(intl)'."""
-    return spec
+ENV = owee_keys.ENV
+read_env, write_env = owee_keys.read_env, owee_keys.write_env
 
 class Teclado(Page):
     title = _("Teclado"); icon = "owee-set-keyboard"; group = "Dispositivos"; order = 30; keywords = _("distribución idioma teclas repetición")
     def build(self, app):
-        self.deb = Debounce(300); e = read_env(); lay = [x for x in e.get("XKB_DEFAULT_LAYOUT", "us").split(",") if x]; var = e.get("XKB_DEFAULT_VARIANT", "").split(",")
-        keyof = lambda i: (f"{lay[i]}({var[i]})" if i < len(var) and var[i] else lay[i]) if i < len(lay) else None
-        self.cur = [keyof(0) or "us", keyof(1) or ""]
+        self.deb = Debounce(300); lst, self.idx = owee_keys.state(); self.cur = [lst[0], lst[1] if len(lst) > 1 else ""]
         b = page_box(_("Teclado"), _("El cambio se aplica al instante en toda la sesión.")); b.append(heading(_("Distribución")))
         opts = [(k, n) for k, (l, v, n) in zip(KEYS, LAYOUTS)]
         b.append(row(_("Distribución principal"), dropdown(opts, self.cur[0], lambda k: self.set(0, k))))
-        b.append(row(_("Segunda distribución"), dropdown([("", _("Ninguna"))] + opts, self.cur[1], lambda k: self.set(1, k)), _("Con dos distribuciones, se cambia de una a otra con Alt + Mayús")))
+        b.append(row(_("Segunda distribución"), dropdown([("", _("Ninguna"))] + opts, self.cur[1], lambda k: self.set(1, k)), _("Con dos distribuciones, se cambia de una a otra con Super + Mayús + Espacio o desde el indicador del panel")))
         b.append(heading(_("Repetición de teclas")))
         rate = int(rcxml.get("keyboard/repeatRate", default="25") or 25); delay = int(rcxml.get("keyboard/repeatDelay", default="600") or 600)
         b.append(row(_("Velocidad de repetición (por segundo)"), slider(5, 60, rate, lambda v: self.deb(lambda: rcxml.set_values([("keyboard/repeatRate", round(v))])), width=260)))
@@ -58,12 +44,10 @@ class Teclado(Page):
         """Activar un método (pinyin, Mozc, Owee…) lo deja ACTIVO desde el principio: se escribe con él sin pulsar nada. El teclado normal se recupera con Ctrl + Espacio,
         con un clic en el icono del teclado del panel o quitando el método."""
         cur = [m for m in metodos.enabled() if m != name] + ([name] if active else [])
-        metodos.write_profile(self.cur[0].split("(")[0] if self.cur and self.cur[0] else "us", cur, active=bool(cur))
+        metodos.write_profile(owee_keys.active().split("(")[0], cur, active=bool(cur))
 
     def set(self, idx, key):
         self.cur[idx] = key; keys = [k for k in self.cur if k]
-        lay = ",".join(k.split("(")[0] for k in keys); var = ",".join((k.split("(")[1].rstrip(")") if "(" in k else "") for k in keys)
-        write_env({"XKB_DEFAULT_LAYOUT": lay, "XKB_DEFAULT_VARIANT": var if var.strip(",") else "", "XKB_DEFAULT_OPTIONS": "grp:alt_shift_toggle" if len(keys) > 1 else ""})
-        rcxml.reconfigure()
-        metodos.write_profile(lay, metodos.enabled())            # la distribución principal es también la base de Fcitx5
+        owee_keys.apply(keys, min(self.idx, len(keys) - 1)); self.idx = min(self.idx, len(keys) - 1)
+        metodos.write_profile(keys[self.idx].split("(")[0], metodos.enabled())            # la distribución activa es también la base de Fcitx5
 PAGE = Teclado()
