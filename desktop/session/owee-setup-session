@@ -5,4 +5,6 @@ export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite
 if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
 S="${HOME:-/tmp}/.config/owee/settings.json"; L=""; [ -f "$S" ] && command -v jq >/dev/null && L=$(jq -r '.lang // empty' "$S" 2>/dev/null)
 . /usr/libexec/owee/owee-locale 2>/dev/null; owee_locale "$L"
-exec labwc -C /usr/share/owee/labwc-setup -S /usr/libexec/owee/owee-setup-run
+# configuración mínima de labwc en la carpeta del usuario del asistente (así el teclado que se elige en el asistente, que se guarda ahí, sí se aplica); el autostart vacío evita el panel de la sesión Lite
+mkdir -p "$HOME/.config/labwc"; cp /usr/share/owee/labwc-setup/rc.xml /usr/share/owee/labwc-setup/autostart "$HOME/.config/labwc/" 2>/dev/null
+exec labwc -S /usr/libexec/owee/owee-setup-run
