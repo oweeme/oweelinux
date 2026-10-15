@@ -169,10 +169,26 @@ class TaskBar:
     def __init__(self, watcher_get):
         self.box = Gtk.Box(spacing=2); self.box.add_css_class("owee-tasks"); self.get = watcher_get
 
+    classes = None
+    @classmethod
+    def by_class(cls, app):
+        """Icono del lanzador cuyo StartupWMClass (o identificador) coincide con el app_id de la ventana; se recorre una vez y se guarda (se renueva si no aparece)."""
+        if cls.classes is None or app.lower() not in cls.classes:
+            cls.classes = {}
+            for ai in Gio.AppInfo.get_all():
+                try:
+                    c = (ai.get_startup_wm_class() or "").lower(); i = ai.get_id() or ""
+                    if c: cls.classes.setdefault(c, ai.get_icon())
+                    cls.classes.setdefault(i.lower().removesuffix(".desktop"), ai.get_icon())
+                except Exception: pass
+        return cls.classes.get(app.lower())
+
     @staticmethod
     def icon_for(app):
         """Icono del lanzador (.desktop) de esa app; si no, el icono con el mismo nombre; si no, uno genérico."""
         theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+        ic = TaskBar.by_class(app)
+        if ic: return ic
         for cand in (app, app.lower(), app.split(".")[-1].lower()):
             if not cand: continue
             for n in (cand + ".desktop",):

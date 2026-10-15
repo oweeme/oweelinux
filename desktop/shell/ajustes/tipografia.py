@@ -10,7 +10,7 @@ from . import rcxml
 from owee_i18n import _
 
 def families(mono=False):
-    fm = Gdk.Display.get_default() and Pango.cairo_font_map_get_default()
+    fm = Gtk.Label().get_pango_context().get_font_map()
     out = []
     for f in (fm.list_families() if fm else []):
         if mono and not f.is_monospace(): continue
@@ -40,3 +40,4 @@ class Tipografia(Page):
         def fix(root):
             f = rcxml.find(root, "theme/font[place=]", create=True); f.set("place", ""); f.set("name", fam); f.set("size", str(size))
         rcxml.edit(fix)                                                      # barras de título de labwc (recarga solo)
+PAGE = Tipografia()

@@ -91,6 +91,7 @@ python3 - "$R" "$D/i18n" <<'PYEOF'
 import json, os, sys
 R, cat = sys.argv[1], sys.argv[2]
 SRC = {"owee-settings.desktop": "Ajustes de OweeLinux", "owee-calc.desktop": "Calculadora", "owee-capture.desktop": "Capturadora"}
+WMC = {"owee-settings.desktop": "org.oweelinux.Settings", "owee-calc.desktop": "org.oweelinux.Calculator", "owee-capture.desktop": "org.oweelinux.Capture"}       # app_id de la ventana: la barra de ventanas del panel encuentra así el icono
 LOC = {lg: lg for lg in ("en", "pt", "fr", "de", "it", "ru", "uk", "ja", "ko", "ar", "fa", "hi", "ur", "id", "ms")}; LOC["zh"] = "zh_CN"
 for f, es in SRC.items():
     p = os.path.join(R, "usr/share/applications", f)
@@ -99,7 +100,7 @@ for f, es in SRC.items():
     for l in lines:
         out.append(l)
         if l.startswith("Name=") and not l.startswith("Name["):
-            out += ["Name[es]=" + es] + [f"Name[{loc}]=" + json.load(open(os.path.join(cat, lg + ".json"), encoding="utf-8")).get(es, es) for lg, loc in LOC.items()]
+            out += ["StartupWMClass=" + WMC[f], "Name[es]=" + es] + [f"Name[{loc}]=" + json.load(open(os.path.join(cat, lg + ".json"), encoding="utf-8")).get(es, es) for lg, loc in LOC.items()]
     open(p, "w", encoding="utf-8").write("\n".join(out) + "\n")
 PYEOF
 # Owee: fuentes, teclado (Fcitx5) y locale qow_BO del proyecto del idioma (build-owee-debs.sh); catálogos de interfaz desde su glosario
