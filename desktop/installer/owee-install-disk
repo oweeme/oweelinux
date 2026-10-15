@@ -1,0 +1,17 @@
+#!/bin/sh
+# Instalación SIN interfaz: borra TODO el disco indicado, crea EFI (512 MB) + raíz (el resto) y llama a owee-install-deploy. Para pruebas y para quien prefiera la terminal.
+#   Uso: owee-install-disk /dev/sdX [--yes]      (sin --yes pide confirmar)
+set -eu
+D=${1:?uso: $0 /dev/DISCO [--yes]}; [ -b "$D" ] || { echo "no es un disco: $D" >&2; exit 1; }
+if [ "${2:-}" != "--yes" ]; then printf 'Se BORRARÁ todo en %s. Escribe «borrar» para continuar: ' "$D"; read -r a; [ "$a" = "borrar" ] || exit 1; fi
+case "$D" in *[0-9]) P="${D}p" ;; *) P="$D" ;; esac
+sfdisk --wipe always --wipe-partitions always "$D" <<EOS
+label: gpt
+size=512MiB, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=EFI
+type=4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709, name=oweeroot
+EOS
+udevadm settle 2>/dev/null || sleep 2
+mkfs.vfat -F32 -n EFI "${P}1" >/dev/null; mkfs.ext4 -q -F -L oweeroot "${P}2"
+M=$(mktemp -d); mount "${P}2" "$M"; mkdir -p "$M/boot/efi"; mount "${P}1" "$M/boot/efi"
+trap 'umount "$M/boot/efi" 2>/dev/null; umount "$M" 2>/dev/null; rmdir "$M" 2>/dev/null' EXIT
+"$(dirname "$0")/owee-install-deploy" "$M" "$M/boot/efi"

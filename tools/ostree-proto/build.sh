@@ -20,4 +20,6 @@ else
 fi
 ostree admin deploy --sysroot=sysroot --os=oweelinux \
   --karg="root=LABEL=oweeroot rw console=ttyS0 quiet" owee:$BRANCH
+# Imagen de INSTALACIÓN: la marca vive en el /var de este disco (no en /usr), así que el sistema que se instale desde aquí NO la hereda y arranca al asistente de primer arranque
+[ "${OWEE_INSTALLER:-0}" = 1 ] && { mkdir -p sysroot/ostree/deploy/oweelinux/var/lib/owee; touch sysroot/ostree/deploy/oweelinux/var/lib/owee/installer-image; }
 "$HERE/make-disk.sh" sysroot disk.img "${DISK_MIB:-2300}"

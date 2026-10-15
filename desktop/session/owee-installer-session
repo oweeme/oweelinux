@@ -1,0 +1,7 @@
+#!/bin/sh
+# Sesión del instalador (solo en la imagen de instalación): labwc a pantalla completa con Calamares y nada más.
+export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite
+[ -n "$HOME" ] && mkdir -p "$HOME/.config/labwc"
+if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
+cp /usr/share/owee/labwc-setup/rc.xml /usr/share/owee/labwc-setup/autostart "$HOME/.config/labwc/" 2>/dev/null
+exec labwc -S /usr/libexec/owee/owee-installer-run

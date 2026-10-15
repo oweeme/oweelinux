@@ -1,0 +1,28 @@
+#!/bin/sh
+# Instala OweeLinux en un disco ya particionado y montado: copia la versión (commit de ostree) de ESTE sistema al disco nuevo, la despliega y deja arrancable con GRUB (UEFI).
+# Lo usa Calamares (módulo shellprocess, ver calamares/shellprocess-oweedeploy.conf) y `owee-install-disk`. Se ejecuta como root.
+#   Uso: owee-install-deploy RAIZ_MONTADA DIR_ESP [REPO_ORIGEN]
+#     RAIZ_MONTADA: dónde está montada la partición raíz (ext4) nueva · DIR_ESP: dónde está montada la partición EFI (FAT) nueva (p. ej. RAIZ/boot/efi)
+#     REPO_ORIGEN: repositorio ostree con la versión (por defecto /sysroot/ostree/repo, el del sistema en marcha)
+# El disco se identifica por UUID (no por etiqueta): así no choca con el medio de instalación, que tiene la etiqueta «oweeroot».
+set -eu
+ROOT=${1:?uso: $0 RAIZ_MONTADA DIR_ESP [REPO_ORIGEN]}; ESP=${2:?}; SRC=${3:-/sysroot/ostree/repo}
+REF=owee:oweelinux/proto/x86_64
+log() { echo "owee-install: $*"; }
+[ -d "$SRC/objects" ] || { echo "owee-install: no encuentro el repositorio de origen ($SRC)" >&2; exit 1; }
+ostree --repo="$SRC" rev-parse "$REF" >/dev/null 2>&1 || { echo "owee-install: el repositorio no tiene $REF" >&2; exit 1; }
+UUID=$(findmnt -no UUID "$ROOT") || true
+[ -n "$UUID" ] || UUID=$(blkid -s UUID -o value "$(findmnt -no SOURCE "$ROOT")")
+[ -n "$UUID" ] || { echo "owee-install: no pude leer el UUID de la raíz" >&2; exit 1; }
+log "preparando ostree en $ROOT"; ostree admin init-fs --modern "$ROOT"; ostree admin os-init --sysroot="$ROOT" oweelinux
+log "copiando la versión (puede tardar unos minutos)"
+ostree pull-local --repo="$ROOT/ostree/repo" "$SRC" --remote=owee "oweelinux/proto/x86_64" | tail -1
+log "desplegando"
+ostree admin deploy --sysroot="$ROOT" --os=oweelinux --karg="root=UUID=$UUID rw quiet" "$REF"
+log "menú de arranque"
+owee-bootcfg "$ROOT/boot"
+W=$(mktemp -d); trap 'rm -rf "$W"' EXIT
+printf 'search --no-floppy --fs-uuid --set=root %s\nconfigfile /boot/owee/grub.cfg\n' "$UUID" > "$W/grub.cfg"
+mkdir -p "$ESP/EFI/BOOT"
+grub-mkstandalone -O x86_64-efi -o "$ESP/EFI/BOOT/BOOTX64.EFI" --modules="part_gpt ext2 search search_fs_uuid linux normal echo gzio" "boot/grub/grub.cfg=$W/grub.cfg" 2>/dev/null
+sync; log "listo"

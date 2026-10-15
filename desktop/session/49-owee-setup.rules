@@ -3,3 +3,8 @@
 polkit.addRule(function (action, subject) {
     if (action.id == "org.oweelinux.accounts" && subject.user == "owee-setup") return polkit.Result.YES;
 });
+
+// El instalador (solo existe en la imagen de instalación): el usuario owee-installer ejecuta Calamares como administrador, sin clave.
+polkit.addRule(function (action, subject) {
+    if (subject.user == "owee-installer" && (action.id.indexOf("calamares") >= 0 || action.id == "org.freedesktop.policykit.exec")) return polkit.Result.YES;
+});

@@ -1,0 +1,10 @@
+# Paquetes extra de la IMAGEN DE INSTALACIÓN (OWEE_INSTALLER=1): Calamares y las herramientas para particionar, formatear e instalar el cargador de arranque UEFI.
+calamares
+fdisk
+gdisk
+dosfstools
+e2fsprogs
+parted
+grub-common
+grub-efi-amd64-bin
+efibootmgr

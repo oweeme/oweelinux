@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=OweeLinux (instalador)
+Comment=Instala OweeLinux en este equipo
+Exec=/usr/libexec/owee/owee-installer-session
+Type=Application
+DesktopNames=OweeLite

@@ -3,6 +3,7 @@
 (texto = orden como root; «#key k», «#click x y», «#shot nombre», «#quit»); la salida queda en out.N. Se ejecuta en el HOST.
 Abre el lanzador con el ratón, escribe "konsole" con el teclado, pulsa Intro y comprueba que la app arrancó.
 OWEE_REAL_BOOT=1: no crea el usuario ni el inicio automático de pruebas (para probar el primer arranque de una imagen «real»).
+OWEE_EXTRA_DISK=ruta.img añade un segundo disco (para probar el instalador sobre un disco vacío).
 Uso: vm-shell.py DISCO.img DIR_SALIDA"""
 import importlib.util, json, os, shutil, socket, subprocess, sys, time
 here = os.path.dirname(os.path.abspath(__file__)); repo = os.path.abspath(os.path.join(here, "..", ".."))
@@ -19,7 +20,7 @@ W = "/home/oweeme/.cache/oweelinux/vm/litediag"; os.makedirs(W, exist_ok=True); 
 for f in ("ser.sock", "mon.sock", "qmp.sock"):
     if os.path.exists(f): os.unlink(f)
 shutil.copyfile(gui.VARS_SRC, "vars.fd"); open("c.log", "wb").close()
-os.environ["QEMU_MEM"] = "3072"; os.environ["QEMU_EXTRA"] = "-qmp unix:qmp.sock,server=on,wait=off"
+os.environ["QEMU_MEM"] = "3072"; os.environ["QEMU_EXTRA"] = "-qmp unix:qmp.sock,server=on,wait=off" + (" -drive file=" + os.environ["OWEE_EXTRA_DISK"] + ",format=raw,if=virtio" if os.environ.get("OWEE_EXTRA_DISK") else "")
 vm = gui.Vm(disk, W + "/vars.fd", W + "/c.log"); SW, SH = 1280, 800
 U = "runuser -u oweeuser -- env HOME=/home/oweeuser XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus "
 class Qmp:

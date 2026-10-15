@@ -3,6 +3,7 @@
 # Se ejecuta DENTRO del pod (usa la caché apt-cacher-ng y las claves de prueba de gen-test-keys.sh).
 # Resultado en DIR_TRABAJO: rootfs/, repo/ y pub/ (release 1 FIRMADA) y disk.img.
 # OWEE_TEST_USER=0 construye la imagen «real»: sin usuario de pruebas; el primer arranque abre el asistente que crea tu cuenta.
+# OWEE_INSTALLER=1 añade Calamares y hace una imagen de INSTALACIÓN: arranca al instalador y el sistema que instala arranca al asistente de primer arranque.
 # Uso: build-image-full.sh DIR_TRABAJO
 set -euo pipefail
 W=${1:?uso: $0 DIR_TRABAJO}; HERE=$(cd "$(dirname "$0")" && pwd); R=$W/rootfs

@@ -2,3 +2,7 @@ u owee-setup - "OweeLinux setup" /var/lib/owee-setup /bin/bash
 m owee-setup video
 m owee-setup render
 m owee-setup input
+u owee-installer - "OweeLinux installer" /var/lib/owee-installer /bin/bash
+m owee-installer video
+m owee-installer render
+m owee-installer input

@@ -8,6 +8,8 @@ OUT=${1:?uso: $0 DIR_ROOTFS}; HERE=$(cd "$(dirname "$0")" && pwd)
 pgrep -x apt-cacher-ng >/dev/null || { mkdir -p /run/apt-cacher-ng; chown apt-cacher-ng /run/apt-cacher-ng 2>/dev/null || true
   /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng ForeGround=0 PidFile=/run/apt-cacher-ng/pid SocketPath=/run/apt-cacher-ng/socket >/dev/null 2>&1; sleep 2; }
 INCLUDE=$(grep -v -e '^#' -e '^$' "$HERE/packages-plasma.txt" | paste -sd, -)
+# Instalador (Calamares y herramientas de disco): solo con OWEE_INSTALLER=1
+[ "${OWEE_INSTALLER:-0}" = 1 ] && INCLUDE="$INCLUDE,$(grep -v -e '^#' -e '^$' "$HERE/packages-installer.txt" | paste -sd, -)"
 rm -rf "$OUT"
 mmdebstrap --mode=root --variant=minbase --components="main non-free-firmware" \
   --aptopt='Acquire::http::Proxy "http://127.0.0.1:3142"' \

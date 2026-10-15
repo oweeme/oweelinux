@@ -7,7 +7,7 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
@@ -20,6 +20,14 @@ install -Dm0644 "$D/session/labwc-setup/rc.xml" "$R/usr/share/owee/labwc-setup/r
 printf '[Behavior]\nDisabledAddons=notificationitem,notifications\n' | install -Dm0644 /dev/stdin "$ETC/xdg/fcitx5/config"
 # Reproductor de vídeo y música por defecto: mpv (ligero; con controles en pantalla al abrirlo desde el lanzador o desde Dolphin), para las grabaciones de la Capturadora y cualquier archivo multimedia
 { echo "[Default Applications]"; for t in video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp audio/mpeg audio/mp4 audio/ogg audio/flac audio/x-wav audio/webm audio/aac audio/opus; do echo "$t=mpv.desktop"; done; } | install -Dm0644 /dev/stdin "$ETC/xdg/mimeapps.list"
+# Instalador (Calamares): scripts, configuración y marca. Solo se activa en el medio de instalación (marca en /var, ver build.sh); si falta el paquete calamares, no se instala nada.
+if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
+  install -Dm0755 "$D/installer/owee-install-deploy" "$R/usr/libexec/owee/installer/owee-install-deploy"; install -Dm0755 "$D/installer/owee-install-disk" "$R/usr/libexec/owee/installer/owee-install-disk"
+  install -Dm0644 "$D/session/owee-installer.desktop" "$R/usr/share/wayland-sessions/owee-installer.desktop"
+  for f in settings.conf welcome.conf partition.conf shellprocess-oweedeploy.conf finished.conf; do install -Dm0644 "$D/installer/calamares/$f" "$R/usr/share/owee/calamares/$f"; done
+  mkdir -p "$R/usr/share/owee/calamares/modules"; for f in welcome partition finished; do cp "$D/installer/calamares/$f.conf" "$R/usr/share/owee/calamares/modules/$f.conf"; done; cp "$D/installer/calamares/shellprocess-oweedeploy.conf" "$R/usr/share/owee/calamares/modules/"
+  for f in branding.desc show.qml owee-logo.png; do install -Dm0644 "$D/installer/calamares/branding/oweelinux/$f" "$R/usr/share/owee/calamares/branding/oweelinux/$f"; done
+fi
 install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
 install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
 install -Dm0644 "$D/session/owee-setup.sysusers" "$R/usr/lib/sysusers.d/owee-setup.conf"; install -Dm0644 "$D/session/owee-setup.tmpfiles" "$R/usr/lib/tmpfiles.d/owee-setup.conf"

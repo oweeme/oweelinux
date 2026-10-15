@@ -1,0 +1,5 @@
+#!/bin/sh
+# Calamares necesita ser root: pkexec (regla polkit solo para el usuario owee-installer). Se le pasa la pantalla de esta sesión.
+/usr/libexec/owee/owee-wallpaper &
+pkexec env WAYLAND_DISPLAY="$WAYLAND_DISPLAY" XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland calamares -c /usr/share/owee/calamares
+kill %1 2>/dev/null

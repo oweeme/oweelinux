@@ -1,2 +1,3 @@
 d /var/lib/owee-setup 0700 owee-setup owee-setup -
 d /var/lib/owee 0755 root root -
+d /var/lib/owee-installer 0700 owee-installer owee-installer -
