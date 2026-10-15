@@ -200,6 +200,17 @@ inicio de sesión normal con tu usuario. Prueba del asistente: `OWEE_SETUP_WINDO
   (antes solo había un icono de 32 px que se ampliaba y salía borroso).
 - **Dolphin → «Abrir con…»:** la sesión fija `XDG_MENU_PREFIX=plasma-` y reconstruye la caché de aplicaciones de KDE (`kbuildsycoca6`) al entrar; sin ella, el diálogo salía sin aplicaciones.
 
+## Vista general, portapapeles, Calendario y NVIDIA (2026-10-15)
+- **Vista general** (`owee_overview.py`): capa a pantalla completa con las **ventanas abiertas** (tarjetas con icono y título; las minimizadas, atenuadas) y debajo **todas las aplicaciones** en cuadrícula, con un buscador que filtra ambas. Se abre
+  con la esquina activa «Vista general» (Ajustes → Escritorios), con `Super + A` o con `gapplication action org.oweelinux.PanelPrototype overview`. Clic en una ventana la trae al frente (restaura si estaba minimizada), clic central la cierra, Esc
+  cierra. Sin miniaturas de las ventanas (labwc 0.8 no las ofrece). Probado en VM: abrir, ver ventanas y apps, traer una ventana al frente.
+- **Portapapeles en el panel** (`Clipboard`): historial en memoria (25 textos, nunca en disco) con `wl-paste --watch`; un clic vuelve a copiar; «Borrar historial». Probado en VM (dos textos copiados aparecen en la lista).
+- **Calendario** (`apps/calendario/owee_calendar.py`): vista mensual, eventos con hora por día (`~/.local/share/owee/calendar.json`) y **avisos** que lanza el panel a la hora del evento (probado: un evento a las 23:31 generó su notificación).
+- **Terminales:** «Foot Client» y «Foot Server» (piezas internas que no abren una terminal por sí solas) se ocultan del lanzador; quedan Foot y Konsole.
+- **NVIDIA privativo:** `OWEE_NVIDIA=1 build-image-full.sh …` añade los componentes `contrib non-free`, `nvidia-driver` y `nvidia-kernel-dkms` (`packages-nvidia.txt`) y compila el módulo AL CONSTRUIR la imagen (el sistema instalado es de solo lectura: no hay `dkms`
+  en marcha), con `nvidia-drm modeset=1`. **Sin probar** (falta una máquina con NVIDIA; además hay que decidir qué hacer en equipos sin esa GPU y cómo actualizar el módulo con cada kernel nuevo).
+- **Cámara en la Capturadora:** ya estaba (burbuja redonda que se arrastra, la rueda cambia el tamaño, sale en el vídeo solo si se activa); **no se pudo probar** (la VM no tiene webcam).
+
 ## Teclado en uso: distribuciones, indicador y `owee-layout` (probado en VM)
 Ver `docs/IDIOMAS.md`: tabla única de idiomas, teclados árabe/persa/hindi/urdu/indonesio/malayo, `Super + Mayús + Espacio`, indicador del panel con la distribución activa.
 

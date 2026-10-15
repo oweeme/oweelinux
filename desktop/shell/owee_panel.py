@@ -263,15 +263,15 @@ class Clipboard:
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _x: p.get_visible() and self.build())
         if not GLib.find_program_in_path("wl-paste"): self.btn.set_visible(False); return
         try:
-            self.proc = Gio.Subprocess.new(["wl-paste", "--type", "text", "--watch", "sh", "-c", "cat; printf '\\0'"], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE)
+            self.proc = Gio.Subprocess.new(["wl-paste", "--type", "text", "--watch", "sh", "-c", "cat; printf '\\036'"], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE)
             self.stream = Gio.DataInputStream.new(self.proc.get_stdout_pipe()); self.read()
         except GLib.Error as e: print("[portapapeles] desactivado:", e, flush=True); self.btn.set_visible(False)
 
     def read(self):
-        self.stream.read_upto_async("\0", 1, GLib.PRIORITY_DEFAULT, None, self.got)
+        self.stream.read_upto_async("\x1e", 1, GLib.PRIORITY_DEFAULT, None, self.got)
 
     def got(self, stream, res):
-        try: text, _n = stream.read_upto_finish(res); stream.read_byte(None)           # consume el separador \0
+        try: text, _n = stream.read_upto_finish(res); stream.read_byte(None)           # consume el separador (RS, 0x1e: no puede ser NUL porque PyGObject no pasa NUL en cadenas)
         except GLib.Error: return
         if text is not None:
             t = text.strip("\n")
