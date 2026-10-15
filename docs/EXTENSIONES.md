@@ -172,6 +172,23 @@ existe `/var/lib/owee/firstboot-done`; si no hay ninguno, escribe `/etc/sddm.con
 inicio de sesión normal con tu usuario. Prueba del asistente: `OWEE_SETUP_WINDOWED=1 OWEE_SETUP_DRYRUN=1 python3 desktop/setup/owee_setup.py` (ventana normal, sin crear nada).
 **Probado en VM:** el asistente completo en modo simulación (4 páginas, validaciones, argumentos que enviaría) y las protecciones del ayudante. **El flujo real de punta a punta (SDDM → asistente → usuario → login) se verifica con la imagen real.**
 
+## Instalador (Calamares) y barra de ventanas, letra, mpv
+- **Instalador:** `OWEE_INSTALLER=1 OWEE_TEST_USER=0 OWEE_DISK_MIB=12000 build-image-full.sh …` construye una **imagen de instalación**: además del sistema trae Calamares (`packages-installer.txt`: `calamares`, herramientas de disco y GRUB EFI).
+  Una marca en el `/var` de ese disco (`/var/lib/owee/installer-image`, **no** en `/usr`: el sistema instalado no la hereda) hace que SDDM entre solo al usuario `owee-installer` y a su sesión (`owee-installer-session`: labwc de kiosco, sin menú del
+  escritorio, y Calamares con `pkexec` solo para ese usuario). Calamares (`/etc/calamares`, marca «oweelinux» con el logo) tiene 4 pantallas: **bienvenida, particiones (borrar disco: EFI de 512 MB + raíz ext4), resumen e instalación**. No hay
+  módulos de usuario, idioma ni teclado: eso lo pide el asistente de primer arranque. El módulo `shellprocess` llama a `owee-install-deploy`, que copia la versión de ostree del sistema en marcha al disco nuevo (`ostree pull-local`),
+  la despliega con `root=UUID=…` (no por etiqueta, para no chocar con el medio) y escribe el GRUB UEFI (`EFI/BOOT/BOOTX64.EFI`). `owee-install-disk /dev/sdX` hace lo mismo desde la terminal.
+  **Seguridad:** `owee-installer-calamares` oculta a Calamares el disco del que arrancó (espacio de montajes propio con su carpeta de `/sys` vacía): sin eso Calamares ofrecía **ese mismo disco** como primera opción (en una prueba intentó
+  crearle una tabla de particiones; solo falló porque estaba montado).
+  **Probado en VM** (disco vacío de 10 GB): bienvenida → particiones (solo aparece el disco vacío) → resumen → instalar (~4 min) → «All done» → el disco instalado arranca **por UEFI sin consola serie** directamente al asistente de primer arranque.
+  **No probado:** discos NVMe/SATA reales, equipos con Windows u otro sistema (solo «borrar disco»), BIOS antiguo (solo UEFI), Secure Boot, cifrado de disco (desactivado), reinicio automático tras instalar, y el idioma de Calamares (sale en inglés: usa su propia
+  traducción; falta fijarla al del sistema). **Limitación actual:** el sistema instalado también lleva Calamares y las herramientas (~100 MB): la separación entre medio de instalación y sistema llegará con la ISO en vivo (F1).
+- **Barra de ventanas en el panel** (`TaskBar` en `owee_panel.py`, datos de `owee_windows.py`): un icono por ventana abierta, las minimizadas atenuadas; clic = restaurar / traer al frente / minimizar, clic central = cerrar. El icono se busca por
+  `StartupWMClass` o identificador del lanzador (las apps propias lo declaran).
+- **Ajustes → Texto y ventanas** (`ajustes/tipografia.py`): tamaño de texto (8–24), tipo de letra y letra de ancho fijo, y altura de las barras de título (compactas / normales / amplias). Escribe `gtk-font-name` (GTK3/4), `kdeglobals`
+  (Qt/KDE), `theme/font` de labwc y `padding.height` del tema de ventanas; el panel y Ajustes cambian al instante, el resto al reabrir. Para agrandar todo (iconos, paneles) sigue la Escala de Pantalla.
+- **Reproductor:** `mpv` es la app por defecto de vídeo y audio (`/etc/xdg/mimeapps.list`): las grabaciones de la Capturadora se abren con doble clic.
+
 ## Teclado en uso: distribuciones, indicador y `owee-layout` (probado en VM)
 Ver `docs/IDIOMAS.md`: tabla única de idiomas, teclados árabe/persa/hindi/urdu/indonesio/malayo, `Super + Mayús + Espacio`, indicador del panel con la distribución activa.
 
