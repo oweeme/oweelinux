@@ -17,6 +17,8 @@ if command -v fcitx5 >/dev/null; then export XMODIFIERS=@im=fcitx; unset GTK_IM_
 export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
 # En una máquina virtual no hay GPU: gráficos por software (en hardware real NO se tocan)
 if command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
+# GPU NVIDIA con el controlador privativo: el cursor por hardware suele fallar en wlroots; software es seguro
+[ -d /proc/driver/nvidia ] && export WLR_NO_HARDWARE_CURSORS=1
 # Ajustes opcionales de la máquina (p. ej. en una VM: WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo)
 # set -a: las variables del archivo se EXPORTAN (con un simple `source` quedaban solo en el shell y no llegaban a labwc ni al panel)
 if [ -f /etc/owee/lite.env ]; then set -a; . /etc/owee/lite.env; set +a; fi

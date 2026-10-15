@@ -1,0 +1,7 @@
+# Paquetes extra para OWEE_NVIDIA=1 (controlador privativo de NVIDIA y firmware no libre). Para equipos con GPU NVIDIA; en equipos sin ella no se carga (no hace nada).
+linux-headers-amd64
+dkms
+nvidia-driver
+nvidia-kernel-dkms
+nvidia-vulkan-icd
+firmware-misc-nonfree

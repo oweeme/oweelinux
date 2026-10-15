@@ -40,6 +40,8 @@ Icon=plasmadiscover
 Categories=System;PackageManager;
 StartupWMClass=org.kde.discover
 EOD
+# NVIDIA privativo (solo si la imagen se construyó con OWEE_NVIDIA=1): Wayland necesita el modo KMS del módulo
+if [ "${OWEE_NVIDIA:-0}" = 1 ]; then printf 'options nvidia-drm modeset=1 fbdev=1\n' | install -Dm0644 /dev/stdin "$ETC/modprobe.d/owee-nvidia.conf"; fi
 install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
 install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
 install -Dm0644 "$D/session/owee-setup.sysusers" "$R/usr/lib/sysusers.d/owee-setup.conf"; install -Dm0644 "$D/session/owee-setup.tmpfiles" "$R/usr/lib/tmpfiles.d/owee-setup.conf"

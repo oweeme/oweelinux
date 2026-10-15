@@ -11,7 +11,10 @@ INCLUDE=$(grep -v -e '^#' -e '^$' "$HERE/packages-plasma.txt" | paste -sd, -)
 # Instalador (Calamares y herramientas de disco): solo con OWEE_INSTALLER=1
 [ "${OWEE_INSTALLER:-0}" = 1 ] && INCLUDE="$INCLUDE,$(grep -v -e '^#' -e '^$' "$HERE/packages-installer.txt" | paste -sd, -)"
 rm -rf "$OUT"
-mmdebstrap --mode=root --variant=minbase --components="main non-free-firmware" \
+# Controlador privativo de NVIDIA (OWEE_NVIDIA=1): hace falta el componente non-free (y contrib para dkms); el módulo se compila AL CONSTRUIR la imagen (en el sistema instalado /usr es de solo lectura: no hay dkms en marcha)
+COMPONENTS="main non-free-firmware"
+if [ "${OWEE_NVIDIA:-0}" = 1 ]; then COMPONENTS="main contrib non-free non-free-firmware"; INCLUDE="$INCLUDE,$(grep -v -e '^#' -e '^$' "$HERE/packages-nvidia.txt" | paste -sd, -)"; fi
+mmdebstrap --mode=root --variant=minbase --components="$COMPONENTS" \
   --aptopt='Acquire::http::Proxy "http://127.0.0.1:3142"' \
   --aptopt='Acquire::Retries "8"' --aptopt='Acquire::http::Timeout "60"' \
   --include="$INCLUDE" trixie "$OUT" http://deb.debian.org/debian
