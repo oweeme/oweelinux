@@ -2,6 +2,8 @@
 # Arranque de la sesión "OweeLinux Lite": prepara el entorno y entrega el control al compositor (labwc).
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite XDG_SESSION_DESKTOP=owee-lite
 export QT_QPA_PLATFORM=wayland MOZ_ENABLE_WAYLAND=1
+# Apps de KDE (Dolphin → «Abrir con…», diálogos de aplicaciones): necesitan el menú de aplicaciones de Plasma para construir su caché de servicios (ksycoca)
+[ -f /etc/xdg/menus/plasma-applications.menu ] && export XDG_MENU_PREFIX=plasma-
 # Apps Qt/KDE: tomar colores, fuentes e iconos de ~/.config/kdeglobals (lo escribe Ajustes → Apariencia); sin este tema de plataforma el modo oscuro no les llega
 [ -e /usr/lib/x86_64-linux-gnu/qt6/plugins/platformthemes/KDEPlasmaPlatformTheme6.so ] && export QT_QPA_PLATFORMTHEME=kde
 # Idioma: el elegido en Ajustes → Idioma (settings.json); si no hay, español. Solo se usa si ese locale existe en el sistema.

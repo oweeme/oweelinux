@@ -45,6 +45,7 @@ svg("owee-set-shortcuts", P("M12 3v18M3 12h18") + '<circle cx="12" cy="12" r="2.
 svg("owee-set-language", '<circle cx="12" cy="12" r="9"/>' + P("M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"))
 svg("owee-set-users", '<circle cx="12" cy="8" r="3.6"/>' + P("M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"))
 svg("owee-set-fonts", P("M3.5 19l5-13 5 13M5.4 14h6.2") + P("M15.5 19l3-7.5 3 7.5M16.6 16.5h3.8"))
+svg("owee-set-network", P("M3.5 9.5a12 12 0 0 1 17 0M6.5 13a7.7 7.7 0 0 1 11 0M9.5 16.4a3.4 3.4 0 0 1 5 0") + f'<circle cx="12" cy="19.2" r="1.2" fill="{col}" stroke="none"/>')
 svg("owee-set-lock", '<rect x="5" y="10.5" width="14" height="10" rx="2.4"/>' + P("M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"))
 # --- Calculadora (icono de la app y del historial)
 open(os.path.join(out, "owee-calc.svg"), "w").write('''<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="8" y="4" width="48" height="56" rx="10" fill="#102019"/><rect x="14" y="10" width="36" height="14" rx="4" fill="#2A9D8F"/><g fill="#EFF0F1"><circle cx="21" cy="34" r="3.4"/><circle cx="32" cy="34" r="3.4"/><circle cx="43" cy="34" r="3.4"/><circle cx="21" cy="45" r="3.4"/><circle cx="32" cy="45" r="3.4"/><circle cx="21" cy="55" r="0"/></g><rect x="38" y="41" width="10" height="14" rx="5" fill="#F06548"/></svg>\n''')
@@ -52,13 +53,14 @@ svg("owee-calc-history", P("M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4v4.5H8") + P("M12
 open(os.path.join(out, "owee-capture.svg"), "w").write('''<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="6" y="12" width="52" height="40" rx="9" fill="#102019"/><path d="M6 24V21a9 9 0 0 1 9-9h6M43 12h6a9 9 0 0 1 9 9v3M58 40v3a9 9 0 0 1-9 9h-6M21 52h-6a9 9 0 0 1-9-9v-3" fill="none" stroke="#2A9D8F" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="8" fill="#F06548"/></svg>\n''')
 # Logo de OweeLinux (el pez koi del autor, desktop/theme/branding): PNG de 32 px (basta para el panel y pesa poco en memoria; el original grande queda en branding/)
 import shutil
-os.makedirs(os.path.join(dest, "32x32", "apps"), exist_ok=True)
-shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "branding", "owee-logo-32.png"), os.path.join(dest, "32x32", "apps", "owee-logo.png"))
+for sz in (32, 64, 128):        # el logo en varios tamaños (reducidos del original de 945 px con lanczos): con uno solo de 32 px se veía borroso al agrandarlo (asistente de primer arranque)
+    os.makedirs(os.path.join(dest, f"{sz}x{sz}", "apps"), exist_ok=True)
+    shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "branding", f"owee-logo-{sz}.png"), os.path.join(dest, f"{sz}x{sz}", "apps", "owee-logo.png"))
 open(os.path.join(dest, "index.theme"), "w").write("""[Icon Theme]
 Name=%s
 Comment=Iconos propios de OweeLinux (línea, redondeados)
 Inherits=breeze,Adwaita,hicolor
-Directories=scalable/actions,32x32/apps
+Directories=scalable/actions,32x32/apps,64x64/apps,128x128/apps
 
 [scalable/actions]
 Size=24
@@ -70,7 +72,21 @@ Context=Actions
 [32x32/apps]
 Size=32
 MinSize=16
-MaxSize=64
+MaxSize=48
+Type=Scalable
+Context=Applications
+
+[64x64/apps]
+Size=64
+MinSize=49
+MaxSize=96
+Type=Scalable
+Context=Applications
+
+[128x128/apps]
+Size=128
+MinSize=97
+MaxSize=512
 Type=Scalable
 Context=Applications
 """ % NAME)

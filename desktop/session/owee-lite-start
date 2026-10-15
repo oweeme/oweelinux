@@ -3,6 +3,7 @@
 # PANEL (python | waybar | none) y OWEE_PANEL_PATH (para iterar sin reconstruir la imagen) se pueden fijar en /etc/owee/panel.conf
 PANEL=python
 [ -f /etc/owee/panel.conf ] && . /etc/owee/panel.conf
+command -v kbuildsycoca6 >/dev/null && { kbuildsycoca6 --noincremental >/dev/null 2>&1 & }      # caché de aplicaciones de KDE (Dolphin → «Abrir con…»)
 /usr/libexec/owee/owee-wallpaper --daemon &          # fondo fijo o presentación de imágenes (Ajustes → Fondo de pantalla)
 # mako no lee /etc/xdg/mako/config por sí solo: si el usuario no tiene su propio ~/.config/mako/config, se le pasa el de OweeLinux (estilo propio, tiempo de vida, modo silencio)
 if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/mako/config" ]; then mako & else mako -c /etc/xdg/mako/config & fi

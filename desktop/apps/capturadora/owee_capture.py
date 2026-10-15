@@ -43,6 +43,18 @@ class App(Gtk.Application):
     def __init__(self):
         super().__init__(application_id="org.oweelinux.Capture", flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
         self.cfg = core.load_cfg(); self.rec = core.Recorder(); self.win = None; self.pill = None; self.cam = None; self.pres = None; self.tick_id = 0
+        for name, fn in (("stop", lambda *a: self.stop_recording()), ("present", lambda *a: self.present_mode()), ("camera", lambda *a: self.toggle_camera())):
+            act = Gio.SimpleAction.new(name, None); act.connect("activate", fn); self.add_action(act)     # el panel controla la grabación con `gapplication action org.oweelinux.Capture stop|present|camera`
+
+    STATE = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-recording")
+    @staticmethod
+    def panel_present():
+        """¿Hay un panel de OweeLinux que pueda mostrar los controles de grabación? (dueño del nombre org.oweelinux.PanelPrototype en el bus de sesión)"""
+        try:
+            bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+            r = bus.call_sync("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "NameHasOwner", GLib.Variant("(s)", ("org.oweelinux.PanelPrototype",)), GLib.VariantType("(b)"), Gio.DBusCallFlags.NONE, 800, None)
+            return bool(r.unpack()[0])
+        except GLib.Error: return False
 
     def restyle(self):
         col, icons = colors(); css = CSS
@@ -199,6 +211,10 @@ class App(Gtk.Application):
         GLib.timeout_add(400, go)
 
     def show_pill(self):
+        if self.panel_present():              # controles dentro del panel (arriba), no flotando sobre la pantalla: así no salen en el vídeo
+            try: open(self.STATE, "w").write(str(int(time.time()) - self.rec.elapsed()))
+            except OSError: pass
+            return
         w = self.pill = Gtk.Window(application=self, decorated=False); w.add_css_class("pill"); LS.init_for_window(w); LS.set_layer(w, LS.Layer.OVERLAY); LS.set_namespace(w, "owee-rec"); LS.set_keyboard_mode(w, LS.KeyboardMode.NONE)
         LS.set_anchor(w, LS.Edge.TOP, True); LS.set_anchor(w, LS.Edge.RIGHT, True); LS.set_margin(w, LS.Edge.TOP, 52); LS.set_margin(w, LS.Edge.RIGHT, 12)
         box = Gtk.Box(spacing=8, css_classes=["pillbox"]); self.timer_l = Gtk.Label(label="●  00:00"); box.append(self.timer_l)
@@ -214,6 +230,8 @@ class App(Gtk.Application):
     def stop_recording(self):
         if not self.rec.running: return
         if self.pill: self.timer_l.set_text(_("Guardando…"))
+        try: os.remove(self.STATE)
+        except OSError: pass
         def done(path, err):
             if self.pill: self.pill.close(); self.pill = None
             self.close_cam()

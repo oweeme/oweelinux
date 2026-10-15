@@ -23,6 +23,7 @@ CSS_TEMPLATE = """
 window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
 button.owee-task { padding: 2px 6px; border-radius: 8px; min-height: 0; min-width: 0; background: transparent; background-image: none; border: none; box-shadow: none; } button.owee-task image { opacity: 1; } button.owee-task.min image { opacity: .4; }
 button.owee-task:hover, button.owee-task.act { background: @hover@; }
+.owee-rec label { color: #F06548; padding: 0 6px; font-weight: bold; } .owee-rec button { background: transparent; background-image: none; border: none; box-shadow: none; padding: 0 6px; min-height: 0; min-width: 0; color: @fg@; } .owee-rec button:hover { background: @hover@; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
@@ -209,6 +210,26 @@ class TaskBar:
             b.connect("clicked", lambda _b, h=w["handle"]: self.get().toggle(h))
             mid = Gtk.GestureClick(button=2); mid.connect("released", lambda *a, h=w["handle"]: self.get().close(h)); b.add_controller(mid)
             self.box.append(b)
+
+class RecIndicator:
+    """Controles de la grabación de pantalla DENTRO del panel (tiempo, dibujar, cámara, detener): así no flotan sobre la pantalla ni salen en el vídeo. La Capturadora escribe la hora de inicio en
+    $XDG_RUNTIME_DIR/owee-recording mientras graba y acepta las acciones stop / present / camera (`gapplication action org.oweelinux.Capture …`). Sin grabación, no se ve."""
+    STATE = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-recording")
+    def __init__(self):
+        self.box = Gtk.Box(spacing=0); self.box.add_css_class("owee-rec"); self.box.set_visible(False)
+        self.lab = Gtk.Label(label="●  00:00"); self.box.append(self.lab)
+        for sym, act, tip in (("✎", "present", _("Modo presentación (dibujar)")), ("📷", "camera", _("Mostrar u ocultar la cámara")), ("■", "stop", _("■ Detener"))):
+            b = Gtk.Button(label=sym, tooltip_text=tip); b.connect("clicked", lambda _b, a=act: self.act(a)); self.box.append(b)
+        self.tick(); GLib.timeout_add_seconds(1, self.tick)
+
+    def act(self, name):
+        try: Gio.Subprocess.new(["gapplication", "action", "org.oweelinux.Capture", name], Gio.SubprocessFlags.STDERR_SILENCE)
+        except GLib.Error: pass
+
+    def tick(self):
+        try: t0 = int(open(self.STATE).read().strip())
+        except (OSError, ValueError): self.box.set_visible(False); return True
+        s = max(0, int(time.time()) - t0); self.lab.set_text(f"●  {s // 60:02d}:{s % 60:02d}"); self.box.set_visible(True); return True
 
 class Launcher:
     """Lanzador de aplicaciones: botón del panel con ventanita de búsqueda + lista de las apps instaladas (archivos .desktop).
@@ -449,6 +470,7 @@ class Panel(Gtk.Application):
         self.tasks = TaskBar(lambda: self.watcher); left.append(self.tasks.box)
         self.clock = Clock(); bar.set_center_widget(self.clock.btn)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
+        self.rec = RecIndicator(); right.append(self.rec.box)             # controles de la grabación de pantalla (solo mientras se graba)
         try:                                           # la bandeja es opcional: si falla, el panel sigue sin ella
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from owee_tray import Tray
             self.tray = Tray(); right.append(self.tray.box)

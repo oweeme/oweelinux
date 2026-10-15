@@ -28,6 +28,18 @@ if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
   for f in welcome partition finished shellprocess-oweedeploy; do install -Dm0644 "$D/installer/calamares/$f.conf" "$ETC/calamares/modules/$f.conf"; done
   for f in branding.desc show.qml owee-logo.png owee-welcome.png; do install -Dm0644 "$D/installer/calamares/branding/oweelinux/$f" "$ETC/calamares/branding/oweelinux/$f"; done
 fi
+# Tienda de apps = Discover (KDE) solo con el backend de Flatpak (sin PackageKit/apt: el sistema es inmutable); lanzador propio y el de KDE oculto
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-store.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Tienda de apps
+Name[en]=App store
+Comment=Instala y quita aplicaciones (Flathub)
+Exec=plasma-discover --backends flatpak-backend %U
+Icon=plasmadiscover
+Categories=System;PackageManager;
+StartupWMClass=org.kde.discover
+EOD
 install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
 install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
 install -Dm0644 "$D/session/owee-setup.sysusers" "$R/usr/lib/sysusers.d/owee-setup.conf"; install -Dm0644 "$D/session/owee-setup.tmpfiles" "$R/usr/lib/tmpfiles.d/owee-setup.conf"

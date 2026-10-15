@@ -49,7 +49,7 @@ class Setup(Gtk.Application):
         self.win = Gtk.ApplicationWindow(application=self, title=_("Bienvenido a OweeLinux"), default_width=760, default_height=560)
         if not os.environ.get("OWEE_SETUP_WINDOWED"): self.win.fullscreen()
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, spacing=18, width_request=560)
-        outer.append(Gtk.Image(icon_name="owee-logo", pixel_size=96))
+        outer.append(Gtk.Image(icon_name="owee-logo", pixel_size=128))
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.SLIDE_LEFT_RIGHT, hhomogeneous=True); outer.append(self.stack)
         self.err = Gtk.Label(wrap=True, css_classes=["bad"]); outer.append(self.err)
         nav = Gtk.Box(spacing=10); self.back = Gtk.Button(label=_("Atrás")); self.next = Gtk.Button(label=_("Siguiente"), css_classes=["suggested-action"], hexpand=True, halign=Gtk.Align.END)

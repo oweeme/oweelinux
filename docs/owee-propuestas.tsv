@@ -484,3 +484,26 @@ Compactas	Compact	gore-po	PROPUESTA
 Normales	Normal	foma-ko	GLOSARIO
 Amplias	Roomy	gore-pa	PROPUESTA
 Predeterminada	Default	pado-foma	GLOSARIO
+red wifi cable ethernet internet compartir punto de acceso ip dns	network wifi cable ethernet internet share hotspot access point ip dns	rela-sura «WiFi» doke-kopa gora-rela saro-pema kore-doke	PROPUESTA
+Conexión por cable y WiFi, compartir internet y direcciones IP.	Wired and WiFi connection, internet sharing and IP addresses.	doke-kopa re «WiFi» rela-dare, gora-rela saro-pema, kore-doke	PROPUESTA
+Dirección IP	IP address	«IP» kore-doke	PROPUESTA
+Prefijo de red	Network prefix	rela dore-fese	PROPUESTA
+Puerta de enlace	Gateway	rela nado	PROPUESTA
+Servidores DNS (separados por espacios)	DNS servers (separated by spaces)	«DNS» meka-pema	PROPUESTA
+Cable	Wired	doke-kopa	PROPUESTA
+WiFi	WiFi	WiFi	PROPUESTA
+Mínimo 8 caracteres	At least 8 characters	na sena bema-po no	PROPUESTA
+Compartir internet	Share internet	gora-rela saro-pema	PROPUESTA
+Nombre de la red	Network name	rela sena-nara	PROPUESTA
+Activar	Turn on	meka-pado	GLOSARIO
+Desactivar	Turn off	meka-gune	PROPUESTA
+Configurar IP…	Configure IP…	«IP» foma-fena…	PROPUESTA
+Automática (DHCP)	Automatic (DHCP)	meka-ko («DHCP»)	PROPUESTA
+Manual	Manual	maku-ko	PROPUESTA
+Crea una red WiFi para que otros dispositivos usen la conexión de este equipo (mejor si tu internet llega por cable).	Creates a WiFi network so other devices can use this computer's connection (best when your internet comes by cable).	«WiFi» rela dare, naro meka gora-rela kade; meka-mado le kade. gora-rela doke-kopa ko ke, lafe-pa.	PROPUESTA
+No se encontró `nmcli` (NetworkManager).	`nmcli` (NetworkManager) was not found.	«nmcli» («NetworkManager») no pe kera.	PROPUESTA
+No hay tarjeta de red por cable.	There is no wired network card.	doke-kopa rela-meka no mora.	PROPUESTA
+No hay tarjeta WiFi.	There is no WiFi card.	«WiFi» rela-meka no mora.	PROPUESTA
+Compartiendo como «{0}»	Sharing as “{0}”	saro-pema ko «{0}»	PROPUESTA
+Puerta de enlace: {0}	Gateway: {0}	rela nado: {0}	PROPUESTA
+DNS: {0}	DNS: {0}	«DNS»: {0}	PROPUESTA
