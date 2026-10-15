@@ -16,7 +16,9 @@ UUID=$(findmnt -no UUID "$ROOT") || true
 [ -n "$UUID" ] || { echo "owee-install: no pude leer el UUID de la raíz" >&2; exit 1; }
 log "preparando ostree en $ROOT"; ostree admin init-fs --modern "$ROOT"; ostree admin os-init --sysroot="$ROOT" oweelinux
 log "copiando la versión (puede tardar unos minutos)"
-ostree pull-local --repo="$ROOT/ostree/repo" "$SRC" --remote=owee "oweelinux/proto/x86_64" | tail -1
+COMMIT=$(ostree --repo="$SRC" rev-parse "$REF")
+ostree pull-local --repo="$ROOT/ostree/repo" "$SRC" --remote=owee "$COMMIT" | tail -1          # por suma de control: la referencia de origen es «remota» (owee:…) y pull-local no la acepta por nombre
+ostree refs --repo="$ROOT/ostree/repo" --create="$REF" "$COMMIT"
 log "desplegando"
 ostree admin deploy --sysroot="$ROOT" --os=oweelinux --karg="root=UUID=$UUID rw quiet" "$REF"
 log "menú de arranque"
