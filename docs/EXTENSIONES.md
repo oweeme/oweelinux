@@ -189,6 +189,17 @@ inicio de sesión normal con tu usuario. Prueba del asistente: `OWEE_SETUP_WINDO
   (Qt/KDE), `theme/font` de labwc y `padding.height` del tema de ventanas; el panel y Ajustes cambian al instante, el resto al reabrir. Para agrandar todo (iconos, paneles) sigue la Escala de Pantalla.
 - **Reproductor:** `mpv` es la app por defecto de vídeo y audio (`/etc/xdg/mimeapps.list`): las grabaciones de la Capturadora se abren con doble clic.
 
+## Red, tienda de apps, grabación en el panel y logo (2026-10-15)
+- **Ajustes → Red** (`ajustes/red.py`, `nmcli`): cable (conectar/desconectar, IP, puerta de enlace, DNS y **IP manual o automática** por conexión), WiFi (encender, redes cercanas, conectar con clave, olvidar) y **compartir internet** creando
+  una red WiFi (`nmcli device wifi hotspot`, nombre y clave de 8+ caracteres; funciona mejor cuando el internet llega por cable). Todo asíncrono y con límite de tiempo.
+- **Tienda de apps = Discover** (de KDE, ya en la imagen) **solo con el backend de Flatpak** (`plasma-discover --backends flatpak-backend`, lanzador `owee-store.desktop`): abre al instante, sin descargar una tienda ni su runtime
+  (Bazaar necesitaba cientos de MB en el primer arranque y con red lenta no terminaba). `owee-store.service` solo añade el repositorio **Flathub** la primera vez que hay red. Bazaar se puede instalar desde Discover si se quiere.
+- **Controles de grabación en el panel** (`RecIndicator`): mientras se graba, el panel muestra el tiempo y los botones dibujar / cámara / detener (la Capturadora publica la hora de inicio en `$XDG_RUNTIME_DIR/owee-recording` y acepta las
+  acciones `stop`, `present` y `camera`); ya no hay una barra flotante sobre la pantalla que salga en el vídeo. Sin panel, vuelve la barra flotante.
+- **Logo nítido:** el logo se reduce con lanczos desde el original de 945 px a 32/48/64/96/128/256/512 px (`desktop/theme/branding`); el tema de iconos trae 32, 64 y 128 px, el asistente de primer arranque usa 128 y Calamares el de 512/256
+  (antes solo había un icono de 32 px que se ampliaba y salía borroso).
+- **Dolphin → «Abrir con…»:** la sesión fija `XDG_MENU_PREFIX=plasma-` y reconstruye la caché de aplicaciones de KDE (`kbuildsycoca6`) al entrar; sin ella, el diálogo salía sin aplicaciones.
+
 ## Teclado en uso: distribuciones, indicador y `owee-layout` (probado en VM)
 Ver `docs/IDIOMAS.md`: tabla única de idiomas, teclados árabe/persa/hindi/urdu/indonesio/malayo, `Super + Mayús + Espacio`, indicador del panel con la distribución activa.
 
