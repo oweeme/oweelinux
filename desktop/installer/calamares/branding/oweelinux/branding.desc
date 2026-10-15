@@ -20,11 +20,13 @@ strings:
 images:
   productLogo: "owee-logo.png"
   productIcon: "owee-logo.png"
-  productWelcome: "owee-logo.png"
+  productWelcome: "owee-welcome.png"
 slideshow: "show.qml"
 slideshowAPI: 2
 style:
-  sidebarBackground: "#102019"
-  sidebarText: "#EFF0F1"
-  sidebarTextSelect: "#102019"
-  sidebarTextHighlight: "#2A9D8F"
+  SidebarBackground: "#102019"
+  SidebarText: "#EFF0F1"
+  SidebarBackgroundCurrent: "#2A9D8F"
+  SidebarTextCurrent: "#102019"
+  SidebarTextSelect: "#102019"
+  SidebarTextHighlight: "#2A9D8F"

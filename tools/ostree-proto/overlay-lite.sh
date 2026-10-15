@@ -26,7 +26,7 @@ if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
   install -Dm0644 "$D/session/owee-installer.desktop" "$R/usr/share/wayland-sessions/owee-installer.desktop"
   for f in settings.conf; do install -Dm0644 "$D/installer/calamares/$f" "$ETC/calamares/$f"; done          # /etc/calamares: la ubicación normal de Calamares (con -c exigiría su propia carpeta qml/)
   for f in welcome partition finished shellprocess-oweedeploy; do install -Dm0644 "$D/installer/calamares/$f.conf" "$ETC/calamares/modules/$f.conf"; done
-  for f in branding.desc show.qml owee-logo.png; do install -Dm0644 "$D/installer/calamares/branding/oweelinux/$f" "$ETC/calamares/branding/oweelinux/$f"; done
+  for f in branding.desc show.qml owee-logo.png owee-welcome.png; do install -Dm0644 "$D/installer/calamares/branding/oweelinux/$f" "$ETC/calamares/branding/oweelinux/$f"; done
 fi
 install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
 install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
