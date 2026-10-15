@@ -3,6 +3,7 @@ Description=Tienda de apps de OweeLinux (Bazaar, Flatpak)
 After=network-online.target
 Wants=network-online.target
 ConditionPathExists=!/var/lib/flatpak/.owee-store-ok
+ConditionPathExists=!/var/lib/owee/installer-image
 
 [Service]
 Type=simple

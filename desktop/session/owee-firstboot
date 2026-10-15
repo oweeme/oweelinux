@@ -6,7 +6,7 @@ mkdir -p /var/lib/owee /etc/sddm.conf.d
 humans=$(awk -F: '$3 >= 1000 && $3 < 60000' /etc/passwd | wc -l)
 if [ -e /var/lib/owee/installer-image ] && id owee-installer >/dev/null 2>&1; then
   # imagen de instalación: SDDM entra solo al instalador (Calamares), siempre
-  printf '[Autologin]\nUser=owee-installer\nSession=owee-installer.desktop\nRelogin=false\n' > "$C"
+  printf '[Autologin]\nUser=owee-installer\nSession=owee-installer.desktop\nRelogin=true\n' > "$C"
 elif [ ! -e /var/lib/owee/firstboot-done ] && [ "$humans" -eq 0 ] && id owee-setup >/dev/null 2>&1; then
   printf '[Autologin]\nUser=owee-setup\nSession=owee-setup.desktop\nRelogin=false\n' > "$C"
 else
