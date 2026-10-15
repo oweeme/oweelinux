@@ -32,3 +32,13 @@ invisible=1
 # Fcitx5 avisa «Wayland Diagnose» porque labwc no admite que le envíe la distribución del teclado; no afecta a escribir (la distribución la fija Ajustes → Teclado)
 [summary="Wayland Diagnose"]
 invisible=1
+
+# el mismo aviso con el texto traducido (el título cambia con el idioma): por nombre de la aplicación
+[app-name=Fcitx]
+invisible=1
+
+[app-name=fcitx5]
+invisible=1
+
+[app-name="Fcitx 5"]
+invisible=1
