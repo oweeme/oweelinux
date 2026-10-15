@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Es gibt keine WLAN-Karte.",
 "Compartiendo como «{0}»": "Wird als „{0}“ geteilt",
 "Puerta de enlace: {0}": "Gateway: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Kalender",
+"Título del evento": "Titel des Termins",
+"Añadir": "Hinzufügen",
+"Hora (HH:MM)": "Uhrzeit (HH:MM)",
+"No hay eventos este día.": "Keine Termine an diesem Tag.",
+"Ventanas abiertas": "Geöffnete Fenster",
+"Portapapeles": "Zwischenablage",
+"El portapapeles está vacío": "Die Zwischenablage ist leer"
 }

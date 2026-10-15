@@ -8,7 +8,7 @@ R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
 for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
-for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_overview.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
 # en ~/.config/owee/widgets); los ejemplos se dejan aparte para copiarlos y cambiarlos.
@@ -74,6 +74,20 @@ Icon=owee-calc
 Categories=Utility;Calculator;
 Keywords=calculadora;suma;matemáticas;
 EOD
+# Calendario propio (desktop/apps/calendario): vista mensual, eventos y avisos (los lanza el panel)
+install -Dm0755 "$D/apps/calendario/owee_calendar.py" "$R/usr/libexec/owee/apps/calendario/owee_calendar.py"
+install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-calendar.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-calendar.svg"
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-calendar.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Calendario
+GenericName=Calendario
+Comment=Calendario con eventos y avisos
+Exec=/usr/libexec/owee/apps/calendario/owee_calendar.py
+Icon=owee-calendar
+Categories=Office;Calendar;
+Keywords=calendario;agenda;eventos;fecha;
+EOD
 # Capturadora propia (reemplaza a Spectacle): capturas con editor, vídeo con audio y cámara, modo presentación
 for f in "$D"/apps/capturadora/*.py; do install -Dm0755 "$f" "$R/usr/libexec/owee/apps/capturadora/$(basename "$f")"; done
 install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-capture.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-capture.svg"
@@ -102,7 +116,7 @@ Name=Modo presentación
 Exec=/usr/libexec/owee/apps/capturadora/owee_capture.py --present
 EOD
 # Apps de KDE que OweeLinux reemplaza con las propias: se ocultan del lanzador (siguen instaladas por si otra app las llama)
-for f in org.kde.systemsettings.desktop kdesystemsettings.desktop systemsettings.desktop org.kde.kinfocenter.desktop org.kde.kcalc.desktop org.kde.spectacle.desktop org.kde.discover.desktop org.kde.discover.urlhandler.desktop org.kde.discover.notifier.desktop org.kde.discover.flatpak.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
+for f in org.kde.systemsettings.desktop kdesystemsettings.desktop systemsettings.desktop org.kde.kinfocenter.desktop org.kde.kcalc.desktop org.kde.spectacle.desktop org.kde.discover.desktop org.kde.discover.urlhandler.desktop org.kde.discover.notifier.desktop org.kde.discover.flatpak.desktop foot-server.desktop footclient.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
 # ---- Idiomas: catálogos de la interfaz, locales del sistema, fuentes y teclados (docs/EXTENSIONES.md → Idiomas)
 install -d "$R/usr/share/owee/i18n"; cp "$D"/i18n/*.json "$R/usr/share/owee/i18n/"
 for l in es_ES en_US pt_BR fr_FR de_DE it_IT ru_RU uk_UA zh_CN ja_JP ko_KR ar_SA fa_IR hi_IN ur_PK id_ID ms_MY; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
@@ -110,8 +124,8 @@ for l in es_ES en_US pt_BR fr_FR de_DE it_IT ru_RU uk_UA zh_CN ja_JP ko_KR ar_SA
 python3 - "$R" "$D/i18n" <<'PYEOF'
 import json, os, sys
 R, cat = sys.argv[1], sys.argv[2]
-SRC = {"owee-settings.desktop": "Ajustes de OweeLinux", "owee-calc.desktop": "Calculadora", "owee-capture.desktop": "Capturadora"}
-WMC = {"owee-settings.desktop": "org.oweelinux.Settings", "owee-calc.desktop": "org.oweelinux.Calculator", "owee-capture.desktop": "org.oweelinux.Capture"}       # app_id de la ventana: la barra de ventanas del panel encuentra así el icono
+SRC = {"owee-settings.desktop": "Ajustes de OweeLinux", "owee-calc.desktop": "Calculadora", "owee-capture.desktop": "Capturadora", "owee-calendar.desktop": "Calendario"}
+WMC = {"owee-settings.desktop": "org.oweelinux.Settings", "owee-calc.desktop": "org.oweelinux.Calculator", "owee-capture.desktop": "org.oweelinux.Capture", "owee-calendar.desktop": "org.oweelinux.Calendar"}       # app_id de la ventana: la barra de ventanas del panel encuentra así el icono
 LOC = {lg: lg for lg in ("en", "pt", "fr", "de", "it", "ru", "uk", "ja", "ko", "ar", "fa", "hi", "ur", "id", "ms")}; LOC["zh"] = "zh_CN"
 for f, es in SRC.items():
     p = os.path.join(R, "usr/share/applications", f)

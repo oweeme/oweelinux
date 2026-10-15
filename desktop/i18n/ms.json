@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Tiada kad WiFi.",
 "Compartiendo como «{0}»": "Dikongsi sebagai «{0}»",
 "Puerta de enlace: {0}": "Get laluan: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Kalendar",
+"Título del evento": "Tajuk acara",
+"Añadir": "Tambah",
+"Hora (HH:MM)": "Masa (JJ:MM)",
+"No hay eventos este día.": "Tiada acara pada hari ini.",
+"Ventanas abiertas": "Tetingkap dibuka",
+"Portapapeles": "Papan keratan",
+"El portapapeles está vacío": "Papan keratan kosong"
 }

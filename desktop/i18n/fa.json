@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "کارت WiFi وجود ندارد.",
 "Compartiendo como «{0}»": "به نام «{0}» به اشتراک گذاشته می‌شود",
 "Puerta de enlace: {0}": "دروازه: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "تقویم",
+"Título del evento": "عنوان رویداد",
+"Añadir": "افزودن",
+"Hora (HH:MM)": "ساعت (HH:MM)",
+"No hay eventos este día.": "در این روز رویدادی نیست.",
+"Ventanas abiertas": "پنجره‌های باز",
+"Portapapeles": "کلیپ‌بورد",
+"El portapapeles está vacío": "کلیپ‌بورد خالی است"
 }

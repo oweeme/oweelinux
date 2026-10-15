@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "कोई WiFi कार्ड नहीं है।",
 "Compartiendo como «{0}»": "«{0}» के रूप में साझा हो रहा है",
 "Puerta de enlace: {0}": "गेटवे: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "कैलेंडर",
+"Título del evento": "कार्यक्रम का शीर्षक",
+"Añadir": "जोड़ें",
+"Hora (HH:MM)": "समय (HH:MM)",
+"No hay eventos este día.": "इस दिन कोई कार्यक्रम नहीं है।",
+"Ventanas abiertas": "खुली विंडो",
+"Portapapeles": "क्लिपबोर्ड",
+"El portapapeles está vacío": "क्लिपबोर्ड खाली है"
 }

@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Il n'y a pas de carte WiFi.",
 "Compartiendo como «{0}»": "Partage sous « {0} »",
 "Puerta de enlace: {0}": "Passerelle : {0}",
-"DNS: {0}": "DNS : {0}"
+"DNS: {0}": "DNS : {0}",
+"Calendario": "Calendrier",
+"Título del evento": "Titre de l'événement",
+"Añadir": "Ajouter",
+"Hora (HH:MM)": "Heure (HH:MM)",
+"No hay eventos este día.": "Aucun événement ce jour-là.",
+"Ventanas abiertas": "Fenêtres ouvertes",
+"Portapapeles": "Presse-papiers",
+"El portapapeles está vacío": "Le presse-papiers est vide"
 }

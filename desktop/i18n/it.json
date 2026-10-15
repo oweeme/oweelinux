@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Non c'è nessuna scheda WiFi.",
 "Compartiendo como «{0}»": "Condivisione come «{0}»",
 "Puerta de enlace: {0}": "Gateway: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Calendario",
+"Título del evento": "Titolo dell'evento",
+"Añadir": "Aggiungi",
+"Hora (HH:MM)": "Ora (HH:MM)",
+"No hay eventos este día.": "Nessun evento in questo giorno.",
+"Ventanas abiertas": "Finestre aperte",
+"Portapapeles": "Appunti",
+"El portapapeles está vacío": "Gli appunti sono vuoti"
 }

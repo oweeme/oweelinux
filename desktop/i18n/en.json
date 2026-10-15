@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "There is no WiFi card.",
 "Compartiendo como «{0}»": "Sharing as “{0}”",
 "Puerta de enlace: {0}": "Gateway: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Calendar",
+"Título del evento": "Event title",
+"Añadir": "Add",
+"Hora (HH:MM)": "Time (HH:MM)",
+"No hay eventos este día.": "No events this day.",
+"Ventanas abiertas": "Open windows",
+"Portapapeles": "Clipboard",
+"El portapapeles está vacío": "The clipboard is empty"
 }

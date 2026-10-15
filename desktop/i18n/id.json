@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Tidak ada kartu WiFi.",
 "Compartiendo como «{0}»": "Dibagikan sebagai «{0}»",
 "Puerta de enlace: {0}": "Gateway: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Kalender",
+"Título del evento": "Judul acara",
+"Añadir": "Tambah",
+"Hora (HH:MM)": "Waktu (JJ:MM)",
+"No hay eventos este día.": "Tidak ada acara pada hari ini.",
+"Ventanas abiertas": "Jendela terbuka",
+"Portapapeles": "Papan klip",
+"El portapapeles está vacío": "Papan klip kosong"
 }

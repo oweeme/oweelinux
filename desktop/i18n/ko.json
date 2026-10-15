@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "WiFi 카드가 없습니다.",
 "Compartiendo como «{0}»": "«{0}»(으)로 공유 중",
 "Puerta de enlace: {0}": "게이트웨이: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "달력",
+"Título del evento": "일정 제목",
+"Añadir": "추가",
+"Hora (HH:MM)": "시간 (HH:MM)",
+"No hay eventos este día.": "이 날은 일정이 없습니다.",
+"Ventanas abiertas": "열린 창",
+"Portapapeles": "클립보드",
+"El portapapeles está vacío": "클립보드가 비어 있습니다"
 }

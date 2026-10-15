@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "لا توجد بطاقة WiFi.",
 "Compartiendo como «{0}»": "تتم المشاركة باسم «{0}»",
 "Puerta de enlace: {0}": "البوابة: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "التقويم",
+"Título del evento": "عنوان الحدث",
+"Añadir": "إضافة",
+"Hora (HH:MM)": "الوقت (HH:MM)",
+"No hay eventos este día.": "لا توجد أحداث في هذا اليوم.",
+"Ventanas abiertas": "النوافذ المفتوحة",
+"Portapapeles": "الحافظة",
+"El portapapeles está vacío": "الحافظة فارغة"
 }

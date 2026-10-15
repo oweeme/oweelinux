@@ -46,6 +46,8 @@ svg("owee-set-language", '<circle cx="12" cy="12" r="9"/>' + P("M3 12h18M12 3c3 
 svg("owee-set-users", '<circle cx="12" cy="8" r="3.6"/>' + P("M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"))
 svg("owee-set-fonts", P("M3.5 19l5-13 5 13M5.4 14h6.2") + P("M15.5 19l3-7.5 3 7.5M16.6 16.5h3.8"))
 svg("owee-set-network", P("M3.5 9.5a12 12 0 0 1 17 0M6.5 13a7.7 7.7 0 0 1 11 0M9.5 16.4a3.4 3.4 0 0 1 5 0") + f'<circle cx="12" cy="19.2" r="1.2" fill="{col}" stroke="none"/>')
+svg("owee-clipboard", '<rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/>' + P("M9 4.5V3.6h6v.9M8.5 10h7M8.5 13.5h7M8.5 17h4"))
+svg("owee-calendar", '<rect x="3.5" y="5" width="17" height="15.5" rx="2.6"/>' + P("M3.5 10h17M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"))
 svg("owee-set-lock", '<rect x="5" y="10.5" width="14" height="10" rx="2.4"/>' + P("M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"))
 # --- Calculadora (icono de la app y del historial)
 open(os.path.join(out, "owee-calc.svg"), "w").write('''<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="8" y="4" width="48" height="56" rx="10" fill="#102019"/><rect x="14" y="10" width="36" height="14" rx="4" fill="#2A9D8F"/><g fill="#EFF0F1"><circle cx="21" cy="34" r="3.4"/><circle cx="32" cy="34" r="3.4"/><circle cx="43" cy="34" r="3.4"/><circle cx="21" cy="45" r="3.4"/><circle cx="32" cy="45" r="3.4"/><circle cx="21" cy="55" r="0"/></g><rect x="38" y="41" width="10" height="14" rx="5" fill="#F06548"/></svg>\n''')

@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "«WiFi»   .",
 "Compartiendo como «{0}»": "  «{0}»",
 "Puerta de enlace: {0}": " : {0}",
-"DNS: {0}": "«DNS»: {0}"
+"DNS: {0}": "«DNS»: {0}",
+"Calendario": "",
+"Título del evento": " ",
+"Añadir": "",
+"Hora (HH:MM)": " («HH:MM»)",
+"No hay eventos este día.": "     .",
+"Ventanas abiertas": " ",
+"Portapapeles": " ",
+"El portapapeles está vacío": "  "
 }

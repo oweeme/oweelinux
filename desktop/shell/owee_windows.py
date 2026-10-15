@@ -58,6 +58,14 @@ class WindowWatcher:
         elif self.seat: handle.activate(self.seat)
         self.d.flush()
 
+    def toggle_front(self, handle):
+        """Traer al frente (restaurando si estaba minimizada): nunca minimiza. Lo usa la vista general."""
+        w = self.wins.get(handle)
+        if not w: return
+        if 1 in w["state"]: handle.unset_minimized()
+        if self.seat: handle.activate(self.seat)
+        self.d.flush()
+
     def close(self, handle):
         handle.close(); self.d.flush()
 

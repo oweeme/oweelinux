@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "WiFi カードがありません。",
 "Compartiendo como «{0}»": "「{0}」として共有中",
 "Puerta de enlace: {0}": "ゲートウェイ: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "カレンダー",
+"Título del evento": "予定のタイトル",
+"Añadir": "追加",
+"Hora (HH:MM)": "時刻（HH:MM）",
+"No hay eventos este día.": "この日の予定はありません。",
+"Ventanas abiertas": "開いているウィンドウ",
+"Portapapeles": "クリップボード",
+"El portapapeles está vacío": "クリップボードは空です"
 }

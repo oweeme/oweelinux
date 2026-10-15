@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Карты WiFi нет.",
 "Compartiendo como «{0}»": "Раздаётся как «{0}»",
 "Puerta de enlace: {0}": "Шлюз: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Календарь",
+"Título del evento": "Название события",
+"Añadir": "Добавить",
+"Hora (HH:MM)": "Время (ЧЧ:ММ)",
+"No hay eventos este día.": "В этот день событий нет.",
+"Ventanas abiertas": "Открытые окна",
+"Portapapeles": "Буфер обмена",
+"El portapapeles está vacío": "Буфер обмена пуст"
 }

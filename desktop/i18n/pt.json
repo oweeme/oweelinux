@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Não há placa WiFi.",
 "Compartiendo como «{0}»": "Compartilhando como «{0}»",
 "Puerta de enlace: {0}": "Gateway: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Calendário",
+"Título del evento": "Título do evento",
+"Añadir": "Adicionar",
+"Hora (HH:MM)": "Hora (HH:MM)",
+"No hay eventos este día.": "Não há eventos neste dia.",
+"Ventanas abiertas": "Janelas abertas",
+"Portapapeles": "Área de transferência",
+"El portapapeles está vacío": "A área de transferência está vazia"
 }

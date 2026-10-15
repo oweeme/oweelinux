@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "«WiFi» rela-meka no mora.",
 "Compartiendo como «{0}»": "saro-pema ko «{0}»",
 "Puerta de enlace: {0}": "rela nado: {0}",
-"DNS: {0}": "«DNS»: {0}"
+"DNS: {0}": "«DNS»: {0}",
+"Calendario": "loda-kelo-seta",
+"Título del evento": "telo-tera go-sena",
+"Añadir": "dapa",
+"Hora (HH:MM)": "tera («HH:MM»)",
+"No hay eventos este día.": "te loda-kelo bo telo-tera no mora.",
+"Ventanas abiertas": "loke-kopa bure",
+"Portapapeles": "dare-se kopa",
+"El portapapeles está vacío": "dare-se kopa nuse"
 }

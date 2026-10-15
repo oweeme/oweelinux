@@ -24,6 +24,9 @@ window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
 button.owee-task { padding: 2px 6px; border-radius: 8px; min-height: 0; min-width: 0; background: transparent; background-image: none; border: none; box-shadow: none; } button.owee-task image { opacity: 1; } button.owee-task.min image { opacity: .4; }
 button.owee-task:hover, button.owee-task.act { background: @hover@; }
 .owee-rec label { color: #F06548; padding: 0 6px; font-weight: bold; } .owee-rec button { background: transparent; background-image: none; border: none; box-shadow: none; padding: 0 6px; min-height: 0; min-width: 0; color: @fg@; } .owee-rec button:hover { background: @hover@; }
+window.owee-overview { background: alpha(@win@, 0.94); color: @fg@; } .ov-head { font-weight: bold; color: @dim@; margin-top: 10px; }
+.ov-card { padding: 10px 6px; border-radius: 14px; } .ov-btn:hover .ov-card { background: @hover@; } .ov-card.act { background: alpha(@fg@, 0.10); } .ov-card.min image { opacity: .4; } .ov-name { color: @fg@; font-size: 10pt; }
+window.owee-overview button.ov-btn { background: transparent; background-image: none; border: none; box-shadow: none; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
@@ -231,6 +234,67 @@ class RecIndicator:
         except (OSError, ValueError): self.box.set_visible(False); return True
         s = max(0, int(time.time()) - t0); self.lab.set_text(f"●  {s // 60:02d}:{s % 60:02d}"); self.box.set_visible(True); return True
 
+class Reminders:
+    """Avisos del Calendario: cada 20 s mira ~/.local/share/owee/calendar.json (solo lo relee si cambió) y, a la hora de un evento de hoy, lanza una notificación (una sola vez por evento)."""
+    DATA = os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "owee", "calendar.json")
+    def __init__(self):
+        self.mtime = None; self.ev = {}; self.done = set(); GLib.timeout_add_seconds(20, self.tick)
+
+    def tick(self):
+        try:
+            m = os.stat(self.DATA).st_mtime
+            if m != self.mtime: self.mtime = m; self.ev = json.load(open(self.DATA, encoding="utf-8"))
+        except (OSError, ValueError): self.ev = {}; self.mtime = None
+        now = time.localtime(); day = time.strftime("%Y-%m-%d", now); hm = time.strftime("%H:%M", now)
+        for e in (self.ev.get(day, []) if isinstance(self.ev, dict) else []):
+            key = (day, e.get("t"), e.get("title"))
+            if e.get("t") == hm and key not in self.done:
+                self.done.add(key)
+                try: Gio.Subprocess.new(["notify-send", "-a", _("Calendario"), "-i", "owee-calendar", hm, str(e.get("title", ""))[:200]], Gio.SubprocessFlags.NONE)
+                except GLib.Error: pass
+        return True
+
+class Clipboard:
+    """Historial del portapapeles en el panel: guarda en MEMORIA (nunca en disco) los últimos textos copiados (los observa `wl-paste --watch`) y deja volver a copiar uno con un clic.
+    Sin `wl-paste` (wl-clipboard) el botón no aparece. «Borrar historial» lo vacía."""
+    MAX = 25
+    def __init__(self):
+        self.items = []; self.btn = Gtk.MenuButton(has_frame=False, child=Gtk.Image(icon_name="owee-clipboard", pixel_size=18), tooltip_text=_("Portapapeles")); self.btn.add_css_class("owee-widget")
+        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _x: p.get_visible() and self.build())
+        if not GLib.find_program_in_path("wl-paste"): self.btn.set_visible(False); return
+        try:
+            self.proc = Gio.Subprocess.new(["wl-paste", "--type", "text", "--watch", "sh", "-c", "cat; printf '\\0'"], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE)
+            self.stream = Gio.DataInputStream.new(self.proc.get_stdout_pipe()); self.read()
+        except GLib.Error as e: print("[portapapeles] desactivado:", e, flush=True); self.btn.set_visible(False)
+
+    def read(self):
+        self.stream.read_upto_async("\0", 1, GLib.PRIORITY_DEFAULT, None, self.got)
+
+    def got(self, stream, res):
+        try: text, _n = stream.read_upto_finish(res); stream.read_byte(None)           # consume el separador \0
+        except GLib.Error: return
+        if text is not None:
+            t = text.strip("\n")
+            if t.strip():
+                t = t[:4000]
+                if t in self.items: self.items.remove(t)
+                self.items.insert(0, t); del self.items[self.MAX:]
+        self.read()
+
+    def build(self):
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6, width_request=320)
+        box.append(Gtk.Label(label=_("Portapapeles"), xalign=0, css_classes=["heading"], margin_start=6, margin_bottom=2))
+        if not self.items: box.append(Gtk.Label(label=_("El portapapeles está vacío"), xalign=0, css_classes=["dim-label"], margin_start=6, margin_top=4, margin_bottom=4))
+        for t in self.items[:12]:
+            one = " ⏎ ".join(t.split("\n"))[:70] + ("…" if len(t) > 70 or "\n" in t else "")
+            b = Gtk.Button(child=Gtk.Label(label=one, xalign=0, ellipsize=3, max_width_chars=44), has_frame=False, tooltip_text=t[:300]); b.add_css_class("owee-row"); b.connect("clicked", lambda _b, x=t: self.paste(x)); box.append(b)
+        if self.items:
+            box.append(Gtk.Separator(margin_top=4, margin_bottom=4)); clr = Gtk.Button(label=_("Borrar historial"), has_frame=False); clr.add_css_class("owee-row"); clr.connect("clicked", lambda _b: (self.items.clear(), self.pop.popdown())); box.append(clr)
+        self.pop.set_child(box)
+
+    def paste(self, text):
+        self.pop.popdown(); Gdk.Display.get_default().get_clipboard().set(text)
+
 class Launcher:
     """Lanzador de aplicaciones: botón del panel con ventanita de búsqueda + lista de las apps instaladas (archivos .desktop).
     La lista se construye al ABRIR por primera vez (no al arrancar): no cuesta memoria ni tiempo de sesión si no se usa.
@@ -352,8 +416,13 @@ class Clock:
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=14, margin_end=14)
         self.big = Gtk.Label(xalign=0, css_classes=["clock-big"]); self.date = Gtk.Label(xalign=0, css_classes=["heading"])
         self.cal = Gtk.Calendar(show_week_numbers=True); self.go = Gtk.Button(label=_("Hoy")); self.go.connect("clicked", lambda b: self.today())
-        for w in (self.big, self.date, Gtk.Separator(), self.cal, self.go): box.append(w)
+        self.openc = Gtk.Button(label=_("Calendario")); self.openc.connect("clicked", lambda b: (self.pop.popdown(), self.open_app()))
+        for w in (self.big, self.date, Gtk.Separator(), self.cal, self.go, self.openc): box.append(w)
         self.pop.set_child(box); self.tick()
+
+    def open_app(self):
+        for p in ("/usr/libexec/owee/apps/calendario/owee_calendar.py", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "apps", "calendario", "owee_calendar.py")):
+            if os.path.exists(p): Gio.Subprocess.new([p], Gio.SubprocessFlags.NONE); return
 
     def today(self): self.cal.select_day(GLib.DateTime.new_now_local())
 
@@ -453,7 +522,7 @@ class Panel(Gtk.Application):
             self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None)
             self.mon.connect("changed", lambda m, f, o, ev: f.get_basename() == "settings.json" and GLib.timeout_add(150, lambda: (self.apply_settings(), False)[1]))
         except GLib.Error as e: print("[ajustes] sin vigilancia:", e, flush=True)
-        for name, fn in (("launcher", lambda *a: self.launcher.btn.popup()), ("calendar", lambda *a: self.clock.btn.popup()), ("power", lambda *a: self.power.btn.popup())):
+        for name, fn in (("launcher", lambda *a: self.launcher.btn.popup()), ("calendar", lambda *a: self.clock.btn.popup()), ("power", lambda *a: self.power.btn.popup()), ("overview", lambda *a: self.overview.toggle())):
             act = Gio.SimpleAction.new(name, None); act.connect("activate", fn); self.add_action(act)    # `gapplication action org.oweelinux.PanelPrototype launcher` (atajos de labwc)
         win = Gtk.ApplicationWindow(application=self); win.add_css_class("owee-panel")
         LS.init_for_window(win); LS.set_layer(win, LS.Layer.TOP); LS.set_namespace(win, "owee-panel")
@@ -470,6 +539,8 @@ class Panel(Gtk.Application):
         self.tasks = TaskBar(lambda: self.watcher); left.append(self.tasks.box)
         self.clock = Clock(); bar.set_center_widget(self.clock.btn)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
+        self.reminders = Reminders()                                          # avisos de eventos del Calendario
+        self.clip = Clipboard(); right.append(self.clip.btn)                   # historial del portapapeles
         self.rec = RecIndicator(); right.append(self.rec.box)             # controles de la grabación de pantalla (solo mientras se graba)
         try:                                           # la bandeja es opcional: si falla, el panel sigue sin ella
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from owee_tray import Tray
@@ -484,6 +555,7 @@ class Panel(Gtk.Application):
             from owee_windows import WindowWatcher
             self.watcher = WindowWatcher(self.set_compact, self.tasks.update)
         except Exception as e: print("[ventanas] desactivado:", e, flush=True)
+        from owee_overview import Overview; self.overview = Overview(self)         # vista general (esquinas activas, Super + A)
         win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
@@ -499,7 +571,7 @@ class Panel(Gtk.Application):
     def corner_action(self, name):
         """Acciones de las esquinas activas (Ajustes → Escritorios)."""
         import owee_desktops
-        if name == "overview": owee_desktops.overview()
+        if name == "overview": self.overview.toggle()
         elif name == "launcher": self.launcher.btn.popup()
         elif name == "calendar": self.clock.btn.popup()
         elif name == "next": owee_desktops.go(owee_desktops.current() % owee_desktops.desktop_count() + 1)

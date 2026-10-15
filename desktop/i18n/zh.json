@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "没有 WiFi 网卡。",
 "Compartiendo como «{0}»": "正在以“{0}”共享",
 "Puerta de enlace: {0}": "网关：{0}",
-"DNS: {0}": "DNS：{0}"
+"DNS: {0}": "DNS：{0}",
+"Calendario": "日历",
+"Título del evento": "事件标题",
+"Añadir": "添加",
+"Hora (HH:MM)": "时间（HH:MM）",
+"No hay eventos este día.": "这一天没有事件。",
+"Ventanas abiertas": "已打开的窗口",
+"Portapapeles": "剪贴板",
+"El portapapeles está vacío": "剪贴板为空"
 }

@@ -506,5 +506,13 @@
 "No hay tarjeta WiFi.": "Немає картки WiFi.",
 "Compartiendo como «{0}»": "Роздається як «{0}»",
 "Puerta de enlace: {0}": "Шлюз: {0}",
-"DNS: {0}": "DNS: {0}"
+"DNS: {0}": "DNS: {0}",
+"Calendario": "Календар",
+"Título del evento": "Назва події",
+"Añadir": "Додати",
+"Hora (HH:MM)": "Час (ГГ:ХХ)",
+"No hay eventos este día.": "У цей день подій немає.",
+"Ventanas abiertas": "Відкриті вікна",
+"Portapapeles": "Буфер обміну",
+"El portapapeles está vacío": "Буфер обміну порожній"
 }
