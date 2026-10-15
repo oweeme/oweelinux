@@ -18,6 +18,8 @@ install -Dm0644 "$D/session/org.oweelinux.accounts.policy" "$R/usr/share/polkit-
 install -Dm0644 "$D/session/labwc-setup/rc.xml" "$R/usr/share/owee/labwc-setup/rc.xml"; install -Dm0644 "$D/session/labwc-setup/autostart" "$R/usr/share/owee/labwc-setup/autostart"
 # Fcitx5 por defecto (también para usuarios nuevos): sin icono propio en la bandeja (lo reemplaza el indicador del panel) y sin avisos (el de «Wayland Diagnose» no aplica con labwc)
 printf '[Behavior]\nDisabledAddons=notificationitem,notifications\n' | install -Dm0644 /dev/stdin "$ETC/xdg/fcitx5/config"
+# Reproductor de vídeo y música por defecto: mpv (ligero; con controles en pantalla al abrirlo desde el lanzador o desde Dolphin), para las grabaciones de la Capturadora y cualquier archivo multimedia
+{ echo "[Default Applications]"; for t in video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp audio/mpeg audio/mp4 audio/ogg audio/flac audio/x-wav audio/webm audio/aac audio/opus; do echo "$t=mpv.desktop"; done; } | install -Dm0644 /dev/stdin "$ETC/xdg/mimeapps.list"
 install -Dm0755 "$D/setup/owee_setup.py" "$R/usr/libexec/owee/setup/owee_setup.py"
 install -Dm0644 "$D/session/owee-setup.desktop" "$R/usr/share/wayland-sessions/owee-setup.desktop"
 install -Dm0644 "$D/session/owee-setup.sysusers" "$R/usr/lib/sysusers.d/owee-setup.conf"; install -Dm0644 "$D/session/owee-setup.tmpfiles" "$R/usr/lib/tmpfiles.d/owee-setup.conf"

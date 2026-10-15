@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "fese. nado-bure loke-tabe fena te…",
 "Elige tu idioma": "reka delo",
 "Distribución del teclado": "maku-tabe dore",
-"Escribe aquí para probar tu teclado": "kema-le beka, maku-tabe mede"
+"Escribe aquí para probar tu teclado": "kema-le beka, maku-tabe mede",
+"Texto y ventanas": "doke-beka re loke-kopa",
+"letra fuente tipografía tamaño texto ventanas barra de título": "sena-dore gore doke-beka loke-kopa go-sena",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "sena-dore re gore, re loke-kopa go-sena dase. mado-foma bure pe ke, pu-kelo bure ke telo.",
+"Tamaño del texto": "doke-beka gore",
+"Tipo de letra": "sena-dore",
+"Letra de ancho fijo (terminal, código)": "sena-dore dase foma-ko (meka-mado-reka, foma-beka)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "doke-beka dore te mede",
+"Ventanas": "loke-kopa",
+"Barras de título": "go-sena",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "kema-fese gore-pa-dare ke, loke-tabe bo gore kade",
+"Compactas": "gore-po",
+"Normales": "foma-ko",
+"Amplias": "gore-pa",
+"Predeterminada": "pado-foma"
 }

@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "تم. جارٍ تحميل شاشة تسجيل الدخول…",
 "Elige tu idioma": "اختر لغتك",
 "Distribución del teclado": "تخطيط لوحة المفاتيح",
-"Escribe aquí para probar tu teclado": "اكتب هنا لتجربة لوحة المفاتيح"
+"Escribe aquí para probar tu teclado": "اكتب هنا لتجربة لوحة المفاتيح",
+"Texto y ventanas": "النص والنوافذ",
+"letra fuente tipografía tamaño texto ventanas barra de título": "خط حجم نص نوافذ شريط العنوان",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "الخط وحجمه وارتفاع أشرطة عناوين النوافذ. تتغيّر التطبيقات المفتوحة عند فتحها من جديد.",
+"Tamaño del texto": "حجم النص",
+"Tipo de letra": "الخط",
+"Letra de ancho fijo (terminal, código)": "خط ثابت العرض (الطرفية، الشيفرة)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "نص حكيم له سر قاطع وذو شأن عظيم مكتوب على ثوب أخضر 0123456789",
+"Ventanas": "النوافذ",
+"Barras de título": "أشرطة العناوين",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "لتكبير كل شيء (الأيقونات واللوحات والصور) استخدم المقياس في قسم الشاشة.",
+"Compactas": "مدمجة",
+"Normales": "عادية",
+"Amplias": "واسعة",
+"Predeterminada": "الافتراضي"
 }

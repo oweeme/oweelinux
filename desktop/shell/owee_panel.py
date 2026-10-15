@@ -21,6 +21,8 @@ import owee_i18n as _i18n; _i18n.apply_direction()
 import owee_keys
 CSS_TEMPLATE = """
 window.owee-panel { background: @bg@; color: @fg@; border-radius: 12px; }
+button.owee-task { padding: 2px 6px; border-radius: 8px; min-height: 0; min-width: 0; background: transparent; background-image: none; border: none; box-shadow: none; } button.owee-task image { opacity: 1; } button.owee-task.min image { opacity: .4; }
+button.owee-task:hover, button.owee-task.act { background: @hover@; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
@@ -159,6 +161,38 @@ def load_widgets(box):
                 p = os.path.join(d, f)
                 if os.path.isfile(p) and os.access(p, os.X_OK): found[f] = p
     return [ScriptWidget(found[f], box) for f in sorted(found)]
+
+class TaskBar:
+    """Barra de ventanas del panel: un icono por ventana abierta (también las minimizadas, atenuadas). Clic: restaura / trae al frente / minimiza; clic central: cierra.
+    Los datos vienen de wlr-foreign-toplevel (owee_windows.WindowWatcher); si el protocolo no está, queda vacía."""
+    MAX = 12
+    def __init__(self, watcher_get):
+        self.box = Gtk.Box(spacing=2); self.box.add_css_class("owee-tasks"); self.get = watcher_get
+
+    @staticmethod
+    def icon_for(app):
+        """Icono del lanzador (.desktop) de esa app; si no, el icono con el mismo nombre; si no, uno genérico."""
+        theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+        for cand in (app, app.lower(), app.split(".")[-1].lower()):
+            if not cand: continue
+            for n in (cand + ".desktop",):
+                try:
+                    ai = Gio.DesktopAppInfo.new(n)
+                    if ai and ai.get_icon(): return ai.get_icon()
+                except Exception: pass
+            if theme.has_icon(cand): return Gio.ThemedIcon.new(cand)
+        return Gio.ThemedIcon.new("application-x-executable")
+
+    def update(self, wins):
+        while (c := self.box.get_first_child()): self.box.remove(c)
+        for w in wins[:self.MAX]:
+            img = Gtk.Image(gicon=self.icon_for(w["app"]), pixel_size=18); b = Gtk.Button(child=img, has_frame=False, tooltip_text=w["title"] or w["app"])
+            b.add_css_class("owee-task")
+            if w["minimized"]: b.add_css_class("min")
+            if w["active"] and not w["minimized"]: b.add_css_class("act")
+            b.connect("clicked", lambda _b, h=w["handle"]: self.get().toggle(h))
+            mid = Gtk.GestureClick(button=2); mid.connect("released", lambda *a, h=w["handle"]: self.get().close(h)); b.add_controller(mid)
+            self.box.append(b)
 
 class Launcher:
     """Lanzador de aplicaciones: botón del panel con ventanita de búsqueda + lista de las apps instaladas (archivos .desktop).
@@ -396,6 +430,7 @@ class Panel(Gtk.Application):
             from owee_desktops import DesktopSwitcher, Corners
             self.desks = DesktopSwitcher(); left.append(self.desks.box); self.corners = Corners(self, self.corner_action); self.corners.set_actions(owee_config.load().get("corners", {}))
         except Exception as e: print("[escritorios] desactivados:", e, flush=True)
+        self.tasks = TaskBar(lambda: self.watcher); left.append(self.tasks.box)
         self.clock = Clock(); bar.set_center_widget(self.clock.btn)
         right = Gtk.Box(spacing=4); bar.set_end_widget(right)
         try:                                           # la bandeja es opcional: si falla, el panel sigue sin ella
@@ -409,7 +444,7 @@ class Panel(Gtk.Application):
         self.win = win; self.compact = False
         try:                                           # con una ventana maximizada el panel se pega a los bordes y pierde las esquinas (como la barra de menús de macOS)
             from owee_windows import WindowWatcher
-            self.watcher = WindowWatcher(self.set_compact)
+            self.watcher = WindowWatcher(self.set_compact, self.tasks.update)
         except Exception as e: print("[ventanas] desactivado:", e, flush=True)
         win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
@@ -442,6 +477,7 @@ class Panel(Gtk.Application):
         pal = owee_config.palette(cfg)
         self.prov.load_from_data(css_for(pal))
         Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])       # iconos propios; el resto cae a breeze/Adwaita/hicolor
+        fam, size, _m = owee_config.fonts(cfg); Gtk.Settings.get_default().set_property("gtk-font-name", f"{fam} {size}")          # letra del panel al instante (Ajustes → Texto y ventanas)
 
     def dump_layout(self, win):                                  # solo depuración: posición de cada widget (para pruebas con el ratón)
         out = {}

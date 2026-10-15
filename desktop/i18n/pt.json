@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "Pronto. Carregando a tela de login…",
 "Elige tu idioma": "Escolha o seu idioma",
 "Distribución del teclado": "Layout do teclado",
-"Escribe aquí para probar tu teclado": "Digite aqui para testar o teclado"
+"Escribe aquí para probar tu teclado": "Digite aqui para testar o teclado",
+"Texto y ventanas": "Texto e janelas",
+"letra fuente tipografía tamaño texto ventanas barra de título": "fonte letra tamanho texto janelas barra de título",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "Fonte e tamanho, e a altura das barras de título das janelas. Os apps abertos mudam quando você os abre de novo.",
+"Tamaño del texto": "Tamanho do texto",
+"Tipo de letra": "Fonte",
+"Letra de ancho fijo (terminal, código)": "Fonte de largura fixa (terminal, código)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "Um pequeno jabuti xereta viu dez cegonhas felizes 0123456789",
+"Ventanas": "Janelas",
+"Barras de título": "Barras de título",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "Para ampliar tudo (ícones, painéis e imagens), use a Escala em Tela.",
+"Compactas": "Compactas",
+"Normales": "Normais",
+"Amplias": "Amplas",
+"Predeterminada": "Padrão"
 }

@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "Готово. Загружается экран входа…",
 "Elige tu idioma": "Выберите язык",
 "Distribución del teclado": "Раскладка клавиатуры",
-"Escribe aquí para probar tu teclado": "Введите здесь, чтобы проверить клавиатуру"
+"Escribe aquí para probar tu teclado": "Введите здесь, чтобы проверить клавиатуру",
+"Texto y ventanas": "Текст и окна",
+"letra fuente tipografía tamaño texto ventanas barra de título": "шрифт размер текст окна заголовок",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "Шрифт, его размер и высота заголовков окон. Открытые приложения изменятся после повторного запуска.",
+"Tamaño del texto": "Размер текста",
+"Tipo de letra": "Шрифт",
+"Letra de ancho fijo (terminal, código)": "Моноширинный шрифт (терминал, код)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "Съешь же ещё этих мягких французских булок, да выпей чаю 0123456789",
+"Ventanas": "Окна",
+"Barras de título": "Заголовки окон",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "Чтобы увеличить всё (значки, панели, изображения), используйте масштаб в разделе «Экран».",
+"Compactas": "Компактные",
+"Normales": "Обычные",
+"Amplias": "Просторные",
+"Predeterminada": "По умолчанию"
 }

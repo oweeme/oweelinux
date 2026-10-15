@@ -13,7 +13,7 @@ from ajustes.base import Page
 from owee_i18n import _, N_
 import owee_i18n as _i18n; _i18n.apply_direction()
 
-PAGES = ["apariencia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "actualizaciones", "acerca"]
+PAGES = ["apariencia", "tipografia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "actualizaciones", "acerca"]
 GROUPS = ["Personal", "Dispositivos", "Sistema"]          # códigos internos (cada página dice a qué grupo pertenece); se traducen al mostrarlos
 _NOMBRES_DE_GRUPO = (N_("Personal"), N_("Dispositivos"), N_("Sistema"))                   # solo para que el extractor de textos los vea
 CSS = b"""
@@ -55,6 +55,7 @@ class App(Gtk.Application):
         css = ("".join(f"@define-color {k} {v};\n" for k, v in defs.items())).encode() + css
         self.prov.load_from_data(css); Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", self.cfg["mode"] == "dark")
         Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])
+        fam, size, _m = owee_config.fonts(self.cfg); Gtk.Settings.get_default().set_property("gtk-font-name", f"{fam} {size}")
 
     def change(self, **kw):
         """Cambia ajustes visuales (modo, acento, fondo): guarda settings.json y avisa a las páginas que lo escuchan."""

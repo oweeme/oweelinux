@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "Done. Loading the sign-in screen…",
 "Elige tu idioma": "Choose your language",
 "Distribución del teclado": "Keyboard layout",
-"Escribe aquí para probar tu teclado": "Type here to test your keyboard"
+"Escribe aquí para probar tu teclado": "Type here to test your keyboard",
+"Texto y ventanas": "Text and windows",
+"letra fuente tipografía tamaño texto ventanas barra de título": "font typeface size text windows title bar",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "Font and size, and the height of window title bars. Open apps change when you reopen them.",
+"Tamaño del texto": "Text size",
+"Tipo de letra": "Font",
+"Letra de ancho fijo (terminal, código)": "Fixed-width font (terminal, code)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "The quick brown fox jumps over the lazy dog 0123456789",
+"Ventanas": "Windows",
+"Barras de título": "Title bars",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "To enlarge everything (icons, panels and images) use Scale in Display.",
+"Compactas": "Compact",
+"Normales": "Normal",
+"Amplias": "Roomy",
+"Predeterminada": "Default"
 }

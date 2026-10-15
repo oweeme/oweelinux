@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "完成。正在加载登录界面…",
 "Elige tu idioma": "选择语言",
 "Distribución del teclado": "键盘布局",
-"Escribe aquí para probar tu teclado": "在此输入以测试键盘"
+"Escribe aquí para probar tu teclado": "在此输入以测试键盘",
+"Texto y ventanas": "文字和窗口",
+"letra fuente tipografía tamaño texto ventanas barra de título": "字体 字号 文字 窗口 标题栏",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "字体和字号，以及窗口标题栏的高度。已打开的应用在重新打开后生效。",
+"Tamaño del texto": "文字大小",
+"Tipo de letra": "字体",
+"Letra de ancho fijo (terminal, código)": "等宽字体（终端、代码）",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。0123456789",
+"Ventanas": "窗口",
+"Barras de título": "标题栏",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "要放大所有内容（图标、面板和图像），请使用“显示”中的缩放。",
+"Compactas": "紧凑",
+"Normales": "标准",
+"Amplias": "宽松",
+"Predeterminada": "默认"
 }

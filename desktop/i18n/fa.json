@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "انجام شد. در حال بارگذاری صفحهٔ ورود…",
 "Elige tu idioma": "زبان خود را انتخاب کنید",
 "Distribución del teclado": "چیدمان صفحه‌کلید",
-"Escribe aquí para probar tu teclado": "برای آزمایش صفحه‌کلید اینجا بنویسید"
+"Escribe aquí para probar tu teclado": "برای آزمایش صفحه‌کلید اینجا بنویسید",
+"Texto y ventanas": "متن و پنجره‌ها",
+"letra fuente tipografía tamaño texto ventanas barra de título": "قلم اندازه متن پنجره‌ها نوار عنوان",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "قلم و اندازه و ارتفاع نوار عنوان پنجره‌ها. برنامه‌های باز با باز شدن دوباره تغییر می‌کنند.",
+"Tamaño del texto": "اندازهٔ متن",
+"Tipo de letra": "قلم",
+"Letra de ancho fijo (terminal, código)": "قلم با عرض ثابت (ترمینال، کد)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "ژاله، دختر باغبان، بر ضریر پیر چنگ‌زن خوش‌نغمه 0123456789",
+"Ventanas": "پنجره‌ها",
+"Barras de título": "نوار عنوان",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "برای بزرگ‌کردن همه‌چیز (نمادها، پنل‌ها و تصاویر) از مقیاس در بخش نمایشگر استفاده کنید.",
+"Compactas": "فشرده",
+"Normales": "معمولی",
+"Amplias": "جادار",
+"Predeterminada": "پیش‌فرض"
 }

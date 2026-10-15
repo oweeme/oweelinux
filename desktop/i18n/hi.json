@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "हो गया। लॉगिन स्क्रीन लोड हो रही है…",
 "Elige tu idioma": "अपनी भाषा चुनें",
 "Distribución del teclado": "कीबोर्ड लेआउट",
-"Escribe aquí para probar tu teclado": "कीबोर्ड जाँचने के लिए यहाँ लिखें"
+"Escribe aquí para probar tu teclado": "कीबोर्ड जाँचने के लिए यहाँ लिखें",
+"Texto y ventanas": "टेक्स्ट और विंडो",
+"letra fuente tipografía tamaño texto ventanas barra de título": "फ़ॉन्ट आकार टेक्स्ट विंडो शीर्षक पट्टी",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "फ़ॉन्ट और आकार, तथा विंडो की शीर्षक पट्टी की ऊँचाई। खुले ऐप्स दोबारा खोलने पर बदलते हैं।",
+"Tamaño del texto": "टेक्स्ट का आकार",
+"Tipo de letra": "फ़ॉन्ट",
+"Letra de ancho fijo (terminal, código)": "निश्चित चौड़ाई वाला फ़ॉन्ट (टर्मिनल, कोड)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन 0123456789",
+"Ventanas": "विंडो",
+"Barras de título": "शीर्षक पट्टियाँ",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "सब कुछ (आइकन, पैनल और चित्र) बड़ा करने के लिए डिस्प्ले में स्केल का उपयोग करें।",
+"Compactas": "संक्षिप्त",
+"Normales": "सामान्य",
+"Amplias": "विशाल",
+"Predeterminada": "डिफ़ॉल्ट"
 }

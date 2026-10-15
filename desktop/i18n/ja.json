@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "完了しました。ログイン画面を読み込んでいます…",
 "Elige tu idioma": "言語を選んでください",
 "Distribución del teclado": "キーボード配列",
-"Escribe aquí para probar tu teclado": "ここに入力してキーボードを試せます"
+"Escribe aquí para probar tu teclado": "ここに入力してキーボードを試せます",
+"Texto y ventanas": "文字とウィンドウ",
+"letra fuente tipografía tamaño texto ventanas barra de título": "フォント 文字 サイズ テキスト ウィンドウ タイトルバー",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "フォントとサイズ、ウィンドウのタイトルバーの高さです。開いているアプリは開き直すと変わります。",
+"Tamaño del texto": "文字サイズ",
+"Tipo de letra": "フォント",
+"Letra de ancho fijo (terminal, código)": "等幅フォント（ターミナル、コード）",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "いろはにほへと ちりぬるを 0123456789",
+"Ventanas": "ウィンドウ",
+"Barras de título": "タイトルバー",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "アイコンやパネルなどすべてを大きくするには、「ディスプレイ」の拡大率を使ってください。",
+"Compactas": "コンパクト",
+"Normales": "標準",
+"Amplias": "ゆったり",
+"Predeterminada": "デフォルト"
 }

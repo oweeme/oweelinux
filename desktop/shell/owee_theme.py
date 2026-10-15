@@ -56,10 +56,10 @@ def write_gtk_css(cfg):
 
 def write_window_theme(cfg):
     """Barras de título y menús de labwc con los colores del tema (se escribe un tema de usuario «Owee-Tema» y labwc lo recarga)."""
-    pal = owee_config.palette(cfg); fg, acc = pal["fg"], pal["accent"]
+    pal = owee_config.palette(cfg); fg, acc = pal["fg"], pal["accent"]; ph, bw = owee_config.DENSITY.get(cfg.get("window_density", "normal"), (4, 1))
     t = f"""# Generado por Ajustes de OweeLinux (Apariencia)
-border.width: 1
-padding.height: 4
+border.width: {bw}
+padding.height: {ph}
 window.active.border.color: {acc}
 window.inactive.border.color: {pal["line"]}
 window.active.title.bg.color: {pal["title_active"]}
@@ -79,3 +79,20 @@ osd.label.text.color: {fg}
 """
     d = os.path.expanduser("~/.local/share/themes/Owee-Tema/openbox-3"); os.makedirs(d, exist_ok=True); p = os.path.join(d, "themerc"); tmp = p + ".tmp"; open(tmp, "w").write(t); os.replace(tmp, p)
 
+
+
+def write_fonts(cfg):
+    """Tipo y tamaño de letra para las apps: GTK3/GTK4 (settings.ini → gtk-font-name) y Qt/KDE (kdeglobals → font, menuFont, toolBarFont, smallestReadableFont, fixed).
+    El texto de las barras de título de labwc se pone en rc.xml (theme/font) desde Ajustes → Texto y ventanas."""
+    fam, size, mono = owee_config.fonts(cfg)
+    for v in ("3.0", "4.0"):
+        d = os.path.expanduser(f"~/.config/gtk-{v}"); os.makedirs(d, exist_ok=True); p = os.path.join(d, "settings.ini")
+        lines = [l for l in (open(p).read().splitlines() if os.path.exists(p) else []) if not l.startswith("gtk-font-name") and l != "[Settings]"]
+        open(p, "w").write("\n".join(["[Settings]", f"gtk-font-name={fam} {size}"] + lines) + "\n")
+    cp = configparser.RawConfigParser(strict=False); cp.optionxform = str; dst = os.path.expanduser("~/.config/kdeglobals"); cp.read(dst, encoding="utf-8")
+    if not cp.has_section("General"): cp.add_section("General")
+    q = lambda f, n, fixed=0: f"{f},{n},-1,5,400,0,0,0,{fixed},0,0,0,0,0,0,1"
+    for k, v in (("font", q(fam, size)), ("menuFont", q(fam, size)), ("toolBarFont", q(fam, max(8, size - 1))), ("smallestReadableFont", q(fam, max(7, size - 2))), ("fixed", q(mono, size, 1))): cp.set("General", k, v)
+    os.makedirs(os.path.dirname(dst), exist_ok=True); tmp = dst + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f: cp.write(f, space_around_delimiters=False)
+    os.replace(tmp, dst)

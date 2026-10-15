@@ -469,5 +469,19 @@
 "Listo. Cargando la pantalla de inicio de sesión…": "Готово. Завантажується екран входу…",
 "Elige tu idioma": "Оберіть мову",
 "Distribución del teclado": "Розкладка клавіатури",
-"Escribe aquí para probar tu teclado": "Введіть тут, щоб перевірити клавіатуру"
+"Escribe aquí para probar tu teclado": "Введіть тут, щоб перевірити клавіатуру",
+"Texto y ventanas": "Текст і вікна",
+"letra fuente tipografía tamaño texto ventanas barra de título": "шрифт розмір текст вікна заголовок",
+"Tamaño y tipo de letra, y la altura de las barras de las ventanas. Las apps abiertas cambian al volver a abrirlas.": "Шрифт і розмір, а також висота заголовків вікон. Відкриті програми зміняться після повторного відкриття.",
+"Tamaño del texto": "Розмір тексту",
+"Tipo de letra": "Шрифт",
+"Letra de ancho fijo (terminal, código)": "Моноширинний шрифт (термінал, код)",
+"El veloz murciélago hindú comía feliz cardillo y kiwi 0123456789": "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів! 0123456789",
+"Ventanas": "Вікна",
+"Barras de título": "Заголовки вікон",
+"Para agrandar todo (iconos, paneles e imágenes) usa la Escala en Pantalla.": "Щоб збільшити все (піктограми, панелі та зображення), скористайтеся масштабом у розділі «Екран».",
+"Compactas": "Компактні",
+"Normales": "Звичайні",
+"Amplias": "Просторі",
+"Predeterminada": "Типовий"
 }
