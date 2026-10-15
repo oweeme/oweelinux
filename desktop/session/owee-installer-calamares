@@ -1,0 +1,9 @@
+#!/bin/sh
+# (como root) Oculta el disco de arranque y lanza Calamares. Ver owee-installer-run.
+SRC=$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)
+DISK=$(lsblk -no PKNAME "$SRC" 2>/dev/null | head -1)
+if [ -n "$DISK" ] && [ -e "/sys/class/block/$DISK" ]; then
+  mkdir -p /run/owee-empty
+  exec unshare -m sh -c 'mount --make-rprivate / && mount --bind /run/owee-empty "$(readlink -f /sys/class/block/'"$DISK"')" && exec calamares'
+fi
+echo "owee-installer: no pude identificar el disco de arranque; no se inicia el instalador por seguridad" >&2; exit 1

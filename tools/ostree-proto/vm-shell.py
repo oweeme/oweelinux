@@ -20,7 +20,7 @@ W = "/home/oweeme/.cache/oweelinux/vm/litediag"; os.makedirs(W, exist_ok=True); 
 for f in ("ser.sock", "mon.sock", "qmp.sock"):
     if os.path.exists(f): os.unlink(f)
 shutil.copyfile(gui.VARS_SRC, "vars.fd"); open("c.log", "wb").close()
-os.environ["QEMU_MEM"] = "3072"; os.environ["QEMU_EXTRA"] = "-qmp unix:qmp.sock,server=on,wait=off" + (" -drive file=" + os.environ["OWEE_EXTRA_DISK"] + ",format=raw,if=virtio" if os.environ.get("OWEE_EXTRA_DISK") else "")
+os.environ["QEMU_MEM"] = "3072"; os.environ["QEMU_EXTRA"] = "-qmp unix:qmp.sock,server=on,wait=off" + (" -drive file=" + os.environ["OWEE_EXTRA_DISK"] + ",format=raw,if=virtio,snapshot=off" if os.environ.get("OWEE_EXTRA_DISK") else "")
 vm = gui.Vm(disk, W + "/vars.fd", W + "/c.log"); SW, SH = 1280, 800
 U = "runuser -u oweeuser -- env HOME=/home/oweeuser XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus "
 class Qmp:

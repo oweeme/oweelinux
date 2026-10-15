@@ -7,7 +7,7 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre

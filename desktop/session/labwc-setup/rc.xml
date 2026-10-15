@@ -3,5 +3,5 @@
 <labwc_config>
   <core><gap>0</gap></core>
   <keyboard><default /></keyboard>
-  <mouse><default /></mouse>
+  <mouse><!-- sin atajos del ratón por defecto: en esta sesión el menú del escritorio y el arrastre de ventanas no hacen falta --></mouse>
 </labwc_config>
