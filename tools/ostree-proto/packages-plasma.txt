@@ -125,3 +125,4 @@ sudo
 pkexec
 polkitd
 mpv
+xdg-desktop-portal-kde
