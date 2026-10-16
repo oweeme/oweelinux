@@ -211,6 +211,18 @@ inicio de sesión normal con tu usuario. Prueba del asistente: `OWEE_SETUP_WINDO
   en marcha), con `nvidia-drm modeset=1`. **Sin probar** (falta una máquina con NVIDIA; además hay que decidir qué hacer en equipos sin esa GPU y cómo actualizar el módulo con cada kernel nuevo).
 - **Cámara en la Capturadora:** ya estaba (burbuja redonda que se arrastra, la rueda cambia el tamaño, sale en el vídeo solo si se activa); **no se pudo probar** (la VM no tiene webcam).
 
+## Reinstalar conservando datos, copias de seguridad y contenedores (2026-10-15)
+- **Reinstalar / reparar conservando tus archivos, usuarios y aplicaciones** (`desktop/installer/owee-reinstall`, `owee-installer-scan`, `owee_install_choice.py`): al arrancar el medio de instalación, si hay otra partición con un OweeLinux con datos, aparece una pantalla con
+  «Reinstalar conservando mis archivos y aplicaciones» o «Borrar el disco e instalar de cero» (esta última sigue en Calamares). Reinstalar NO formatea: revisa el repositorio ostree del disco (`ostree fsck --delete`, y vuelve a traer del medio lo dañado), añade la versión del medio como
+  despliegue nuevo (ostree fusiona `/etc` del anterior, así que los usuarios se conservan; `/var`, con las carpetas personales, Flatpak y contenedores, no se toca) y reescribe el menú de arranque y el GRUB UEFI. **Probado en VM:** instalar, crear datos de prueba (carpeta personal,
+  Flatpak, un archivo en `/etc`), **borrar un objeto del repositorio a propósito**, reinstalar desde el botón: los datos y el archivo de `/etc` siguen, `ostree fsck` sin errores, y el sistema arranca. Se encontró y corrigió un fallo (la referencia ya existía). **No cubre:** un disco físico dañado ni una partición `/var` corrupta
+  (para eso, las copias de seguridad); y solo detecta particiones ext4 con OweeLinux (no otros sistemas).
+- **Copias de seguridad** (Ajustes → Copias de seguridad, `ajustes/copias.py`): `rsync` incremental de tu carpeta personal a `<destino>/OweeLinux-<usuario>/` (disco externo montado en `/run/media`, `/media`, `/mnt` u otra carpeta), sin cachés ni imágenes de contenedores, **nunca borra** nada de la copia; avisa si el
+  destino está en el mismo disco; «Restaurar desde la copia…» la vuelve a copiar (sobrescribe, no borra). **Solo se comprobó que compila y que las traducciones están completas: la ventana y el rsync real no se probaron todavía.**
+- **Podman y distrobox** en la imagen (`podman`, `podman-compose`, `distrobox`, `uidmap`, `passt`, `slirp4netns`, `aardvark-dns`, `catatonit`, `rsync`) para desarrollar con contenedores sin root y crear cajas Debian donde instalar Rust, Go, PHP, Java, Ada, Node, `.deb`, etc. sin tocar el sistema. **Sin probar:** crear una caja y ejecutar un contenedor
+  (necesita bajar imágenes y un usuario real; la red de las pruebas es lenta).
+- **Medido en VM (3 GB):** sesión Lite en reposo ≈ 570 MB de RAM usada; `/usr` ≈ 3,3 GB (el sistema guarda dos versiones: ≈ 7 GB). Equipos de 2 GB y 40 GB deberían ir (apps ligeras), pero **no se probó en 2 GB reales ni en un HDD**; `polkit-kde-authentication-agent` es lo que más RAM usa (≈ 170 MB) y se puede cambiar por uno más ligero.
+
 ## Teclado en uso: distribuciones, indicador y `owee-layout` (probado en VM)
 Ver `docs/IDIOMAS.md`: tabla única de idiomas, teclados árabe/persa/hindi/urdu/indonesio/malayo, `Super + Mayús + Espacio`, indicador del panel con la distribución activa.
 
