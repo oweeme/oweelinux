@@ -3,7 +3,7 @@
 import json, os
 from owee_i18n import _
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "font_size": 10, "font_family": "", "font_mono": "", "window_density": "normal", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
+DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "font_size": 10, "backup_dest": "", "backup_last": 0, "font_family": "", "font_mono": "", "window_density": "normal", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
 ACCENTS = [(_("Teal"), "#2A9D8F"), (_("Coral"), "#F06548"), (_("Azul"), "#3B82C4"), (_("Violeta"), "#8B6FD6"), (_("Dorado"), "#D9A441"), (_("Verde"), "#5BA85B")]
 
 WALLPAPER_DIRS = ["/usr/share/backgrounds/oweelinux", os.path.expanduser("~/Pictures/Wallpapers"), os.path.expanduser("~/Imágenes/Fondos"), os.path.expanduser("~/.local/share/owee/wallpapers")]
@@ -36,6 +36,8 @@ def load():
         for k in ("font_family", "font_mono"):
             if isinstance(j.get(k), str) and len(j[k]) < 80 and not any(c in j[k] for c in ',"\n\\'): d[k] = j[k]
         if j.get("window_density") in ("compact", "normal", "large"): d["window_density"] = j["window_density"]
+        if isinstance(j.get("backup_dest"), str): d["backup_dest"] = j["backup_dest"]
+        if isinstance(j.get("backup_last"), int): d["backup_last"] = j["backup_last"]
         if isinstance(j.get("lock_wallpaper"), bool): d["lock_wallpaper"] = j["lock_wallpaper"]
         if isinstance(j.get("layout_idx"), int): d["layout_idx"] = j["layout_idx"]
         if j.get("wallpaper_mode") in ("single", "slideshow"): d["wallpaper_mode"] = j["wallpaper_mode"]            # fondo fijo o presentación de imágenes

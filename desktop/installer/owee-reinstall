@@ -1,0 +1,32 @@
+#!/bin/sh
+# REINSTALAR / REPARAR OweeLinux CONSERVANDO archivos, usuarios y aplicaciones: sobre una partición que ya tiene OweeLinux (ostree), añade la versión de este medio como despliegue
+# nuevo y reescribe el arranque. No formatea nada: /var (carpetas personales, Flatpak, contenedores) y los usuarios de /etc se conservan (ostree fusiona /etc del despliegue anterior).
+# Si el repositorio del disco está dañado se intenta repararlo (se borran los objetos corruptos y se vuelven a traer del medio) antes de desplegar.
+#   Uso: owee-reinstall PARTICION_RAIZ [REPO_ORIGEN]      (como root; PARTICION_RAIZ p. ej. /dev/sda2; la EFI se busca en el mismo disco)
+set -eu
+DEV=${1:?uso: $0 PARTICION_RAIZ [REPO_ORIGEN]}; SRC=${2:-/sysroot/ostree/repo}; REF=owee:oweelinux/proto/x86_64
+log() { echo "owee-reinstall: $*"; }
+[ -b "$DEV" ] || { echo "owee-reinstall: no es una partición: $DEV" >&2; exit 1; }
+COMMIT=$(ostree --repo="$SRC" rev-parse "$REF") || { echo "owee-reinstall: el medio no tiene la versión $REF" >&2; exit 1; }
+M=$(mktemp -d /run/owee-reinstall.XXXXXX); trap 'umount "$M/boot/efi" 2>/dev/null; umount "$M" 2>/dev/null; rmdir "$M" 2>/dev/null' EXIT
+mount "$DEV" "$M"
+[ -d "$M/ostree/deploy/oweelinux/var" ] || { echo "owee-reinstall: $DEV no tiene un OweeLinux con datos que conservar" >&2; exit 1; }
+UUID=$(blkid -s UUID -o value "$DEV"); [ -n "$UUID" ] || { echo "owee-reinstall: no pude leer el UUID" >&2; exit 1; }
+DISK=$(lsblk -no PKNAME "$DEV" | head -1); ESPDEV=$(lsblk -lnpo NAME,PARTTYPE "/dev/$DISK" | awk 'tolower($2)=="c12a7328-f81f-11d2-ba4b-00a0c93ec93b"{print $1; exit}')
+[ -n "$ESPDEV" ] || { echo "owee-reinstall: no encuentro la partición EFI de /dev/$DISK" >&2; exit 1; }
+mkdir -p "$M/boot/efi"
+log "revisando el repositorio del disco"
+ostree --repo="$M/ostree/repo" fsck --delete >/dev/null 2>&1 || log "(aviso: se encontraron objetos dañados; se vuelven a traer del medio)"
+log "copiando la versión (puede tardar unos minutos)"
+ostree pull-local --repo="$M/ostree/repo" "$SRC" --remote=owee "$COMMIT" | tail -1
+ostree refs --repo="$M/ostree/repo" --create="$REF" "$COMMIT"
+log "desplegando (tus archivos, usuarios y aplicaciones no se tocan)"
+ostree admin deploy --sysroot="$M" --os=oweelinux --karg="root=UUID=$UUID rw quiet" "$REF"
+ostree admin cleanup --sysroot="$M" >/dev/null 2>&1 || true
+log "menú de arranque"
+owee-bootcfg "$M/boot"
+mount "$ESPDEV" "$M/boot/efi"
+W=$(mktemp -d); printf 'search --no-floppy --fs-uuid --set=root %s\nconfigfile /boot/owee/grub.cfg\n' "$UUID" > "$W/grub.cfg"
+mkdir -p "$M/boot/efi/EFI/BOOT"
+grub-mkstandalone -O x86_64-efi -o "$M/boot/efi/EFI/BOOT/BOOTX64.EFI" --modules="part_gpt ext2 search search_fs_uuid linux normal echo gzio" "boot/grub/grub.cfg=$W/grub.cfg" 2>/dev/null; rm -rf "$W"
+sync; log "listo"

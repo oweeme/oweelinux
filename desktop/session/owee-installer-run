@@ -1,7 +1,10 @@
 #!/bin/sh
-# Calamares necesita ser root: pkexec (regla polkit solo para el usuario owee-installer). Se le pasa la pantalla de esta sesión.
-# SEGURIDAD: el disco desde el que arrancó el instalador se OCULTA a Calamares (espacio de montajes propio donde su carpeta de /sys queda vacía), para que nadie pueda
-# elegirlo —ni por error ni por ser el primero de la lista— y borrar el medio que está usando.
+# Sesión del instalador: 1) si ya hay un OweeLinux con datos, pregunta si reinstalar conservándolos o borrar el disco; 2) Calamares (borrar disco e instalar de cero).
+# Calamares necesita ser root: pkexec (regla polkit solo para el usuario owee-installer).
+# SEGURIDAD: el disco desde el que arrancó el instalador se OCULTA a Calamares (ver owee-installer-calamares) para que nadie lo borre por error.
 /usr/libexec/owee/owee-wallpaper &
-pkexec env WAYLAND_DISPLAY="$WAYLAND_DISPLAY" XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland /usr/libexec/owee/owee-installer-calamares
+python3 /usr/libexec/owee/installer/owee_install_choice.py; rc=$?
+if [ "$rc" -ne 20 ]; then
+  pkexec env WAYLAND_DISPLAY="$WAYLAND_DISPLAY" XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland /usr/libexec/owee/owee-installer-calamares
+fi
 kill %1 2>/dev/null

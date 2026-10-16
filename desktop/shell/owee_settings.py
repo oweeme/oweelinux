@@ -13,7 +13,7 @@ from ajustes.base import Page
 from owee_i18n import _, N_
 import owee_i18n as _i18n; _i18n.apply_direction()
 
-PAGES = ["apariencia", "tipografia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "red", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "actualizaciones", "acerca"]
+PAGES = ["apariencia", "tipografia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "red", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "copias", "actualizaciones", "acerca"]
 GROUPS = ["Personal", "Dispositivos", "Sistema"]          # códigos internos (cada página dice a qué grupo pertenece); se traducen al mostrarlos
 _NOMBRES_DE_GRUPO = (N_("Personal"), N_("Dispositivos"), N_("Sistema"))                   # solo para que el extractor de textos los vea
 CSS = b"""
