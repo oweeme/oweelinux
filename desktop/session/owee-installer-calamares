@@ -1,15 +1,21 @@
 #!/bin/sh
-# (como root) Oculta el disco de arranque y lanza Calamares. Ver owee-installer-run.
+# (como root) Protege los discos que NO deben tocarse y lanza Calamares. Ver owee-installer-run.
+#  · Disco de arranque (el medio de instalación): se oculta a Calamares (espacio de montajes propio) para que nadie lo borre por error.
+#  · Disco elegido para /home (si hay): se oculta GLOBALMENTE (Calamares ejecuta sus órdenes de disco en un proceso privilegiado que NO comparte el espacio de montajes) y pasa a solo lectura.
 SRC=$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)
 DISK=$(lsblk -no PKNAME "$SRC" 2>/dev/null | head -1)
 HOMEDISK=""
-if [ -s /run/owee/home-uuid ]; then   # el disco elegido para /home también se oculta: Calamares no puede borrarlo
-  HP=$(blkid -U "$(cat /run/owee/home-uuid)" 2>/dev/null); [ -n "$HP" ] && HOMEDISK=$(lsblk -no PKNAME "$HP" 2>/dev/null | head -1)
+if [ -s /run/owee/home-uuid ]; then
+  HP=$(blkid -U "$(cat /run/owee/home-uuid)" 2>/dev/null); [ -n "$HP" ] && { HOMEDISK=$(lsblk -no PKNAME "$HP" 2>/dev/null | head -1); [ -n "$HOMEDISK" ] || HOMEDISK=$(basename "$HP"); }
 fi
 if [ -n "$DISK" ] && [ -e "/sys/class/block/$DISK" ]; then
-  mkdir -p /run/owee-empty
-  HIDE="mount --bind /run/owee-empty \"\$(readlink -f /sys/class/block/$DISK)\""
-  [ -n "$HOMEDISK" ] && [ -e "/sys/class/block/$HOMEDISK" ] && HIDE="$HIDE && mount --bind /run/owee-empty \"\$(readlink -f /sys/class/block/$HOMEDISK)\""
-  exec unshare -m sh -c "mount --make-rprivate / && $HIDE && exec calamares"
+  mkdir -p /run/owee-empty /run/owee
+  if [ -n "$HOMEDISK" ] && [ "$HOMEDISK" != "$DISK" ] && [ -e "/sys/class/block/$HOMEDISK" ]; then
+    HNODES=$(lsblk -lno NAME "/dev/$HOMEDISK" 2>/dev/null)
+    for n in $HNODES; do blockdev --setro "/dev/$n" 2>/dev/null; done                      # primero solo lectura, luego se oculta
+    HSYS=$(readlink -f "/sys/class/block/$HOMEDISK"); for n in $HNODES; do mount --bind /dev/null "/dev/$n"; done; mount --bind /run/owee-empty "$HSYS"
+  fi
+  BNODES=$(lsblk -lno NAME "/dev/$DISK" 2>/dev/null); for n in $BNODES; do blockdev --setro "/dev/$n" 2>/dev/null; done
+  exec unshare -m sh -c "mount --make-rprivate / && mount --bind /run/owee-empty \"\$(readlink -f /sys/class/block/$DISK)\" && exec calamares"
 fi
 echo "owee-installer: no pude identificar el disco de arranque; no se inicia el instalador por seguridad" >&2; exit 1

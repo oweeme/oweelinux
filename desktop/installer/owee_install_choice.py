@@ -53,7 +53,7 @@ class Choice(Gtk.Application):
 
     def after_erase(self):
         if self.homes: self.show_homes()
-        else: setattr(self, "rc", 0); self.release()
+        else: self.rc = 0; self.quit()
 
     def show_homes(self):
         if getattr(self, "win", None): self.win.close()
@@ -70,7 +70,7 @@ class Choice(Gtk.Application):
 
     def save_home(self):
         uuid = self.hopts[self.dd.get_selected()][1]
-        try: p = Gio.Subprocess.new(["pkexec", tool("owee-installer-sethome"), uuid], Gio.SubprocessFlags.STDERR_SILENCE); p.wait_async(None, lambda pr, res: (pr.wait_finish(res), setattr(self, "rc", 0), self.release()))
+        try: p = Gio.Subprocess.new(["pkexec", tool("owee-installer-sethome"), uuid], Gio.SubprocessFlags.STDERR_SILENCE); p.wait_async(None, lambda pr, res: (pr.wait_finish(res), setattr(self, "rc", 0), self.quit()))
         except GLib.Error as e: self.out.set_text(str(e))
 
     def show(self, found):

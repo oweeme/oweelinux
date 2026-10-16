@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Arranca un disco en QEMU SIN consola serie (como en un equipo real) y guarda capturas de pantalla (screendump por QMP) a los N segundos indicados.
-Sirve para ver qué muestra un sistema recién instalado (p. ej. el asistente de primer arranque). Uso: boot-shot.py DISCO.img SALIDA_PREFIJO [seg1 seg2 …]   (por defecto 60 120)"""
+Sirve para ver qué muestra un sistema recién instalado (p. ej. el asistente de primer arranque). Uso: boot-shot.py DISCO.img SALIDA_PREFIJO [seg1 seg2 …]   (por defecto 60 120)
+Opcionales (variables de entorno): BOOT_EXTRA=disco1.img,disco2.img (discos extra, que SÍ se escriben) y BOOT_DO="40:click:864,686;45:type:hola;50:key:ret" (acciones con el ratón y el teclado a los N segundos)."""
 import json, os, shutil, socket, subprocess, sys, tempfile, time
 disk, prefix = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2]); times = [int(x) for x in sys.argv[3:]] or [60, 120]
 W = tempfile.mkdtemp(prefix="bootshot", dir=os.path.expanduser("~/.cache/oweelinux/tmp")) if os.path.isdir(os.path.expanduser("~/.cache/oweelinux/tmp")) else tempfile.mkdtemp()
 vars_fd = os.path.join(W, "vars.fd"); shutil.copyfile("/usr/share/OVMF/OVMF_VARS_4M.fd", vars_fd); sock = os.path.join(W, "qmp.sock")
 p = subprocess.Popen(["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-smp", "2", "-m", "3072", "-machine", "q35", "-display", "none", "-device", "virtio-vga,xres=1280,yres=800", "-nic", "user", "-snapshot",
     "-qmp", f"unix:{sock},server=on,wait=off", "-drive", "if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd", "-drive", f"if=pflash,format=raw,file={vars_fd}",
-    "-drive", f"file={disk},format=raw,if=virtio", "-device", "qemu-xhci", "-device", "usb-tablet", "-device", "usb-kbd"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    "-drive", f"file={disk},format=raw,if=virtio", "-device", "qemu-xhci", "-device", "usb-tablet", "-device", "usb-kbd"] + [a for d in os.environ.get("BOOT_EXTRA", "").split(",") if d for a in ("-drive", f"file={d},format=raw,if=virtio,snapshot=off")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 try:
     for _ in range(100):
         if os.path.exists(sock):
@@ -21,6 +22,20 @@ try:
             r = json.loads(f.readline())
             if "return" in r or "error" in r: return r
     cmd("qmp_capabilities"); t0 = time.time()
+    KEYS = {" ": "spc", "\n": "ret", ".": "dot", "-": "minus", "_": "shift-minus", "/": "slash"}
+    def press(k): cmd("send-key", keys=[{"type": "qcode", "data": q} for q in k.split("+")]); time.sleep(0.12)
+    def typ(text):
+        for ch in text: press(KEYS.get(ch) or ("shift+" + ch.lower() if ch.isupper() else ch))
+    def click(x, y):
+        for ax, v, m in (("x", x, 1280), ("y", y, 800)): pass
+        cmd("input-send-event", events=[{"type": "abs", "data": {"axis": "x", "value": int(x * 32767 / 1280)}}, {"type": "abs", "data": {"axis": "y", "value": int(y * 32767 / 800)}}]); time.sleep(0.2)
+        cmd("input-send-event", events=[{"type": "btn", "data": {"down": True, "button": "left"}}]); time.sleep(0.12); cmd("input-send-event", events=[{"type": "btn", "data": {"down": False, "button": "left"}}])
+    todo = sorted((int(a.split(":", 1)[0]), a.split(":", 1)[1]) for a in os.environ.get("BOOT_DO", "").split(";") if a)
+    for t, act in todo:
+        time.sleep(max(0, t - (time.time() - t0))); kind, _s, arg = act.partition(":")
+        if kind == "click": click(*[int(v) for v in arg.split(",")])
+        elif kind == "type": typ(arg)
+        elif kind == "key": press(arg)
     for t in times:
         time.sleep(max(0, t - (time.time() - t0))); out = f"{prefix}-{t}s.ppm"; cmd("screendump", filename=out)
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", out, out[:-4] + ".png"]); os.remove(out); print("captura", out[:-4] + ".png", flush=True)

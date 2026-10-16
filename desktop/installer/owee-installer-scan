@@ -3,8 +3,8 @@
 # el instalador. Monta cada una de solo lectura un instante. Ver owee-reinstall.
 MODE=${1:-os}
 BOOT=$(lsblk -no PKNAME "$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)" 2>/dev/null | head -1)
-for p in $(lsblk -lnpo NAME,TYPE | awk '$2=="part"{print $1}'); do
-  d=$(lsblk -no PKNAME "$p" | head -1); [ "$d" = "$BOOT" ] && continue
+for p in $(lsblk -lnpo NAME,TYPE | awk '$2=="part"||$2=="disk"{print $1}'); do
+  d=$(lsblk -no PKNAME "$p" | head -1); [ -n "$d" ] || d=$(basename "$p"); [ "$d" = "$BOOT" ] && continue
   [ "$(blkid -s TYPE -o value "$p" 2>/dev/null)" = ext4 ] || continue
   m=$(mktemp -d /run/owee-scan.XXXXXX); if mount -o ro "$p" "$m" 2>/dev/null; then
     if [ "$MODE" = "--homes" ]; then
