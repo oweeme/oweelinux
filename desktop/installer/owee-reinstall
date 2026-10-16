@@ -19,7 +19,9 @@ log "revisando el repositorio del disco"
 ostree --repo="$M/ostree/repo" fsck --delete >/dev/null 2>&1 || log "(aviso: se encontraron objetos dañados; se vuelven a traer del medio)"
 log "copiando la versión (puede tardar unos minutos)"
 ostree pull-local --repo="$M/ostree/repo" "$SRC" --remote=owee "$COMMIT" | tail -1
-ostree refs --repo="$M/ostree/repo" --create="$REF" "$COMMIT"
+if [ "$(ostree --repo="$M/ostree/repo" rev-parse "$REF" 2>/dev/null)" != "$COMMIT" ]; then       # la referencia del disco apunta a otra versión (o a ninguna): se apunta a la de este medio
+  rm -f "$M/ostree/repo/refs/remotes/owee/oweelinux/proto/x86_64"; ostree refs --repo="$M/ostree/repo" --create="$REF" "$COMMIT"
+fi
 log "desplegando (tus archivos, usuarios y aplicaciones no se tocan)"
 ostree admin deploy --sysroot="$M" --os=oweelinux --karg="root=UUID=$UUID rw quiet" "$REF"
 ostree admin cleanup --sysroot="$M" >/dev/null 2>&1 || true
