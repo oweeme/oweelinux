@@ -2,8 +2,14 @@
 # (como root) Oculta el disco de arranque y lanza Calamares. Ver owee-installer-run.
 SRC=$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)
 DISK=$(lsblk -no PKNAME "$SRC" 2>/dev/null | head -1)
+HOMEDISK=""
+if [ -s /run/owee/home-uuid ]; then   # el disco elegido para /home también se oculta: Calamares no puede borrarlo
+  HP=$(blkid -U "$(cat /run/owee/home-uuid)" 2>/dev/null); [ -n "$HP" ] && HOMEDISK=$(lsblk -no PKNAME "$HP" 2>/dev/null | head -1)
+fi
 if [ -n "$DISK" ] && [ -e "/sys/class/block/$DISK" ]; then
   mkdir -p /run/owee-empty
-  exec unshare -m sh -c 'mount --make-rprivate / && mount --bind /run/owee-empty "$(readlink -f /sys/class/block/'"$DISK"')" && exec calamares'
+  HIDE="mount --bind /run/owee-empty \"\$(readlink -f /sys/class/block/$DISK)\""
+  [ -n "$HOMEDISK" ] && [ -e "/sys/class/block/$HOMEDISK" ] && HIDE="$HIDE && mount --bind /run/owee-empty \"\$(readlink -f /sys/class/block/$HOMEDISK)\""
+  exec unshare -m sh -c "mount --make-rprivate / && $HIDE && exec calamares"
 fi
 echo "owee-installer: no pude identificar el disco de arranque; no se inicia el instalador por seguridad" >&2; exit 1

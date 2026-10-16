@@ -23,7 +23,7 @@ printf '[Behavior]\nDisabledAddons=notificationitem,notifications\n' | install -
 # Instalador (Calamares): scripts, configuración y marca. Solo se activa en el medio de instalación (marca en /var, ver build.sh); si falta el paquete calamares, no se instala nada.
 if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
   install -Dm0755 "$D/installer/owee-install-deploy" "$R/usr/libexec/owee/installer/owee-install-deploy"; install -Dm0755 "$D/installer/owee-install-disk" "$R/usr/libexec/owee/installer/owee-install-disk"
-  for f in owee-reinstall owee-installer-scan owee_install_choice.py; do install -Dm0755 "$D/installer/$f" "$R/usr/libexec/owee/installer/$f"; done
+  for f in owee-reinstall owee-installer-scan owee-installer-sethome owee_install_choice.py; do install -Dm0755 "$D/installer/$f" "$R/usr/libexec/owee/installer/$f"; done
   install -Dm0644 "$D/session/owee-installer.desktop" "$R/usr/share/wayland-sessions/owee-installer.desktop"
   for f in settings.conf; do install -Dm0644 "$D/installer/calamares/$f" "$ETC/calamares/$f"; done          # /etc/calamares: la ubicación normal de Calamares (con -c exigiría su propia carpeta qml/)
   for f in welcome partition finished shellprocess-oweedeploy; do install -Dm0644 "$D/installer/calamares/$f.conf" "$ETC/calamares/modules/$f.conf"; done

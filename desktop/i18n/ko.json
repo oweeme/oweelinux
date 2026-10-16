@@ -541,5 +541,9 @@
 "Restaurar": "복원",
 "Conecta un disco externo o elige una carpeta.": "외장 디스크를 연결하거나 폴더를 선택하세요.",
 "Aviso: el destino está en el mismo disco que tu carpeta personal; si el disco falla, la copia se pierde con él.": "주의: 대상이 홈 폴더와 같은 디스크에 있습니다. 디스크가 고장 나면 백업도 함께 사라집니다.",
-"Restauración terminada": "복원이 끝났습니다"
+"Restauración terminada": "복원이 끝났습니다",
+"Continuar": "계속",
+"¿Dónde va tu carpeta personal (/home)?": "내 홈 폴더(/home)를 어디에 둘까요?",
+"Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "이미 내 파일이 있는 파티션을 쓸 수 있습니다. 그대로 유지되며 포맷하지 않습니다. 그 디스크는 시스템 설치 위치로 고를 수 없게 됩니다.",
+"Dentro del mismo disco que el sistema (lo normal)": "시스템과 같은 디스크 안 (일반적인 방식)"
 }

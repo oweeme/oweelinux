@@ -541,5 +541,9 @@
 "Restaurar": "Restaurer",
 "Conecta un disco externo o elige una carpeta.": "Branchez un disque externe ou choisissez un dossier.",
 "Aviso: el destino está en el mismo disco que tu carpeta personal; si el disco falla, la copia se pierde con él.": "Attention : la destination est sur le même disque que votre dossier personnel ; si le disque tombe en panne, la sauvegarde est perdue avec lui.",
-"Restauración terminada": "Restauration terminée"
+"Restauración terminada": "Restauration terminée",
+"Continuar": "Continuer",
+"¿Dónde va tu carpeta personal (/home)?": "Où placer votre dossier personnel (/home) ?",
+"Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Vous pouvez utiliser une partition contenant déjà vos fichiers : elle est conservée telle quelle (non formatée). Ce disque ne pourra pas être choisi pour installer le système.",
+"Dentro del mismo disco que el sistema (lo normal)": "Sur le même disque que le système (le cas habituel)"
 }

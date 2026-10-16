@@ -1,12 +1,16 @@
 #!/bin/sh
 # (como root) Lista, una por línea «DISPOSITIVO|TAMAÑO|USUARIOS», las particiones con un OweeLinux instalado y con datos (ostree/deploy/oweelinux/var), SIN contar el disco del que arrancó
 # el instalador. Monta cada una de solo lectura un instante. Ver owee-reinstall.
+MODE=${1:-os}
 BOOT=$(lsblk -no PKNAME "$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)" 2>/dev/null | head -1)
 for p in $(lsblk -lnpo NAME,TYPE | awk '$2=="part"{print $1}'); do
   d=$(lsblk -no PKNAME "$p" | head -1); [ "$d" = "$BOOT" ] && continue
   [ "$(blkid -s TYPE -o value "$p" 2>/dev/null)" = ext4 ] || continue
   m=$(mktemp -d /run/owee-scan.XXXXXX); if mount -o ro "$p" "$m" 2>/dev/null; then
-    if [ -d "$m/ostree/deploy/oweelinux/var" ]; then
+    if [ "$MODE" = "--homes" ]; then
+      dirs=$(ls -1 "$m" 2>/dev/null | grep -v -E "^(lost\+found)$" | head -6 | tr '\n' ' ')
+      echo "$p|$(lsblk -no SIZE "$p" | head -1 | tr -d ' ')|$(blkid -s LABEL -o value "$p")|$(blkid -s UUID -o value "$p")|${dirs:-}"
+    elif [ -d "$m/ostree/deploy/oweelinux/var" ]; then
       users=$(ls "$m/ostree/deploy/oweelinux/var/home" 2>/dev/null | tr '\n' ' ')
       echo "$p|$(lsblk -no SIZE "$p" | head -1 | tr -d ' ')|${users:-}"
     fi

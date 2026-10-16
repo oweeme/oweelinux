@@ -78,7 +78,15 @@ elif op == "firstboot" and len(a) == 7:
     if not re.fullmatch(r"[A-Za-z0-9_+-]+(/[A-Za-z0-9_+-]+)*", tz) or not os.path.isfile("/usr/share/zoneinfo/" + tz): die("zona horaria no válida")
     pw = password()
     sh("groupadd", "-f", ADMIN); groups = [g for g in GROUPS if any(x.gr_name == g for x in grp.getgrall())]
-    sh("useradd", "-m", "-s", "/bin/bash", "-c", fn, "-G", ",".join(groups + [ADMIN]), name); sh("chpasswd", stdin=f"{name}:{pw}\n")
+    # ¿ya existe la carpeta personal (un disco /home reutilizado)? Se conserva tal cual y el usuario toma el mismo UID para que los archivos sigan siendo suyos
+    homedir = f"/var/home/{name}"; ids = []
+    if os.path.isdir(homedir) and not os.path.islink(homedir):
+        st = os.stat(homedir)
+        if 1000 <= st.st_uid < 60000:
+            if st.st_uid in {p.pw_uid for p in pwd.getpwall()}: die("la carpeta personal existente pertenece a otro usuario del sistema")
+            ids = ["-u", str(st.st_uid), "-M", "-d", "/home/" + name]
+            if not any(g.gr_gid == st.st_gid for g in grp.getgrall()) and 1000 <= st.st_gid < 60000: sh("groupadd", "-g", str(st.st_gid), name); ids += ["-g", str(st.st_gid)]
+    sh("useradd", *(ids or ["-m"]), "-s", "/bin/bash", "-c", fn, "-G", ",".join(groups + [ADMIN]), name); sh("chpasswd", stdin=f"{name}:{pw}\n")
     u = pwd.getpwnam(name); cfg = os.path.join(u.pw_dir, ".config"); os.makedirs(os.path.join(cfg, "owee"), exist_ok=True); os.makedirs(os.path.join(cfg, "labwc"), exist_ok=True)
     key = lay[int(idx)]; base, _s, var = key.partition("(")
     json.dump({"lang": lang, "layouts": lay, "layout_idx": int(idx)}, open(os.path.join(cfg, "owee", "settings.json"), "w"), indent=1)

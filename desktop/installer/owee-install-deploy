@@ -21,6 +21,11 @@ ostree pull-local --repo="$ROOT/ostree/repo" "$SRC" --remote=owee "$COMMIT" | ta
 ostree refs --repo="$ROOT/ostree/repo" --create="$REF" "$COMMIT"
 log "desplegando"
 ostree admin deploy --sysroot="$ROOT" --os=oweelinux --karg="root=UUID=$UUID rw quiet" "$REF"
+# /home en OTRA partición (elegida antes de Calamares, ver owee_install_choice.py): se monta en /var/home (en este sistema /home es /var/home); sin formatear. nofail: si el disco falta, el equipo arranca igual.
+if [ -s /run/owee/home-uuid ]; then
+  HU=$(cat /run/owee/home-uuid); D=$(ls -d "$ROOT"/ostree/deploy/oweelinux/deploy/*.0 | head -1)
+  if blkid -U "$HU" >/dev/null 2>&1 && [ -n "$D" ]; then printf 'UUID=%s /var/home ext4 defaults,nofail,x-systemd.device-timeout=10 0 2\n' "$HU" >> "$D/etc/fstab"; log "/home en la partición $HU"; else log "(aviso: no encuentro la partición de /home; se usa el mismo disco)"; fi
+fi
 log "menú de arranque"
 owee-bootcfg "$ROOT/boot"
 W=$(mktemp -d); trap 'rm -rf "$W"' EXIT

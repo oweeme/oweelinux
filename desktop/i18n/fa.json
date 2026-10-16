@@ -541,5 +541,9 @@
 "Restaurar": "بازیابی",
 "Conecta un disco externo o elige una carpeta.": "یک دیسک خارجی وصل کنید یا پوشه‌ای انتخاب کنید.",
 "Aviso: el destino está en el mismo disco que tu carpeta personal; si el disco falla, la copia se pierde con él.": "هشدار: مقصد روی همان دیسک پوشهٔ شخصی شماست؛ اگر دیسک خراب شود پشتیبان هم از بین می‌رود.",
-"Restauración terminada": "بازیابی تمام شد"
+"Restauración terminada": "بازیابی تمام شد",
+"Continuar": "ادامه",
+"¿Dónde va tu carpeta personal (/home)?": "پوشهٔ شخصی شما (/home) کجا باشد؟",
+"Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "می‌توانید از پارتیشنی که پرونده‌هایتان در آن است استفاده کنید: همان‌طور که هست می‌ماند (فرمت نمی‌شود). آن دیسک را برای نصب سیستم نمی‌توان انتخاب کرد.",
+"Dentro del mismo disco que el sistema (lo normal)": "روی همان دیسک سیستم (حالت معمول)"
 }
