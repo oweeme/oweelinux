@@ -128,7 +128,6 @@ mpv
 xdg-desktop-portal-kde
 # desarrollo con contenedores (el sistema es de solo lectura: los lenguajes y herramientas viven en cajas): Podman sin root, cajas Debian/otras con distrobox y copias de seguridad con rsync
 podman
-buildah
 podman-compose
 distrobox
 uidmap
