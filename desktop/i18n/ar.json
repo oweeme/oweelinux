@@ -545,5 +545,7 @@
 "Continuar": "متابعة",
 "¿Dónde va tu carpeta personal (/home)?": "أين يكون مجلدك الشخصي (/home)؟",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "يمكنك استخدام قسم يحتوي بالفعل على ملفاتك: يبقى كما هو (دون تهيئة). لن يمكن اختيار ذلك القرص لتثبيت النظام.",
-"Dentro del mismo disco que el sistema (lo normal)": "داخل نفس قرص النظام (الوضع المعتاد)"
+"Dentro del mismo disco que el sistema (lo normal)": "داخل نفس قرص النظام (الوضع المعتاد)",
+"▭ Rectángulo": "▭ مستطيل",
+"Encuadrar una zona": "تحديد منطقة بإطار"
 }

@@ -355,9 +355,10 @@ class Launcher:
             h = Gtk.Box(spacing=10)
             img = Gtk.Image.new_from_gicon(a.get_icon()) if a.get_icon() else Gtk.Image(); img.set_pixel_size(24)
             h.append(img); h.append(Gtk.Label(label=a.get_name(), xalign=0)); row.set_child(h); self.list.append(row)
-        sw = Gtk.ScrolledWindow(min_content_height=320, min_content_width=300, child=self.list); box.append(sw)
+        sw = self.sw = Gtk.ScrolledWindow(min_content_height=320, min_content_width=300, child=self.list); box.append(sw)
         self.entry.connect("search-changed", lambda e: (self.list.invalidate_filter(), self.select_first()))
-        self.entry.connect("activate", lambda e: self.activate_first())
+        self.entry.connect("activate", lambda e: self.activate_selected())
+        kc = Gtk.EventControllerKey(); kc.connect("key-pressed", self.on_key); self.entry.add_controller(kc)          # ↑/↓ recorren la lista sin salir del buscador; Esc cierra
         self.pop.set_child(box)
 
     def visible_row(self, row): return self.entry.get_text().lower() in row.key
@@ -372,6 +373,24 @@ class Launcher:
     def activate_first(self):
         r = self.first()
         if r: self.launch(r.app)
+    def activate_selected(self):
+        r = self.list.get_selected_row()
+        if r is not None and r.get_child_visible() and self.visible_row(r): self.launch(r.app)
+        else: self.activate_first()
+    def on_key(self, c, kv, code, st):
+        n = Gdk.keyval_name(kv)
+        if n == "Escape": self.pop.popdown(); return True
+        if n in ("Down", "Up"):
+            rows = []; i = 0
+            while (r := self.list.get_row_at_index(i)): (rows.append(r) if r.get_child_visible() and self.visible_row(r) else None); i += 1
+            if not rows: return True
+            cur = self.list.get_selected_row(); k = rows.index(cur) if cur in rows else -1
+            k = min(len(rows) - 1, k + 1) if n == "Down" else max(0, k - 1) if k > 0 else 0
+            self.list.select_row(rows[k]); adj = self.sw.get_vadjustment(); h = rows[k].get_height(); top = sum(r.get_height() for r in rows[:k])
+            if top < adj.get_value(): adj.set_value(top)
+            elif top + h > adj.get_value() + adj.get_page_size(): adj.set_value(top + h - adj.get_page_size())
+            return True
+        return False
 
     def launch(self, app):
         self.pop.popdown()

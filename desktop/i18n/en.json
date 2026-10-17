@@ -545,5 +545,7 @@
 "Continuar": "Continue",
 "¿Dónde va tu carpeta personal (/home)?": "Where does your home folder (/home) go?",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "You can use a partition that already has your files: it is kept as is (not formatted). That disk can't be chosen to install the system.",
-"Dentro del mismo disco que el sistema (lo normal)": "Inside the same disk as the system (the usual way)"
+"Dentro del mismo disco que el sistema (lo normal)": "Inside the same disk as the system (the usual way)",
+"▭ Rectángulo": "▭ Rectangle",
+"Encuadrar una zona": "Frame an area"
 }

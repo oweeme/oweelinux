@@ -136,3 +136,6 @@ slirp4netns
 aardvark-dns
 catatonit
 rsync
+
+# Hora por red (sin ella los certificados HTTPS fallan en equipos con la hora atrasada)
+systemd-timesyncd

@@ -7,4 +7,4 @@ S="${HOME:-/tmp}/.config/owee/settings.json"; L=""; [ -f "$S" ] && command -v jq
 . /usr/libexec/owee/owee-locale 2>/dev/null; owee_locale "$L"
 # configuración mínima de labwc en la carpeta del usuario del asistente (así el teclado que se elige en el asistente, que se guarda ahí, sí se aplica); el autostart vacío evita el panel de la sesión Lite
 mkdir -p "$HOME/.config/labwc"; cp /usr/share/owee/labwc-setup/rc.xml /usr/share/owee/labwc-setup/autostart "$HOME/.config/labwc/" 2>/dev/null
-exec labwc -S /usr/libexec/owee/owee-setup-run
+exec /usr/libexec/owee/owee-run-labwc -S /usr/libexec/owee/owee-setup-run

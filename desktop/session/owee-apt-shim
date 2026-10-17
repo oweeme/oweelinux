@@ -1,0 +1,22 @@
+#!/bin/sh
+# apt / apt-get en OweeLinux. El sistema es inmutable (/usr de solo lectura y una base de dpkg que no cambia en caliente), así que apt NO puede instalar aquí: en vez de fallar con errores
+# de bloqueo, explica las vías que sí funcionan. Fuera de un sistema ostree (contenedores distrobox, construcción de la imagen) deja pasar a apt de verdad.
+[ -e /run/ostree-booted ] || exec "/usr/libexec/owee/$(basename "$0").real" "$@"
+[ "${OWEE_APT_REAL:-0}" = 1 ] && exec "/usr/libexec/owee/$(basename "$0").real" "$@"
+case "${LANG:-}" in
+  es*|"") cat >&2 <<'MSG'
+OweeLinux es un sistema inmutable: apt no instala programas en el sistema base. Opciones:
+  • Aplicaciones de uso diario ........ Discover (tienda, Flatpak)
+  • Herramientas de desarrollo ........ distrobox create -n dev -i debian:trixie && distrobox enter dev   (ahí sí funciona apt)
+  • Actualizar OweeLinux .............. Ajustes → Actualizaciones, o:  sudo owee-update
+MSG
+  ;;
+  *) cat >&2 <<'MSG'
+OweeLinux is an immutable system: apt does not install software into the base system. Options:
+  • Everyday apps ..................... Discover (app store, Flatpak)
+  • Development tools ................. distrobox create -n dev -i debian:trixie && distrobox enter dev   (apt works there)
+  • Update OweeLinux .................. Settings → Updates, or:  sudo owee-update
+MSG
+  ;;
+esac
+exit 1

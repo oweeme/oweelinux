@@ -69,7 +69,7 @@ class Idioma(Page):
         self.app.change(lang=code)                                    # el panel vigila settings.json y se reinicia con el idioma nuevo
         self.note.set_text(_("Idioma cambiado. Reiniciando esta ventana…"))
         from . import rcxml; rcxml.reconfigure()
-        GLib.timeout_add(900, self.restart)
+        GLib.timeout_add(250, self.restart)
 
     def restart(self):
         """Reinicia Ajustes en el idioma nuevo (los textos se fijan al arrancar)."""

@@ -545,5 +545,7 @@
 "Continuar": "Lanjutkan",
 "¿Dónde va tu carpeta personal (/home)?": "Di mana folder pribadi Anda (/home)?",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Anda dapat memakai partisi yang sudah berisi berkas Anda: dipertahankan apa adanya (tidak diformat). Disk itu tidak bisa dipilih untuk memasang sistem.",
-"Dentro del mismo disco que el sistema (lo normal)": "Di disk yang sama dengan sistem (cara biasa)"
+"Dentro del mismo disco que el sistema (lo normal)": "Di disk yang sama dengan sistem (cara biasa)",
+"▭ Rectángulo": "▭ Persegi panjang",
+"Encuadrar una zona": "Bingkai area"
 }

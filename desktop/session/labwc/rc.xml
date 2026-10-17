@@ -8,10 +8,17 @@
   </theme>
   <!-- Botones de ventana: cerrar/maximizar/minimizar a la DERECHA (el icono a la izquierda) -->
   <titlebar><layout>icon:iconify,max,close</layout><showTitle>yes</showTitle></titlebar>
+  <!-- Alt+Tab: nombre de la aplicación y título de la ventana (sin el «[xdg-shell]» de fábrica) -->
+  <windowSwitcher show="yes" preview="no" outlines="no" allWorkspaces="no">
+    <fields><field content="trimmed_identifier" width="28%"/><field content="title" width="72%"/></fields>
+  </windowSwitcher>
   <desktops><number>4</number><popupTime>700</popupTime></desktops>
   <keyboard>
     <default />
     <!-- Atajos propios (Super = tecla Windows). Alt+Tab, Alt+F4 y mover/redimensionar con Alt+ratón ya vienen de labwc -->
+    <!-- Tecla Super (Windows) sola: abre el menú de aplicaciones (se puede navegar con ↑/↓, Intro abre, Esc cierra) -->
+    <keybind key="Super_L" onRelease="yes"><action name="Execute" command="gapplication action org.oweelinux.PanelPrototype launcher"/></keybind>
+    <keybind key="Super_R" onRelease="yes"><action name="Execute" command="gapplication action org.oweelinux.PanelPrototype launcher"/></keybind>
     <keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
     <keybind key="W-space"><action name="Execute" command="gapplication action org.oweelinux.PanelPrototype launcher"/></keybind>
     <keybind key="W-S-space"><action name="Execute" command="/usr/libexec/owee/owee-layout next"/></keybind>

@@ -16,6 +16,8 @@ if [ ! -f "$R/usr/lib/modules/$KVER/initramfs.img" ]; then   # reintentable: no 
       "/usr/lib/modules/$KVER/initramfs.img"
 fi
 rm -rf "$R"/boot/* "$R"/var/lib/initramfs-tools
+# El proxy de apt-cacher de la construcción no debe viajar en la imagen (rompería apt en el equipo del usuario)
+grep -rlE '127\.0\.0\.1:3142' "$R/etc/apt" 2>/dev/null | xargs -r rm -f
 
 # 2. /var no va en el commit: se guarda la base de dpkg como registro y se vacía.
 mkdir -p "$R/usr/share/owee"

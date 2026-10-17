@@ -7,7 +7,7 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_overview.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
@@ -158,6 +158,14 @@ install -d "$R/usr/share/backgrounds/oweelinux"; cp "$D"/wallpapers/fondos/*.jpg
 # Tienda de apps: Bazaar (Flatpak). El servicio la instala en el primer arranque con red; Discover (de KDE) se oculta
 install -Dm0644 "$D/session/owee-store.service" "$R/usr/lib/systemd/system/owee-store.service"
 mkdir -p "$ETC/systemd/system/multi-user.target.wants"; ln -sf /usr/lib/systemd/system/owee-store.service "$ETC/systemd/system/multi-user.target.wants/owee-store.service"
+# Hora por red: sin NTP el reloj de equipos con la pila agotada se queda atrás y Discover/HTTPS fallan con «certificado aún no válido»
+mkdir -p "$ETC/systemd/system/sysinit.target.wants"; ln -sf /usr/lib/systemd/system/systemd-timesyncd.service "$ETC/systemd/system/sysinit.target.wants/systemd-timesyncd.service"
+# Carpetas personales de siempre (Escritorio, Documentos, Descargas, Música, Imágenes, Vídeos): el gestor de archivos las muestra en su barra lateral
+for d in Desktop Documents Downloads Music Pictures Videos; do install -d "$ETC/skel/$d"; done
+printf 'XDG_DESKTOP_DIR="$HOME/Desktop"\nXDG_DOCUMENTS_DIR="$HOME/Documents"\nXDG_DOWNLOAD_DIR="$HOME/Downloads"\nXDG_MUSIC_DIR="$HOME/Music"\nXDG_PICTURES_DIR="$HOME/Pictures"\nXDG_VIDEOS_DIR="$HOME/Videos"\n' | install -Dm0644 /dev/stdin "$ETC/skel/.config/user-dirs.dirs"
+# apt/apt-get explican cómo instalar en un sistema inmutable (apt de verdad se conserva como .real y sigue funcionando en contenedores y al construir)
+install -d "$R/usr/libexec/owee"
+for b in apt apt-get; do [ -x "$R/usr/bin/$b" ] && [ ! -e "$R/usr/libexec/owee/$b.real" ] && mv "$R/usr/bin/$b" "$R/usr/libexec/owee/$b.real"; install -Dm0755 "$D/session/owee-apt-shim" "$R/usr/bin/$b"; done
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

@@ -545,5 +545,7 @@
 "Continuar": "Продолжить",
 "¿Dónde va tu carpeta personal (/home)?": "Где будет ваша домашняя папка (/home)?",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Можно использовать раздел, где уже лежат ваши файлы: он сохраняется как есть (не форматируется). Этот диск нельзя будет выбрать для установки системы.",
-"Dentro del mismo disco que el sistema (lo normal)": "На том же диске, что и система (обычный вариант)"
+"Dentro del mismo disco que el sistema (lo normal)": "На том же диске, что и система (обычный вариант)",
+"▭ Rectángulo": "▭ Прямоугольник",
+"Encuadrar una zona": "Обвести область"
 }

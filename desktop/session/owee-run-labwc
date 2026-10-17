@@ -1,0 +1,13 @@
+#!/bin/sh
+# Arranca labwc (argumentos opcionales: -S programa…) con dos protecciones contra una carrera de arranque: 1) espera (máx. 20 s) a que exista un dispositivo gráfico (/dev/dri/card*),
+# que en equipos lentos o en el medio en vivo aparece unos segundos después de SDDM; 2) si labwc se cierra con error nada más empezar, lo reintenta (hasta 3 veces) en vez de
+# devolver al usuario a un login de texto. Un cierre de sesión normal (código 0) termina sin reintentos.
+i=0; while [ "$i" -lt 40 ] && ! ls /dev/dri/card* >/dev/null 2>&1; do sleep 0.5; i=$((i + 1)); done
+n=0
+while [ "$n" -lt 3 ]; do
+  t0=$(date +%s); labwc "$@"; rc=$?
+  [ "$rc" -eq 0 ] && exit 0
+  [ $(( $(date +%s) - t0 )) -ge 15 ] && exit "$rc"          # funcionó un buen rato y luego cayó: no reintentar en bucle
+  n=$((n + 1)); echo "owee-run-labwc: labwc terminó con $rc al arrancar; reintento $n de 3" >&2; sleep 2
+done
+exit 1

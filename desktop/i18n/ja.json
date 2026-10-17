@@ -545,5 +545,7 @@
 "Continuar": "続ける",
 "¿Dónde va tu carpeta personal (/home)?": "ホームフォルダー（/home）をどこに置きますか？",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "既にファイルがあるパーティションを使えます。そのまま保持され（フォーマットされません）、そのディスクはシステムのインストール先には選べなくなります。",
-"Dentro del mismo disco que el sistema (lo normal)": "システムと同じディスク内（通常）"
+"Dentro del mismo disco que el sistema (lo normal)": "システムと同じディスク内（通常）",
+"▭ Rectángulo": "▭ 四角形",
+"Encuadrar una zona": "範囲を囲む"
 }

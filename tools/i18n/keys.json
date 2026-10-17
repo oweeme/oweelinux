@@ -550,5 +550,7 @@
 "Continuar",
 "¿Dónde va tu carpeta personal (/home)?",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.",
-"Dentro del mismo disco que el sistema (lo normal)"
+"Dentro del mismo disco que el sistema (lo normal)",
+"▭ Rectángulo",
+"Encuadrar una zona"
 ]

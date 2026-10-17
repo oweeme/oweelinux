@@ -545,5 +545,7 @@
 "Continuar": "جاری رکھیں",
 "¿Dónde va tu carpeta personal (/home)?": "آپ کا ہوم فولڈر (/home) کہاں رہے گا؟",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "آپ ایسا پارٹیشن استعمال کر سکتے ہیں جس میں پہلے سے آپ کی فائلیں ہیں: وہ جیسا ہے ویسا رہے گا (فارمیٹ نہیں ہوگا)۔ اس ڈسک کو سسٹم انسٹال کے لیے نہیں چنا جا سکے گا۔",
-"Dentro del mismo disco que el sistema (lo normal)": "سسٹم والی ہی ڈسک پر (عام طریقہ)"
+"Dentro del mismo disco que el sistema (lo normal)": "سسٹم والی ہی ڈسک پر (عام طریقہ)",
+"▭ Rectángulo": "▭ مستطیل",
+"Encuadrar una zona": "کسی علاقے کو گھیریں"
 }

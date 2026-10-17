@@ -4,4 +4,4 @@ export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite
 [ -n "$HOME" ] && mkdir -p "$HOME/.config/labwc"
 if { command -v systemd-detect-virt >/dev/null && systemd-detect-virt -q; } || grep -qw owee.safe /proc/cmdline 2>/dev/null; then export WLR_RENDERER=pixman WLR_NO_HARDWARE_CURSORS=1 GSK_RENDERER=cairo; fi
 cp /usr/share/owee/labwc-setup/rc.xml /usr/share/owee/labwc-setup/autostart "$HOME/.config/labwc/" 2>/dev/null
-exec labwc -S /usr/libexec/owee/owee-installer-run
+exec /usr/libexec/owee/owee-run-labwc -S /usr/libexec/owee/owee-installer-run

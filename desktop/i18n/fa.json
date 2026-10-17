@@ -545,5 +545,7 @@
 "Continuar": "ادامه",
 "¿Dónde va tu carpeta personal (/home)?": "پوشهٔ شخصی شما (/home) کجا باشد؟",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "می‌توانید از پارتیشنی که پرونده‌هایتان در آن است استفاده کنید: همان‌طور که هست می‌ماند (فرمت نمی‌شود). آن دیسک را برای نصب سیستم نمی‌توان انتخاب کرد.",
-"Dentro del mismo disco que el sistema (lo normal)": "روی همان دیسک سیستم (حالت معمول)"
+"Dentro del mismo disco que el sistema (lo normal)": "روی همان دیسک سیستم (حالت معمول)",
+"▭ Rectángulo": "▭ مستطیل",
+"Encuadrar una zona": "قاب‌گرفتن یک ناحیه"
 }

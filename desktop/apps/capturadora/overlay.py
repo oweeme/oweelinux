@@ -1,4 +1,4 @@
-"""Modo presentación de OweeLinux: una capa transparente a pantalla completa para DIBUJAR sobre lo que se ve (lápiz, resaltador, flecha), con un halo que sigue al puntero y
+"""Modo presentación de OweeLinux: una capa transparente a pantalla completa para DIBUJAR sobre lo que se ve (lápiz, resaltador, flecha, rectángulo), con un halo que sigue al puntero y
 ondas al hacer clic. Pensado para clases, demostraciones y grabaciones. Atajos: Esc o clic derecho larga → salir, Supr/Retroceso → borrar todo, 1-6 → color, F → alternar halo.
 Mientras está activo, la capa recibe el ratón (los clics NO llegan a las apps de debajo); al salir, todo vuelve a la normalidad."""
 import math, time
@@ -20,7 +20,7 @@ class Overlay(Gtk.Window):
         Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 1)
         ov = Gtk.Overlay(); self.set_child(ov); self.area = Gtk.DrawingArea(hexpand=True, vexpand=True); self.area.set_draw_func(self.draw); ov.set_child(self.area)
         bar = Gtk.Box(spacing=6, halign=Gtk.Align.CENTER, valign=Gtk.Align.END, margin_bottom=22); bar.add_css_class("opbar"); ov.add_overlay(bar); self.btns = {}
-        for k, label, tip in (("pen", _("✎ Lápiz"), _("Dibujar libremente")), ("marker", _("▬ Resaltador"), _("Resaltar texto")), ("arrow", _("➚ Flecha"), _("Señalar con una flecha"))):
+        for k, label, tip in (("pen", _("✎ Lápiz"), _("Dibujar libremente")), ("marker", _("▬ Resaltador"), _("Resaltar texto")), ("arrow", _("➚ Flecha"), _("Señalar con una flecha")), ("rect", _("▭ Rectángulo"), _("Encuadrar una zona"))):
             b = Gtk.Button(label=label, tooltip_text=tip); b.connect("clicked", lambda _b, k=k: self.set_tool(k)); bar.append(b); self.btns[k] = b
         self.sw = {}
         for c, key in COLORS:
@@ -52,6 +52,7 @@ class Overlay(Gtk.Window):
         if n == "Escape": self.finish(); return True
         if n in ("Delete", "BackSpace"): self.clear(); return True
         if n in ("f", "F"): self.toggle_halo(); return True
+        if n in ("r", "R"): self.set_tool("rect"); return True
         if n in ("1", "2", "3", "4", "5", "6"): self.set_color(COLORS[int(n) - 1][0]); return True
         if (st & Gdk.ModifierType.CONTROL_MASK) and n in ("z", "Z") and self.strokes: self.strokes.pop(); self.area.queue_draw(); return True
         return False
@@ -75,6 +76,10 @@ class Overlay(Gtk.Window):
         cr.set_line_cap(cairo.LINE_CAP_ROUND); cr.set_line_join(cairo.LINE_JOIN_ROUND)
         for s in self.strokes + ([self.cur] if self.cur else []):
             r, g, b = self.rgb(s["c"]); pts = s["pts"]
+            if s["t"] == "rect":
+                if len(pts) > 1:
+                    (x1, y1), (x2, y2) = pts[0], pts[-1]; cr.set_source_rgb(r, g, b); cr.set_line_width(4); cr.set_line_join(cairo.LINE_JOIN_ROUND); cr.rectangle(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1)); cr.stroke()
+                continue
             if s["t"] == "marker": cr.set_source_rgba(r, g, b, 0.4); cr.set_line_width(22); cr.set_line_cap(cairo.LINE_CAP_BUTT)
             else: cr.set_source_rgb(r, g, b); cr.set_line_width(4); cr.set_line_cap(cairo.LINE_CAP_ROUND)
             cr.move_to(*pts[0]); [cr.line_to(*p) for p in pts[1:]]; cr.stroke()
