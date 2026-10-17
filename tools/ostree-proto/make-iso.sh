@@ -27,7 +27,7 @@ set timeout=4
 set default=0
 menuentry 'Instalar OweeLinux' --id install { linux /boot/vmlinuz $BASE; initrd /boot/initramfs.img; }
 menuentry 'Probar OweeLinux (sin instalar)' --id try { linux /boot/vmlinuz $BASE owee.mode=try; initrd /boot/initramfs.img; }
-menuentry 'Instalar OweeLinux (modo seguro: sin aceleración gráfica)' --id safe { linux /boot/vmlinuz $BASE nomodeset; initrd /boot/initramfs.img; }
+menuentry 'Instalar OweeLinux (modo seguro: gráficos por software)' --id safe { linux /boot/vmlinuz $BASE owee.safe=1; initrd /boot/initramfs.img; }
 EOC
 log "imagen de arranque UEFI"
 printf 'search --no-floppy --label OWEELIVE --set=root\nconfigfile /boot/grub/grub.cfg\n' > "$T/early.cfg"
