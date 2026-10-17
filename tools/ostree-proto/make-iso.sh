@@ -10,8 +10,8 @@ KVER=$(ls "$R/usr/lib/modules" | head -1); T=$(mktemp -d "$W/iso.XXXXXX"); trap 
 log() { echo "[iso] $*"; }
 log "initramfs en vivo (dracut: ostree + dmsquash-live) para $KVER"
 chroot "$R" sh -c 'command -v dracut >/dev/null && ls /usr/lib/dracut/modules.d | grep -q dmsquash-live' || { log "instalando dracut-live en el rootfs de trabajo"; chroot "$R" sh -c 'apt-get -o Acquire::http::Proxy="http://127.0.0.1:3142" install -y --no-install-recommends dracut-live dmsetup >/dev/null'; }
-mkdir -p "$R/proc" "$R/sys" "$R/dev"
-chroot "$R" dracut --force --no-hostonly --add "ostree dmsquash-live" --omit "plymouth nfs iscsi" --compress zstd --kver "$KVER" /tmp/live-initramfs.img
+mkdir -p "$R/proc" "$R/sys" "$R/dev" "$R/var/tmp" "$R/tmp"
+chroot "$R" dracut --force --no-hostonly --add "ostree dmsquash-live" --omit "plymouth nfs iscsi" --install /usr/lib/x86_64-linux-gnu/libkmod.so.2 --compress gzip --kver "$KVER" /tmp/live-initramfs.img
 cp "$R/tmp/live-initramfs.img" "$T/iso/boot/initramfs.img"; rm -f "$R/tmp/live-initramfs.img"; install -m0644 "$R/usr/lib/modules/$KVER/vmlinuz" "$T/iso/boot/vmlinuz"
 log "imagen del sistema (ext4 con el sysroot de ostree)"
 MB=$(( $(du -sm "$S" | cut -f1) * 112 / 100 + 64 ))
@@ -32,7 +32,8 @@ EOC
 log "imagen de arranque UEFI"
 printf 'search --no-floppy --label OWEELIVE --set=root\nconfigfile /boot/grub/grub.cfg\n' > "$T/early.cfg"
 grub-mkstandalone -O x86_64-efi -o "$T/BOOTX64.EFI" --modules="part_gpt part_msdos fat iso9660 search search_label linux normal echo configfile gzio all_video" "boot/grub/grub.cfg=$T/early.cfg" 2>/dev/null
-dd if=/dev/zero of="$T/iso/boot/grub/efi.img" bs=1M count=8 status=none; mkfs.vfat -F12 "$T/iso/boot/grub/efi.img" >/dev/null
+EFIMB=$(( $(stat -c %s "$T/BOOTX64.EFI") / 1048576 + 4 ))
+dd if=/dev/zero of="$T/iso/boot/grub/efi.img" bs=1M count="$EFIMB" status=none; mkfs.vfat -F16 "$T/iso/boot/grub/efi.img" >/dev/null
 mmd -i "$T/iso/boot/grub/efi.img" ::/EFI ::/EFI/BOOT; mcopy -i "$T/iso/boot/grub/efi.img" "$T/BOOTX64.EFI" ::/EFI/BOOT/BOOTX64.EFI
 log "ISO"
 xorriso -as mkisofs -iso-level 3 -full-iso9660-filenames -volid OWEELIVE -appid "OweeLinux" -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \

@@ -12,7 +12,7 @@ echo "kernel: $KVER"
 mkdir -p "$R/proc" "$R/sys" "$R/dev"
 if [ ! -f "$R/usr/lib/modules/$KVER/initramfs.img" ]; then   # reintentable: no repetir si ya está hecho
   install -m0644 "$R/boot/vmlinuz-$KVER" "$R/usr/lib/modules/$KVER/vmlinuz"
-  chroot "$R" dracut --force --no-hostonly --add ostree --kver "$KVER" \
+  chroot "$R" dracut --force --no-hostonly --add ostree --install /usr/lib/x86_64-linux-gnu/libkmod.so.2 --kver "$KVER" \
       "/usr/lib/modules/$KVER/initramfs.img"
 fi
 rm -rf "$R"/boot/* "$R"/var/lib/initramfs-tools

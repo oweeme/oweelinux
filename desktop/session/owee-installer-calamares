@@ -5,6 +5,7 @@
 SRC=$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)
 case "$SRC" in /dev/*) ;; *) SRC=$(blkid -L OWEELIVE 2>/dev/null);; esac      # medio en vivo (ISO): la raíz es una superposición en RAM; el «disco de arranque» es el que tiene la etiqueta OWEELIVE
 DISK=$(lsblk -no PKNAME "$SRC" 2>/dev/null | head -1)
+[ -n "$DISK" ] || DISK=$(basename "$SRC")   # medio sin disco padre (CD/DVD: /dev/sr0)
 HOMEDISK=""
 if [ -s /run/owee/home-uuid ]; then
   HP=$(blkid -U "$(cat /run/owee/home-uuid)" 2>/dev/null); [ -n "$HP" ] && { HOMEDISK=$(lsblk -no PKNAME "$HP" 2>/dev/null | head -1); [ -n "$HOMEDISK" ] || HOMEDISK=$(basename "$HP"); }

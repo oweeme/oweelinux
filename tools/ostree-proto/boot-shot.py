@@ -6,9 +6,9 @@ import json, os, shutil, socket, subprocess, sys, tempfile, time
 disk, prefix = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2]); times = [int(x) for x in sys.argv[3:]] or [60, 120]
 W = tempfile.mkdtemp(prefix="bootshot", dir=os.path.expanduser("~/.cache/oweelinux/tmp")) if os.path.isdir(os.path.expanduser("~/.cache/oweelinux/tmp")) else tempfile.mkdtemp()
 vars_fd = os.path.join(W, "vars.fd"); shutil.copyfile("/usr/share/OVMF/OVMF_VARS_4M.fd", vars_fd); sock = os.path.join(W, "qmp.sock")
-p = subprocess.Popen(["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-smp", "2", "-m", "3072", "-machine", "q35", "-display", "none", "-device", "virtio-vga,xres=1280,yres=800", "-nic", "user", "-snapshot",
+p = subprocess.Popen(["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-smp", "2", "-m", os.environ.get("BOOT_MEM", "3072"), "-machine", "q35", "-display", "none", "-device", "virtio-vga,xres=1280,yres=800", "-nic", "user", "-snapshot",
     "-qmp", f"unix:{sock},server=on,wait=off", "-drive", "if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd", "-drive", f"if=pflash,format=raw,file={vars_fd}",
-    "-drive", f"file={disk},format=raw,if=virtio", "-device", "qemu-xhci", "-device", "usb-tablet", "-device", "usb-kbd"] + [a for d in os.environ.get("BOOT_EXTRA", "").split(",") if d for a in ("-drive", f"file={d},format=raw,if=virtio,snapshot=off")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    *(["-device", "ich9-ahci,id=ahci", "-drive", f"if=none,id=cd0,file={disk},media=cdrom,readonly=on", "-device", "ide-cd,drive=cd0,bus=ahci.0,bootindex=0"] if disk.endswith(".iso") else ["-drive", f"file={disk},format=raw,if=virtio"]), "-serial", (os.environ["BOOT_SERIAL"] if os.environ.get("BOOT_SERIAL", "").startswith("pipe:") else "file:" + os.environ.get("BOOT_SERIAL", "/dev/null")), "-device", "qemu-xhci", "-device", "usb-tablet", "-device", "usb-kbd"] + [a for d in os.environ.get("BOOT_EXTRA", "").split(",") if d for a in ("-drive", f"file={d},format=raw,if=virtio,snapshot=off")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 try:
     for _ in range(100):
         if os.path.exists(sock):
