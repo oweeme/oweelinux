@@ -8,3 +8,5 @@ parted
 grub-common
 grub-efi-amd64-bin
 efibootmgr
+dracut-live
+dmsetup

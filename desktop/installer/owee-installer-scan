@@ -2,7 +2,9 @@
 # (como root) Lista, una por línea «DISPOSITIVO|TAMAÑO|USUARIOS», las particiones con un OweeLinux instalado y con datos (ostree/deploy/oweelinux/var), SIN contar el disco del que arrancó
 # el instalador. Monta cada una de solo lectura un instante. Ver owee-reinstall.
 MODE=${1:-os}
-BOOT=$(lsblk -no PKNAME "$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)" 2>/dev/null | head -1)
+SRCDEV=$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)
+case "$SRCDEV" in /dev/*) ;; *) SRCDEV=$(blkid -L OWEELIVE 2>/dev/null);; esac      # medio en vivo (ISO): ver owee-installer-calamares
+BOOT=$(lsblk -no PKNAME "$SRCDEV" 2>/dev/null | head -1); [ -n "$BOOT" ] || BOOT=$(basename "$SRCDEV")
 for p in $(lsblk -lnpo NAME,TYPE | awk '$2=="part"||$2=="disk"{print $1}'); do
   d=$(lsblk -no PKNAME "$p" | head -1); [ -n "$d" ] || d=$(basename "$p"); [ "$d" = "$BOOT" ] && continue
   [ "$(blkid -s TYPE -o value "$p" 2>/dev/null)" = ext4 ] || continue

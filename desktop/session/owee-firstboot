@@ -1,11 +1,18 @@
 #!/bin/sh
-# Se ejecuta en cada arranque, antes de SDDM: si el equipo NO tiene ningún usuario (y el asistente no terminó), SDDM entra solo al asistente de primer arranque (usuario de sistema
-# `owee-setup`, sesión `owee-setup`); si ya hay usuarios, quita esa entrada y SDDM muestra el inicio de sesión normal. Nunca falla: sin esto el equipo arranca al login.
+# Se ejecuta en cada arranque, antes de SDDM, y decide a qué sesión entra SDDM solo:
+#  · medio en vivo con «owee.mode=try» en la línea de arranque (ISO, opción «Probar OweeLinux»): crea el usuario temporal «live» (sin clave, solo existe en la RAM) y entra al escritorio;
+#  · medio de instalación (marca /var/lib/owee/installer-image): entra al instalador (Calamares);
+#  · equipo SIN usuarios y sin asistente terminado: entra al asistente de primer arranque (usuario de sistema `owee-setup`);
+#  · si no, quita esa entrada y SDDM muestra el inicio de sesión normal. Nunca falla: sin esto el equipo arranca al login.
 C=/etc/sddm.conf.d/05-owee-setup.conf
 mkdir -p /var/lib/owee /etc/sddm.conf.d
 humans=$(awk -F: '$3 >= 1000 && $3 < 60000' /etc/passwd | wc -l)
-if [ -e /var/lib/owee/installer-image ] && id owee-installer >/dev/null 2>&1; then
-  # imagen de instalación: SDDM entra solo al instalador (Calamares), siempre
+if grep -q 'owee.mode=try' /proc/cmdline 2>/dev/null; then
+  id live >/dev/null 2>&1 || { useradd -m -u 1000 -s /bin/bash -G audio,video,plugdev,netdev -c "OweeLinux (prueba)" live && passwd -d live >/dev/null; }
+  # SOLO en este modo en vivo: el usuario «live» puede hacer tareas de administrador sin clave (la regla vive en /run: desaparece al apagar)
+  mkdir -p /run/polkit-1/rules.d; printf 'polkit.addRule(function (action, subject) { if (subject.user == "live") return polkit.Result.YES; });\n' > /run/polkit-1/rules.d/49-owee-live.rules
+  printf '[Autologin]\nUser=live\nSession=owee-lite.desktop\nRelogin=true\n' > "$C"
+elif [ -e /var/lib/owee/installer-image ] && id owee-installer >/dev/null 2>&1; then
   printf '[Autologin]\nUser=owee-installer\nSession=owee-installer.desktop\nRelogin=true\n' > "$C"
 elif [ ! -e /var/lib/owee/firstboot-done ] && [ "$humans" -eq 0 ] && id owee-setup >/dev/null 2>&1; then
   printf '[Autologin]\nUser=owee-setup\nSession=owee-setup.desktop\nRelogin=false\n' > "$C"

@@ -3,6 +3,7 @@
 #  · Disco de arranque (el medio de instalación): se oculta a Calamares (espacio de montajes propio) para que nadie lo borre por error.
 #  · Disco elegido para /home (si hay): se oculta GLOBALMENTE (Calamares ejecuta sus órdenes de disco en un proceso privilegiado que NO comparte el espacio de montajes) y pasa a solo lectura.
 SRC=$(findmnt -no SOURCE /sysroot 2>/dev/null || findmnt -no SOURCE /)
+case "$SRC" in /dev/*) ;; *) SRC=$(blkid -L OWEELIVE 2>/dev/null);; esac      # medio en vivo (ISO): la raíz es una superposición en RAM; el «disco de arranque» es el que tiene la etiqueta OWEELIVE
 DISK=$(lsblk -no PKNAME "$SRC" 2>/dev/null | head -1)
 HOMEDISK=""
 if [ -s /run/owee/home-uuid ]; then
