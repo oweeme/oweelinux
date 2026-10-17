@@ -8,7 +8,12 @@ C=/etc/sddm.conf.d/05-owee-setup.conf
 mkdir -p /var/lib/owee /etc/sddm.conf.d
 humans=$(awk -F: '$3 >= 1000 && $3 < 60000' /etc/passwd | wc -l)
 if grep -q 'owee.mode=try' /proc/cmdline 2>/dev/null; then
-  id live >/dev/null 2>&1 || { useradd -m -u 1000 -s /bin/bash -G audio,video,plugdev,netdev -c "OweeLinux (prueba)" live && passwd -d live >/dev/null; }
+  # /home es un enlace a /var/home: si este servicio corre antes de que exista, useradd crea el usuario SIN carpeta personal y SDDM falla con «chdir(/home/live) failed» (el escritorio no arranca).
+  mkdir -p /var/home
+  id live >/dev/null 2>&1 || useradd -m -u 1000 -s /bin/bash -G audio,video,plugdev,netdev -c "OweeLinux (prueba)" live
+  passwd -d live >/dev/null 2>&1
+  [ -d /var/home/live ] || { mkdir -p /var/home/live && cp -a /etc/skel/. /var/home/live/ 2>/dev/null; }
+  chown -R live:live /var/home/live; chmod 0700 /var/home/live
   # SOLO en este modo en vivo: el usuario «live» puede hacer tareas de administrador sin clave (la regla vive en /run: desaparece al apagar)
   mkdir -p /run/polkit-1/rules.d; printf 'polkit.addRule(function (action, subject) { if (subject.user == "live") return polkit.Result.YES; });\n' > /run/polkit-1/rules.d/49-owee-live.rules
   printf '[Autologin]\nUser=live\nSession=owee-lite.desktop\nRelogin=true\n' > "$C"
