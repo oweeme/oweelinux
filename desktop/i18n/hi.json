@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "आप ऐसा पार्टिशन इस्तेमाल कर सकते हैं जिसमें पहले से आपकी फ़ाइलें हैं: वह जैसा है वैसा रहेगा (फ़ॉर्मैट नहीं होगा)। उस डिस्क को सिस्टम इंस्टॉल के लिए नहीं चुना जा सकेगा।",
 "Dentro del mismo disco que el sistema (lo normal)": "सिस्टम वाली ही डिस्क पर (सामान्य तरीका)",
 "▭ Rectángulo": "▭ आयत",
-"Encuadrar una zona": "किसी क्षेत्र को घेरें"
+"Encuadrar una zona": "किसी क्षेत्र को घेरें",
+"Escritorios — arrastra una ventana a otro escritorio": "डेस्कटॉप — विंडो को दूसरे डेस्कटॉप पर खींचें",
+"Pasar a escritorio {0}": "डेस्कटॉप {0} पर ले जाएँ",
+"(vacío)": "(खाली)"
 }

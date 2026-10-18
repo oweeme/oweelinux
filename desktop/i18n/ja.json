@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "既にファイルがあるパーティションを使えます。そのまま保持され（フォーマットされません）、そのディスクはシステムのインストール先には選べなくなります。",
 "Dentro del mismo disco que el sistema (lo normal)": "システムと同じディスク内（通常）",
 "▭ Rectángulo": "▭ 四角形",
-"Encuadrar una zona": "範囲を囲む"
+"Encuadrar una zona": "範囲を囲む",
+"Escritorios — arrastra una ventana a otro escritorio": "デスクトップ — ウィンドウを別のデスクトップへドラッグ",
+"Pasar a escritorio {0}": "デスクトップ {0} へ移動",
+"(vacío)": "（空）"
 }

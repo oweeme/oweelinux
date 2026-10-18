@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Anda boleh menggunakan partition yang sudah mengandungi fail anda: ia dikekalkan seperti sedia ada (tidak diformat). Cakera itu tidak boleh dipilih untuk memasang sistem.",
 "Dentro del mismo disco que el sistema (lo normal)": "Pada cakera yang sama dengan sistem (cara biasa)",
 "▭ Rectángulo": "▭ Segi empat",
-"Encuadrar una zona": "Bingkai kawasan"
+"Encuadrar una zona": "Bingkai kawasan",
+"Escritorios — arrastra una ventana a otro escritorio": "Desktop — seret tetingkap ke desktop lain",
+"Pasar a escritorio {0}": "Alihkan ke desktop {0}",
+"(vacío)": "(kosong)"
 }

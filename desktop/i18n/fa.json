@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "می‌توانید از پارتیشنی که پرونده‌هایتان در آن است استفاده کنید: همان‌طور که هست می‌ماند (فرمت نمی‌شود). آن دیسک را برای نصب سیستم نمی‌توان انتخاب کرد.",
 "Dentro del mismo disco que el sistema (lo normal)": "روی همان دیسک سیستم (حالت معمول)",
 "▭ Rectángulo": "▭ مستطیل",
-"Encuadrar una zona": "قاب‌گرفتن یک ناحیه"
+"Encuadrar una zona": "قاب‌گرفتن یک ناحیه",
+"Escritorios — arrastra una ventana a otro escritorio": "میزهای کار — پنجره را به میز دیگر بکشید",
+"Pasar a escritorio {0}": "انتقال به میز {0}",
+"(vacío)": "(خالی)"
 }

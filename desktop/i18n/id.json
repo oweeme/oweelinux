@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Anda dapat memakai partisi yang sudah berisi berkas Anda: dipertahankan apa adanya (tidak diformat). Disk itu tidak bisa dipilih untuk memasang sistem.",
 "Dentro del mismo disco que el sistema (lo normal)": "Di disk yang sama dengan sistem (cara biasa)",
 "▭ Rectángulo": "▭ Persegi panjang",
-"Encuadrar una zona": "Bingkai area"
+"Encuadrar una zona": "Bingkai area",
+"Escritorios — arrastra una ventana a otro escritorio": "Desktop — seret jendela ke desktop lain",
+"Pasar a escritorio {0}": "Pindahkan ke desktop {0}",
+"(vacío)": "(kosong)"
 }

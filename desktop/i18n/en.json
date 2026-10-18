@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "You can use a partition that already has your files: it is kept as is (not formatted). That disk can't be chosen to install the system.",
 "Dentro del mismo disco que el sistema (lo normal)": "Inside the same disk as the system (the usual way)",
 "▭ Rectángulo": "▭ Rectangle",
-"Encuadrar una zona": "Frame an area"
+"Encuadrar una zona": "Frame an area",
+"Escritorios — arrastra una ventana a otro escritorio": "Desktops — drag a window to another desktop",
+"Pasar a escritorio {0}": "Move to desktop {0}",
+"(vacío)": "(empty)"
 }

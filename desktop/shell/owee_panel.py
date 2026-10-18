@@ -26,6 +26,7 @@ button.owee-task:hover, button.owee-task.act { background: @hover@; }
 .owee-rec label { color: #F06548; padding: 0 6px; font-weight: bold; } .owee-rec button { background: transparent; background-image: none; border: none; box-shadow: none; padding: 0 6px; min-height: 0; min-width: 0; color: @fg@; } .owee-rec button:hover { background: @hover@; }
 window.owee-overview { background: alpha(@win@, 0.94); color: @fg@; } .ov-head { font-weight: bold; color: @dim@; margin-top: 10px; }
 .ov-card { padding: 10px 6px; border-radius: 14px; } .ov-btn:hover .ov-card { background: @hover@; } .ov-card.act { background: alpha(@fg@, 0.10); } .ov-card.min image { opacity: .4; } .ov-name { color: @fg@; font-size: 10pt; }
+.ov-card.sel { background: alpha(@fg@, 0.22); } .dv-col { padding: 10px; border-radius: 14px; background: alpha(@fg@, 0.05); } .dv-col.dv-cur { background: alpha(@fg@, 0.10); } .dv-head { font-weight: bold; } button.dv-move { padding: 0 6px; min-height: 0; min-width: 0; border-radius: 6px; background: alpha(@fg@, 0.10); background-image: none; box-shadow: none; border: none; color: @fg@; } button.dv-move:hover { background: @hover@; }
 window.owee-overview button.ov-btn { background: transparent; background-image: none; border: none; box-shadow: none; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
@@ -541,7 +542,7 @@ class Panel(Gtk.Application):
             self.mon = Gio.File.new_for_path(os.path.dirname(owee_config.PATH)).monitor_directory(Gio.FileMonitorFlags.NONE, None)
             self.mon.connect("changed", lambda m, f, o, ev: f.get_basename() == "settings.json" and GLib.timeout_add(150, lambda: (self.apply_settings(), False)[1]))
         except GLib.Error as e: print("[ajustes] sin vigilancia:", e, flush=True)
-        for name, fn in (("launcher", lambda *a: self.launcher.btn.popup()), ("calendar", lambda *a: self.clock.btn.popup()), ("power", lambda *a: self.power.btn.popup()), ("overview", lambda *a: self.overview.toggle())):
+        for name, fn in (("launcher", lambda *a: self.launcher.btn.popup()), ("calendar", lambda *a: self.clock.btn.popup()), ("power", lambda *a: self.power.btn.popup()), ("overview", lambda *a: self.overview.toggle()), ("switcher-next", lambda *a: self.switcher.step(1)), ("switcher-prev", lambda *a: self.switcher.step(-1)), ("desktops", lambda *a: self.desktops_view.toggle())):
             act = Gio.SimpleAction.new(name, None); act.connect("activate", fn); self.add_action(act)    # `gapplication action org.oweelinux.PanelPrototype launcher` (atajos de labwc)
         win = Gtk.ApplicationWindow(application=self); win.add_css_class("owee-panel")
         LS.init_for_window(win); LS.set_layer(win, LS.Layer.TOP); LS.set_namespace(win, "owee-panel")
@@ -570,11 +571,13 @@ class Panel(Gtk.Application):
         self.power = PowerMenu(); right.append(self.power.btn)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
         self.tick(); GLib.timeout_add_seconds(1, self.tick)
         self.win = win; self.compact = False
+        from owee_switcher import Registry, WindowSwitcher, DesktopsView; self.registry = Registry()      # uso reciente y escritorio de cada ventana (antes del vigilante, que lo alimenta)
         try:                                           # con una ventana maximizada el panel se pega a los bordes y pierde las esquinas (como la barra de menús de macOS)
             from owee_windows import WindowWatcher
-            self.watcher = WindowWatcher(self.set_compact, self.tasks.update)
+            self.watcher = WindowWatcher(self.set_compact, lambda ws: (self.tasks.update(ws), self.registry.update(ws)))
         except Exception as e: print("[ventanas] desactivado:", e, flush=True)
-        from owee_overview import Overview; self.overview = Overview(self)         # vista general (esquinas activas, Super + A)
+        from owee_overview import Overview; self.overview = Overview(self)
+        self.switcher = WindowSwitcher(self); self.desktops_view = DesktopsView(self)       # Alt + Tab y Super + Tab         # vista general (esquinas activas, Super + A)
         win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])

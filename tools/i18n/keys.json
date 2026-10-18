@@ -552,5 +552,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.",
 "Dentro del mismo disco que el sistema (lo normal)",
 "▭ Rectángulo",
-"Encuadrar una zona"
+"Encuadrar una zona",
+"Escritorios — arrastra una ventana a otro escritorio",
+"Pasar a escritorio {0}",
+"(vacío)"
 ]

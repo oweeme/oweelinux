@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Você pode usar uma partição que já tem seus arquivos: ela é mantida como está (não é formatada). Esse disco não poderá ser escolhido para instalar o sistema.",
 "Dentro del mismo disco que el sistema (lo normal)": "No mesmo disco do sistema (o normal)",
 "▭ Rectángulo": "▭ Retângulo",
-"Encuadrar una zona": "Enquadrar uma área"
+"Encuadrar una zona": "Enquadrar uma área",
+"Escritorios — arrastra una ventana a otro escritorio": "Áreas de trabalho — arraste uma janela para outra",
+"Pasar a escritorio {0}": "Mover para a área de trabalho {0}",
+"(vacío)": "(vazio)"
 }

@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "你可以使用已存有文件的分区：它会原样保留（不格式化）。该磁盘不能再被选作系统安装位置。",
 "Dentro del mismo disco que el sistema (lo normal)": "与系统在同一磁盘上（常规方式）",
 "▭ Rectángulo": "▭ 矩形",
-"Encuadrar una zona": "框出一个区域"
+"Encuadrar una zona": "框出一个区域",
+"Escritorios — arrastra una ventana a otro escritorio": "桌面 — 将窗口拖到另一个桌面",
+"Pasar a escritorio {0}": "移到桌面 {0}",
+"(vacío)": "（空）"
 }

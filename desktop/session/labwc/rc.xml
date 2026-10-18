@@ -41,7 +41,15 @@
     <keybind key="C-A-Left"><action name="Execute" command="/usr/libexec/owee/owee-desktop left"/><action name="GoToDesktop" to="left"/></keybind>
     <keybind key="C-A-Right"><action name="Execute" command="/usr/libexec/owee/owee-desktop right"/><action name="GoToDesktop" to="right"/></keybind>
     <!-- Vista general: lista de todas las ventanas de todos los escritorios (clic para ir a una). W-A-F9 lo usa el panel y las esquinas activas -->
-    <keybind key="W-Tab"><action name="ShowMenu" menu="client-list-combined-menu"/></keybind>
+    <keybind key="W-Tab"><action name="Execute" command="gapplication action org.oweelinux.PanelPrototype desktops"/></keybind>
+    <!-- Alt + Tab: selector propio del panel (tarjetas con icono y título, orden de uso reciente); Alt + Mayús + Tab hacia atrás -->
+    <keybind key="A-Tab"><action name="Execute" command="gapplication action org.oweelinux.PanelPrototype switcher-next"/></keybind>
+    <keybind key="A-S-Tab"><action name="Execute" command="gapplication action org.oweelinux.PanelPrototype switcher-prev"/></keybind>
+    <!-- Mover la ventana activa al escritorio N (lo usa la vista Super + Tab) -->
+    <keybind key="W-C-F1"><action name="SendToDesktop" to="1"/><action name="Execute" command="/usr/libexec/owee/owee-desktop 1"/></keybind>
+    <keybind key="W-C-F2"><action name="SendToDesktop" to="2"/><action name="Execute" command="/usr/libexec/owee/owee-desktop 2"/></keybind>
+    <keybind key="W-C-F3"><action name="SendToDesktop" to="3"/><action name="Execute" command="/usr/libexec/owee/owee-desktop 3"/></keybind>
+    <keybind key="W-C-F4"><action name="SendToDesktop" to="4"/><action name="Execute" command="/usr/libexec/owee/owee-desktop 4"/></keybind>
     <keybind key="W-A-F9"><action name="ShowMenu" menu="client-list-combined-menu"/></keybind>
     <keybind key="W-q"><action name="Close"/></keybind>
     <keybind key="W-Up"><action name="ToggleMaximize"/></keybind>

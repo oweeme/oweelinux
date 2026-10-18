@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "Можно использовать раздел, где уже лежат ваши файлы: он сохраняется как есть (не форматируется). Этот диск нельзя будет выбрать для установки системы.",
 "Dentro del mismo disco que el sistema (lo normal)": "На том же диске, что и система (обычный вариант)",
 "▭ Rectángulo": "▭ Прямоугольник",
-"Encuadrar una zona": "Обвести область"
+"Encuadrar una zona": "Обвести область",
+"Escritorios — arrastra una ventana a otro escritorio": "Рабочие столы — перетащите окно на другой стол",
+"Pasar a escritorio {0}": "Переместить на стол {0}",
+"(vacío)": "(пусто)"
 }

@@ -547,5 +547,8 @@
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "이미 내 파일이 있는 파티션을 쓸 수 있습니다. 그대로 유지되며 포맷하지 않습니다. 그 디스크는 시스템 설치 위치로 고를 수 없게 됩니다.",
 "Dentro del mismo disco que el sistema (lo normal)": "시스템과 같은 디스크 안 (일반적인 방식)",
 "▭ Rectángulo": "▭ 사각형",
-"Encuadrar una zona": "영역 둘러싸기"
+"Encuadrar una zona": "영역 둘러싸기",
+"Escritorios — arrastra una ventana a otro escritorio": "데스크톱 — 창을 다른 데스크톱으로 끌어 놓으세요",
+"Pasar a escritorio {0}": "데스크톱 {0}(으)로 이동",
+"(vacío)": "(비어 있음)"
 }
