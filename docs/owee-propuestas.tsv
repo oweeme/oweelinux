@@ -179,7 +179,6 @@ Esquina superior derecha	Top-right corner	go doma-kado-no kore	PROPUESTA
 Esquina inferior izquierda	Bottom-left corner	gu doma-kado kore	PROPUESTA
 Esquina inferior derecha	Bottom-right corner	gu doma-kado-no kore	PROPUESTA
 Escritorios y esquinas	Desktops and corners	meka-tabe re kore	PROPUESTA
-Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).	Several desktops to organize your windows. Shortcuts: Super+1…4 (go), Super+Shift+1…4 (move the window), Ctrl+Alt+←/→, Super+Tab (overview).	meka-tabe gore-pa: loke-kopa seta. sape-nado: «Super»+be…fo (to duma), «Super»+«Shift»+be…fo (loke-kopa duma-dare), «Ctrl»+«Alt»+←/→, «Super»+«Tab» (luma-salo).	PROPUESTA
 Escritorios virtuales	Virtual desktops	meka-tabe-seta	PROPUESTA
 Cantidad de escritorios	Number of desktops	meka-tabe bema	PROPUESTA
 El panel muestra un punto por escritorio; clic en uno para ir a él	The panel shows one dot per desktop; click one to go to it	loke-tabe bo meka-tabe be pota loke-pema; pota tada-kade ke to duma	PROPUESTA
@@ -551,3 +550,91 @@ Encuadrar una zona	Frame an area		SIN TRADUCIR
 Escritorios — arrastra una ventana a otro escritorio	Desktops — drag a window to another desktop		SIN TRADUCIR
 Pasar a escritorio {0}	Move to desktop {0}		SIN TRADUCIR
 (vacío)	(empty)		SIN TRADUCIR
+Pide al programa que se cierre (puede guardar sus datos)	Asks the program to close (it can save its data)		SIN TRADUCIR
+Mata el proceso al instante (se pierde lo no guardado): úsalo si el programa está colgado	Kills the process instantly (unsaved work is lost): use it if the program is frozen		SIN TRADUCIR
+CPU {0:.0f} %	CPU {0:.0f} %		SIN TRADUCIR
+Memoria {0:.1f} de {1:.1f} GB	Memory {0:.1f} of {1:.1f} GB		SIN TRADUCIR
+Intercambio {0:.1f} GB	Swap {0:.1f} GB		SIN TRADUCIR
+Monitor del sistema	System monitor	meka-paku	GLOSARIO
+Buscar proceso…	Search process…		SIN TRADUCIR
+Solo mis procesos	Only my processes		SIN TRADUCIR
+Forzar cierre	Force quit		SIN TRADUCIR
+Elige primero un proceso de la lista.	Choose a process from the list first.		SIN TRADUCIR
+Ese es este mismo monitor.	That is this monitor itself.		SIN TRADUCIR
+Enviado a {0}.	Sent to {0}.		SIN TRADUCIR
+Nombre	Name	sena-nara	GLOSARIO
+PID	PID		SIN TRADUCIR
+CPU	CPU		SIN TRADUCIR
+El proceso ya no existe.	The process no longer exists.		SIN TRADUCIR
+Basado en {0}	Based on {0}		SIN TRADUCIR
+Opciones de desarrollador	Developer options		SIN TRADUCIR
+desarrollo modificar interfaz código root usr desbloquear registros	development modify interface code root usr unlock logs		SIN TRADUCIR
+Para quien quiera cambiar OweeLinux. Desactivado, el sistema queda protegido.	For anyone who wants to change OweeLinux. When off, the system stays protected.		SIN TRADUCIR
+Copia activa	Copy active		SIN TRADUCIR
+Copia borrada: OweeLinux usa la interfaz original.	Copy deleted: OweeLinux uses the original interface.		SIN TRADUCIR
+¿Desbloquear /usr?	Unlock /usr?		SIN TRADUCIR
+Podrás modificar archivos del sistema hasta el próximo reinicio. Al reiniciar se descartan todos los cambios. Pide la contraseña de administrador.	You will be able to modify system files until the next restart. On restart all changes are discarded. Asks for the administrator password.		SIN TRADUCIR
+Modo desarrollador	Developer mode		SIN TRADUCIR
+Ninguna de estas opciones cambia el sistema de forma permanente	None of these options changes the system permanently		SIN TRADUCIR
+Mi copia de la interfaz (segura)	My copy of the interface (safe)		SIN TRADUCIR
+Copia creada, desactivada	Copy created, inactive		SIN TRADUCIR
+Aún no has creado una copia	You haven't created a copy yet		SIN TRADUCIR
+Crear copia editable	Create editable copy		SIN TRADUCIR
+Activar mi copia	Activate my copy		SIN TRADUCIR
+Usar la original	Use the original		SIN TRADUCIR
+Abrir la carpeta	Open the folder		SIN TRADUCIR
+Reiniciar el panel	Restart the panel		SIN TRADUCIR
+Volver al original	Back to the original		SIN TRADUCIR
+Sistema (avanzado)	System (advanced)		SIN TRADUCIR
+Diagnóstico	Diagnostics		SIN TRADUCIR
+Ver los errores del sistema	View system errors		SIN TRADUCIR
+Copia creada en {0}. Edítala y pulsa «Activar mi copia».	Copy created in {0}. Edit it and press “Activate my copy”.		SIN TRADUCIR
+Desbloquear	Unlock		SIN TRADUCIR
+No hay ninguna terminal instalada.	No terminal is installed.		SIN TRADUCIR
+Crea una copia del panel y de Ajustes en tu carpeta personal, modifícala y actívala. Si tu copia falla al arrancar, OweeLinux usa la original solo. «Volver al original» borra tu copia.	Creates a copy of the panel and Settings in your home folder; modify it and activate it. If your copy fails to start, OweeLinux uses the original by itself. “Back to the original” deletes your copy.		SIN TRADUCIR
+«Desbloquear /usr» permite editar los archivos del sistema hasta que reinicies; al reiniciar, OweeLinux vuelve exactamente a como estaba.	“Unlock /usr” lets you edit system files until you restart; on restart, OweeLinux goes back exactly as it was.		SIN TRADUCIR
+/usr está desbloqueado (hasta el próximo reinicio)	/usr is unlocked (until the next restart)		SIN TRADUCIR
+/usr está protegido (solo lectura)	/usr is protected (read-only)		SIN TRADUCIR
+Desbloquear /usr hasta el reinicio	Unlock /usr until restart		SIN TRADUCIR
+/usr desbloqueado hasta el reinicio.	/usr unlocked until restart.		SIN TRADUCIR
+No se pudo desbloquear (¿cancelaste la contraseña?).	Could not unlock (did you cancel the password?).		SIN TRADUCIR
+hardware controladores drivers cpu memoria gráficos red sonido batería discos cámara tableta wacom	hardware drivers cpu memory graphics network sound battery disks camera tablet wacom		SIN TRADUCIR
+Dispositivos y controladores	Devices and drivers		SIN TRADUCIR
+Lo que tiene tu equipo y si cada pieza tiene su controlador. En rojo: sin controlador (puede faltar el controlador o su firmware).	What your computer has and whether each part has its driver. In red: no driver (the driver or its firmware may be missing).		SIN TRADUCIR
+hilos	threads		SIN TRADUCIR
+Almacenamiento	Storage	mena-kopa	GLOSARIO
+Cámara	Camera		SIN TRADUCIR
+Teclado, ratón y tabletas	Keyboard, mouse and tablets		SIN TRADUCIR
+Abrir el monitor del sistema	Open the system monitor		SIN TRADUCIR
+zram/swap	zram/swap		SIN TRADUCIR
+Gráficos	Graphics		SIN TRADUCIR
+Tableta gráfica	Graphics tablet		SIN TRADUCIR
+Abrir el gestor de discos	Open the disk manager		SIN TRADUCIR
+controlador {0}	driver {0}		SIN TRADUCIR
+SIN controlador	NO driver		SIN TRADUCIR
+No se pudo leer la lista de dispositivos PCI (falta pciutils).	Could not read the PCI device list (pciutils is missing).		SIN TRADUCIR
+salud {0} %	health {0} %		SIN TRADUCIR
+No se detecta ninguna cámara.	No camera detected.		SIN TRADUCIR
+Adaptador detectado	Adapter detected		SIN TRADUCIR
+No se detecta ningún adaptador Bluetooth.	No Bluetooth adapter detected.		SIN TRADUCIR
+Las tabletas Wacom y similares se reconocen solas (libinput).	Wacom and similar tablets are recognized automatically (libinput).		SIN TRADUCIR
+Panel	Panel		SIN TRADUCIR
+Posición del panel	Panel position		SIN TRADUCIR
+Se mueve al instante; las ventanitas se abren hacia el lado contrario	It moves instantly; pop-ups open toward the opposite side		SIN TRADUCIR
+Tamaño del panel	Panel size		SIN TRADUCIR
+Arriba	Top	go	GLOSARIO
+Abajo	Bottom	gu	GLOSARIO
+Izquierda	Left	doma-kado	GLOSARIO
+Derecha	Right	doma-kado-no	GLOSARIO
+Compacto	Compact		SIN TRADUCIR
+Grande	Large		SIN TRADUCIR
+Añadir otro idioma…	Add another language…		SIN TRADUCIR
+Añadir otro idioma	Add another language		SIN TRADUCIR
+Buscar idioma…	Search language…		SIN TRADUCIR
+Las aplicaciones de KDE se traducen al idioma elegido; los textos propios de OweeLinux saldrán en inglés hasta que alguien aporte la traducción.	KDE applications are translated into the chosen language; OweeLinux's own texts will appear in English until someone contributes the translation.		SIN TRADUCIR
+Generando el idioma… (unos segundos)	Generating the language… (a few seconds)		SIN TRADUCIR
+No se pudo generar el idioma.	Could not generate the language.		SIN TRADUCIR
+Permitir superar el 100 % (hasta 150 %)	Allow going above 100 % (up to 150 %)		SIN TRADUCIR
+Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse	Raises the volume of the speakers or microphone further; above 100 % the sound may distort		SIN TRADUCIR
+Puerto	Port	rela-nado	GLOSARIO
+Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).	Several desktops to organize your windows. Shortcuts: Super+1…4 (go), Super+Shift+1…4 (move the window), Ctrl+Alt+←/→, Super+Tab (desktops and windows), Super+A (overview).		SIN TRADUCIR

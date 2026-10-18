@@ -224,6 +224,8 @@ install -Dm0644 /dev/stdin "$ETC/default/earlyoom" <<'EOS'
 EARLYOOM_ARGS="-r 0 -m 4,2 -s 5,2 --avoid '(^|/)(labwc|sddm|sddm-helper|Xwayland|pipewire|wireplumber|systemd|systemd-logind|dbus-daemon|NetworkManager|polkitd|polkit-mate-authentication-agent-1|mako|foot|python3)$' --prefer '(^|/)(QtWebEngineProc|falkon|chrome|chromium|firefox|firefox-esr|electron|java|code|slack|discord|steam)$'"
 EOS
 mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
+# Fcitx5 no debe arrancarse solo por D-Bus (lo activaban Ajustes y el panel nada más abrirse, +32 MB): se lanza cuando el usuario activa un método de escritura (Ajustes → Teclado) o ya tiene uno
+rm -f "$R/usr/share/dbus-1/services/org.fcitx.Fcitx5.service"
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

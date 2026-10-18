@@ -183,3 +183,10 @@ sin reiniciar*. Comparar con la imagen sin protecciones para tener la línea bas
 
 ## Lo que se deja fuera hasta después
 Kernel propio (oweeOS), compatibilidad con `.deb`/Windows, tienda de apps propia, navegador propio.
+
+
+## ISO en vivo y herramientas de equipo (octubre 2026)
+- ISO híbrida UEFI de ~1,4 GB (`tools/ostree-proto/make-iso.sh`): instalar, probar sin instalar y modo seguro; verificada en QEMU (CD y USB). Requiere Secure Boot desactivado.
+- Escritorio: Alt+Tab y Super+Tab propios, panel en las cuatro posiciones, monitor del sistema, página Dispositivos, opciones de desarrollador, añadir idiomas, sonido con puertos y volumen hasta 150 %.
+- Recursos: ver `docs/RECURSOS.md`.
+- Pendiente: Secure Boot (shim firmado), pruebas en hardware real, miniaturas de ventanas (requiere un labwc más nuevo).
