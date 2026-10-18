@@ -478,7 +478,18 @@ class InputIndicator:
         self.label = Gtk.Label(label="…"); self.btn = Gtk.MenuButton(has_frame=False, child=self.label); self.btn.add_css_class("owee-widget"); self.btn.set_visible(False)
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _x: p.get_visible() and self.build())
         self.cur = ""
-        if GLib.find_program_in_path("fcitx5-remote"): self.poll(); GLib.timeout_add_seconds(2, self.poll)
+        self.src = 0
+        if GLib.find_program_in_path("fcitx5-remote"):               # solo se pregunta a Fcitx5 mientras esté en marcha (antes: dos procesos cada 2 s, aunque no hubiera ningún método activo)
+            self.watch = Gio.bus_watch_name(Gio.BusType.SESSION, "org.fcitx.Fcitx5", Gio.BusNameWatcherFlags.NONE, self.appeared, self.vanished)
+
+    def appeared(self, conn, name, owner=None):
+        self.poll()
+        if not self.src: self.src = GLib.timeout_add_seconds(2, self.poll)
+
+    def vanished(self, conn, name):
+        if self.src: GLib.source_remove(self.src); self.src = 0
+        n = self.last or self.guess(); self.cur = n; self.btn.set_visible(bool(n))
+        if n: self.label.set_text(self.short(n)); self.btn.set_tooltip_text(self.nice(n))
 
     def poll(self):
         try:
