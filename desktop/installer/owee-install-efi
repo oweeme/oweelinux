@@ -1,0 +1,21 @@
+#!/bin/sh
+# Deja el cargador de arranque UEFI en la partición EFI. Uso: owee-install-efi DIR_ESP UUID_RAIZ
+# Con shim y GRUB firmados presentes (la ISO los trae): Secure Boot (shim firmado por Microsoft → GRUB firmado de Debian → núcleo firmado de Debian). Si no, GRUB sin firmar (solo con Secure Boot desactivado).
+# El GRUB firmado lee su configuración de EFI/debian/grub.cfg (y de EFI/BOOT/grub.cfg); la configuración busca la raíz por UUID y carga /boot/owee/grub.cfg.
+set -eu
+ESP=${1:?uso: $0 DIR_ESP UUID_RAIZ}; UUID=${2:?falta el UUID de la raíz}
+case "$UUID" in *[!0-9A-Fa-f-]*|"") echo "owee-install-efi: UUID no válido" >&2; exit 2 ;; esac
+W=$(mktemp -d); trap 'rm -rf "$W"' EXIT
+printf 'search --no-floppy --fs-uuid --set=root %s\nconfigfile /boot/owee/grub.cfg\n' "$UUID" > "$W/grub.cfg"
+mkdir -p "$ESP/EFI/BOOT"
+SHIM=/usr/lib/shim/shimx64.efi.signed; GRS=/usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed
+if [ -f "$SHIM" ] && [ -f "$GRS" ]; then
+  echo "cargador firmado (Secure Boot)"
+  mkdir -p "$ESP/EFI/debian"
+  install -m0644 "$SHIM" "$ESP/EFI/BOOT/BOOTX64.EFI"; install -m0644 "$GRS" "$ESP/EFI/BOOT/grubx64.efi"
+  [ -f /usr/lib/shim/mmx64.efi.signed ] && install -m0644 /usr/lib/shim/mmx64.efi.signed "$ESP/EFI/BOOT/mmx64.efi"
+  install -m0644 "$W/grub.cfg" "$ESP/EFI/BOOT/grub.cfg"; install -m0644 "$W/grub.cfg" "$ESP/EFI/debian/grub.cfg"
+else
+  echo "(aviso: sin cargador firmado; solo arrancará con Secure Boot desactivado)"
+  grub-mkstandalone -O x86_64-efi -o "$ESP/EFI/BOOT/BOOTX64.EFI" --modules="part_gpt ext2 search search_fs_uuid linux normal echo gzio" "boot/grub/grub.cfg=$W/grub.cfg" 2>/dev/null
+fi

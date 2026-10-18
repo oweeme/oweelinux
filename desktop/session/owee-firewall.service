@@ -1,0 +1,17 @@
+[Unit]
+Description=Cortafuegos de OweeLinux (bloquea lo entrante)
+Documentation=file:///usr/share/doc/oweelinux/SEGURIDAD.md
+Before=network-pre.target
+Wants=network-pre.target
+DefaultDependencies=no
+After=systemd-sysctl.service
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/owee/owee-firewall apply
+ExecStop=-/usr/sbin/nft delete table inet owee
+
+[Install]
+WantedBy=multi-user.target

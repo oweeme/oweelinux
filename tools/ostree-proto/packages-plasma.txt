@@ -151,3 +151,8 @@ pulseaudio-utils
 mate-polkit
 earlyoom
 thermald
+
+# Seguridad: cortafuegos nftables y AppArmor (perfiles en modo aviso: base para afinar después)
+nftables
+apparmor
+apparmor-profiles

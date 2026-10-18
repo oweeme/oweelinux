@@ -10,3 +10,7 @@ grub-efi-amd64-bin
 efibootmgr
 dracut-live
 dmsetup
+
+# Secure Boot: shim firmado por Microsoft y GRUB firmado de Debian (la ISO y el sistema instalado arrancan con Secure Boot activado)
+shim-signed
+grub-efi-amd64-signed

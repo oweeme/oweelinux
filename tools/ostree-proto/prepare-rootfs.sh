@@ -52,6 +52,9 @@ EOI
 echo "OweeLinux 1" > "$R/etc/issue.net"; : > "$R/etc/motd"      # el aviso de la consola dice «OweeLinux», no «Debian GNU/Linux»
 mkdir -p "$R/etc/systemd/system/serial-getty@ttyS0.service.d"
 cat > "$R/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf" <<'EOC'
+[Unit]
+# SOLO para depurar: sin «owee.debug» en la línea de arranque no hay ninguna consola serie con acceso (antes: root sin clave si el equipo tenía consola serie)
+ConditionKernelCommandLine=owee.debug
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
@@ -64,7 +67,14 @@ mkdir -p "$R/etc/systemd/network" "$R/etc/ostree/remotes.d" "$R/etc/systemd/syst
 printf '[Match]\nName=en*\n\n[Network]\nDHCP=yes\n' > "$R/etc/systemd/network/20-dhcp.network"
 ln -sf /usr/lib/systemd/system/systemd-networkd.service \
    "$R/etc/systemd/system/multi-user.target.wants/systemd-networkd.service"
-printf '[remote "owee"]\nurl=http://10.0.2.2:8000/pub\ngpg-verify=false\n' > "$R/etc/ostree/remotes.d/owee.conf"
+# Remoto de actualizaciones. PRODUCCIÓN (por defecto): HTTPS y firma OBLIGATORIA, y sin ninguna clave de confianza instalada → una actualización no firmada por la clave real de OweeLinux se rechaza
+# (falla cerrado). La URL de abajo es un MARCADOR: hay que poner la del servidor real y colocar la clave pública en /usr/share/ostree/trusted.gpg.d/ (docs/ACTUALIZACIONES.md).
+# PRUEBAS (OWEE_DEV_REMOTE=1): servidor local del anfitrión de QEMU (10.0.2.2) sin firma, que es lo que usan update-test.sh, rollback-test.sh y powerloss-test.py.
+if [ "${OWEE_DEV_REMOTE:-0}" = 1 ]; then
+  printf '[remote "owee"]\nurl=http://10.0.2.2:8000/pub\ngpg-verify=false\n' > "$R/etc/ostree/remotes.d/owee.conf"
+else
+  printf '[remote "owee"]\nurl=https://updates.oweeme.com/ostree\ngpg-verify=true\n' > "$R/etc/ostree/remotes.d/owee.conf"
+fi
 
 # 4a. SOLO PRUEBAS: usuario sin contraseña con inicio de sesión automático (OWEE_TEST_USER=1).
 [ "${OWEE_TEST_USER:-0}" = 1 ] && "$(dirname "$0")/overlay-test-user.sh" "$R"

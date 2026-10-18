@@ -28,7 +28,5 @@ ostree admin cleanup --sysroot="$M" >/dev/null 2>&1 || true
 log "menú de arranque"
 owee-bootcfg "$M/boot"
 mount "$ESPDEV" "$M/boot/efi"
-W=$(mktemp -d); printf 'search --no-floppy --fs-uuid --set=root %s\nconfigfile /boot/owee/grub.cfg\n' "$UUID" > "$W/grub.cfg"
-mkdir -p "$M/boot/efi/EFI/BOOT"
-grub-mkstandalone -O x86_64-efi -o "$M/boot/efi/EFI/BOOT/BOOTX64.EFI" --modules="part_gpt ext2 search search_fs_uuid linux normal echo gzio" "boot/grub/grub.cfg=$W/grub.cfg" 2>/dev/null; rm -rf "$W"
+efi=$(/usr/libexec/owee/installer/owee-install-efi "$M/boot/efi" "$UUID") || { log "no se pudo instalar el cargador de arranque"; exit 1; }; log "$efi"
 sync; log "listo"

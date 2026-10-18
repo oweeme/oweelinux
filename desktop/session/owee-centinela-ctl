@@ -1,0 +1,14 @@
+#!/bin/sh
+# Control de Centinela (lo usa Ajustes → Seguridad con pkexec). Uso: owee-centinela-ctl status | on | off | autoblock on|off | events [N] | clear
+CONF=/etc/owee/centinela.conf
+getc() { [ -f "$CONF" ] && sed -n "s/^$1=\"\{0,1\}\([^\"]*\)\"\{0,1\}$/\1/p" "$CONF" | head -1; }
+setc() { mkdir -p /etc/owee; touch "$CONF"; grep -v "^$1=" "$CONF" > "$CONF.tmp"; printf '%s="%s"\n' "$1" "$2" >> "$CONF.tmp"; mv "$CONF.tmp" "$CONF"; }
+case "${1:-status}" in
+  on) systemctl enable --now owee-firewall.service owee-centinela.service ;;
+  off) systemctl disable --now owee-centinela.service ;;
+  autoblock) [ "${2:-}" = on ] && setc AUTOBLOCK 1 || setc AUTOBLOCK 0; systemctl is-active --quiet owee-centinela && systemctl restart owee-centinela; echo "bloqueo automático: ${2:-}" ;;
+  events) tail -n "${2:-30}" /var/lib/owee-centinela/events.jsonl 2>/dev/null ;;
+  clear) : > /var/lib/owee-centinela/events.jsonl 2>/dev/null; rm -f /run/owee-centinela/alert ;;
+  status) printf 'activo=%s\nbloqueo=%s\npuertos=%s\n' "$(systemctl is-active owee-centinela 2>/dev/null)" "$(getc AUTOBLOCK || true)" "$(getc PORTS || true)" ;;
+  *) echo "uso: owee-centinela-ctl status|on|off|autoblock on|off|events [N]|clear" >&2; exit 2 ;;
+esac

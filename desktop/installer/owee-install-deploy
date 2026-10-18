@@ -28,8 +28,5 @@ if [ -s /run/owee/home-uuid ]; then
 fi
 log "menú de arranque"
 owee-bootcfg "$ROOT/boot"
-W=$(mktemp -d); trap 'rm -rf "$W"' EXIT
-printf 'search --no-floppy --fs-uuid --set=root %s\nconfigfile /boot/owee/grub.cfg\n' "$UUID" > "$W/grub.cfg"
-mkdir -p "$ESP/EFI/BOOT"
-grub-mkstandalone -O x86_64-efi -o "$ESP/EFI/BOOT/BOOTX64.EFI" --modules="part_gpt ext2 search search_fs_uuid linux normal echo gzio" "boot/grub/grub.cfg=$W/grub.cfg" 2>/dev/null
+efi=$(/usr/libexec/owee/installer/owee-install-efi "$ESP" "$UUID") || { log "no se pudo instalar el cargador de arranque"; exit 1; }; log "$efi"
 sync; log "listo"

@@ -7,7 +7,7 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run owee-firewall owee-centinela owee-centinela-ctl; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_overview.py owee_switcher.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
@@ -23,7 +23,7 @@ printf '[Behavior]\nDisabledAddons=notificationitem,notifications\n' | install -
 # Instalador (Calamares): scripts, configuración y marca. Solo se activa en el medio de instalación (marca en /var, ver build.sh); si falta el paquete calamares, no se instala nada.
 if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
   install -Dm0755 "$D/installer/owee-install-deploy" "$R/usr/libexec/owee/installer/owee-install-deploy"; install -Dm0755 "$D/installer/owee-install-disk" "$R/usr/libexec/owee/installer/owee-install-disk"
-  for f in owee-reinstall owee-installer-scan owee-installer-sethome owee_install_choice.py; do install -Dm0755 "$D/installer/$f" "$R/usr/libexec/owee/installer/$f"; done
+  for f in owee-reinstall owee-install-efi owee-installer-scan owee-installer-sethome owee_install_choice.py; do install -Dm0755 "$D/installer/$f" "$R/usr/libexec/owee/installer/$f"; done
   install -Dm0644 "$D/session/owee-installer.desktop" "$R/usr/share/wayland-sessions/owee-installer.desktop"
   for f in settings.conf; do install -Dm0644 "$D/installer/calamares/$f" "$ETC/calamares/$f"; done          # /etc/calamares: la ubicación normal de Calamares (con -c exigiría su propia carpeta qml/)
   for f in welcome partition finished shellprocess-oweedeploy; do install -Dm0644 "$D/installer/calamares/$f.conf" "$ETC/calamares/modules/$f.conf"; done
@@ -226,6 +226,33 @@ EOS
 mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
 # Fcitx5 no debe arrancarse solo por D-Bus (lo activaban Ajustes y el panel nada más abrirse, +32 MB): se lanza cuando el usuario activa un método de escritura (Ajustes → Teclado) o ya tiene uno
 rm -f "$R/usr/share/dbus-1/services/org.fcitx.Fcitx5.service"
+# Seguridad: cortafuegos (bloquea lo entrante; activo por defecto), Centinela (señuelo de red pasivo; apagado por defecto) y endurecimiento del kernel
+install -Dm0644 "$D/session/owee-firewall.service" "$R/usr/lib/systemd/system/owee-firewall.service"
+install -Dm0644 "$D/session/owee-centinela.service" "$R/usr/lib/systemd/system/owee-centinela.service"
+install -Dm0644 "$D/session/owee-centinela.sysusers" "$R/usr/lib/sysusers.d/owee-centinela.conf"
+ln -sf /usr/lib/systemd/system/owee-firewall.service "$ETC/systemd/system/multi-user.target.wants/owee-firewall.service"
+install -Dm0644 /dev/stdin "$R/usr/lib/sysctl.d/91-owee-hardening.conf" <<'EOS'
+# Endurecimiento de escritorio: no rompe navegadores, Flatpak ni Podman (se dejan los espacios de nombres de usuario sin restringir)
+kernel.kptr_restrict = 2
+kernel.dmesg_restrict = 1
+kernel.unprivileged_bpf_disabled = 1
+net.core.bpf_jit_harden = 2
+kernel.kexec_load_disabled = 1
+kernel.yama.ptrace_scope = 1
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+fs.protected_fifos = 2
+fs.protected_regular = 2
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv6.conf.all.accept_redirects = 0
+net.ipv6.conf.default.accept_redirects = 0
+net.ipv4.tcp_syncookies = 1
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+EOS
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

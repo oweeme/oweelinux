@@ -250,7 +250,23 @@ class Reminders:
     def __init__(self):
         self.mtime = None; self.ev = {}; self.done = set(); GLib.timeout_add_seconds(20, self.tick)
 
+    ALERT = "/run/owee-centinela/alert"
+    def sentinel(self):
+        """Aviso de Centinela (señuelo de red): si hay una alerta nueva, notificación. Solo mira la fecha de un archivo (cada 20 s, junto a los avisos del calendario)."""
+        try: m = os.stat(self.ALERT).st_mtime
+        except OSError: return
+        first = getattr(self, "amtime", None) is None
+        if m == getattr(self, "amtime", None): return
+        self.amtime = m
+        if first and time.time() - m > 120: return                       # alerta anterior a este arranque del panel
+        try: a = json.load(open(self.ALERT))
+        except (OSError, ValueError): return
+        txt = _('Alguien está escaneando tu equipo desde {0} (puertos {1}).', str(a.get("ip", "?"))[:45], ", ".join(str(x) for x in a.get("ports", [])[:6])) + " " + (_("Lo bloqueé.") if a.get("blocked") else _("Quedó anotado."))
+        try: Gio.Subprocess.new(["notify-send", "-u", "critical", "-a", "Centinela", "-i", "security-low", _("Centinela"), txt], Gio.SubprocessFlags.NONE)
+        except GLib.Error: pass
+
     def tick(self):
+        self.sentinel()
         try:
             m = os.stat(self.DATA).st_mtime
             if m != self.mtime: self.mtime = m; self.ev = json.load(open(self.DATA, encoding="utf-8"))

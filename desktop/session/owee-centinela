@@ -1,0 +1,103 @@
+#!/usr/bin/python3
+"""Centinela de OweeLinux: un señuelo de red (honeypot) PASIVO y de muy poco consumo. Escucha en unos puertos que nadie legítimo usa (por defecto 23, 445, 3389, 5900, 2222), acepta la conexión, lee como mucho
+128 bytes, la cierra y lo anota. NO ejecuta ni responde nada de lo que recibe: no hay ningún servicio detrás, así que no hay nada que explotar. Dos o más puertos distintos (o tres intentos) desde la misma
+dirección en 10 minutos = un escaneo: avisa al usuario (panel) y, si está activado, bloquea esa dirección con el cortafuegos (conjuntos blocked4/blocked6 de owee-firewall) el tiempo configurado.
+Corre como un usuario propio sin privilegios, con solo dos capacidades (puertos bajos y nftables) y muy acotado por systemd (owee-centinela.service). Config: /etc/owee/centinela.conf."""
+import asyncio, collections, ipaddress, json, os, re, signal, subprocess, sys, time
+
+CONF = os.environ.get("OWEE_CENTINELA_CONF", "/etc/owee/centinela.conf"); STATE = os.environ.get("OWEE_CENTINELA_STATE", "/var/lib/owee-centinela"); RUN = os.environ.get("OWEE_CENTINELA_RUN", "/run/owee-centinela")
+LOG = os.path.join(STATE, "events.jsonl"); ALERT = os.path.join(RUN, "alert")
+WINDOW = 600; MAX_PER_MIN = 40
+
+def conf():
+    d = {"PORTS": "23 445 3389 5900 2222", "AUTOBLOCK": "1", "BLOCK_SECONDS": "3600"}
+    try:
+        for l in open(CONF):
+            m = re.match(r'\s*([A-Z_]+)\s*=\s*"?([^"\n#]*)"?', l)
+            if m: d[m.group(1)] = m.group(2).strip()
+    except OSError: pass
+    return d
+
+def nft(cmd):
+    try: subprocess.run(["/usr/sbin/nft"] + cmd.split(), timeout=5, capture_output=True)
+    except Exception: pass
+
+def gateways():
+    """Puertas de enlace actuales: nunca se bloquean (cortarían la propia red)."""
+    out = set()
+    try:
+        for l in open("/proc/net/route").read().splitlines()[1:]:
+            f = l.split()
+            if len(f) > 2 and f[1] == "00000000": out.add(str(ipaddress.IPv4Address(int(f[2], 16).to_bytes(4, "little"))))
+    except (OSError, ValueError): pass
+    return out
+
+class Sentinel:
+    def __init__(self, c):
+        self.c = c; self.recent = collections.defaultdict(collections.deque); self.alerted = {}; self.minute = collections.defaultdict(lambda: [0, 0])
+        os.makedirs(STATE, exist_ok=True)
+
+    def sane(self, data):
+        return re.sub(r"[^\x20-\x7e]", ".", data.decode("latin1"))[:80]
+
+    async def handle(self, reader, writer, port):
+        peer = writer.get_extra_info("peername"); ip = (peer[0] if peer else "?").split("%")[0]
+        if ip.startswith("::ffff:"): ip = ip[7:]
+        try:
+            try: data = await asyncio.wait_for(reader.read(128), 3)
+            except Exception: data = b""
+        finally:
+            try: writer.close()
+            except Exception: pass
+        self.record(ip, port, data)
+
+    def record(self, ip, port, data):
+        now = time.time(); m = self.minute[ip]
+        if now - m[0] > 60: m[0], m[1] = now, 0
+        m[1] += 1
+        if m[1] > MAX_PER_MIN: return                                   # un inundador no llena el registro
+        ev = {"t": int(now), "ip": ip, "port": port, "data": self.sane(data)}
+        self.write_log(ev); print(json.dumps(ev), flush=True)
+        q = self.recent[ip]; q.append((now, port))
+        while q and now - q[0][0] > WINDOW: q.popleft()
+        ports = {p for _t, p in q}
+        if (len(ports) >= 2 or len(q) >= 3) and now - self.alerted.get(ip, 0) > 60:
+            self.alerted[ip] = now; blocked = self.block(ip)
+            self.alert({"t": int(now), "ip": ip, "ports": sorted(ports), "n": len(q), "blocked": blocked})
+        if len(self.recent) > 500: self.recent.clear(); self.minute.clear(); self.alerted.clear()      # tope de memoria
+
+    def write_log(self, ev):
+        try:
+            with open(LOG, "a") as f: f.write(json.dumps(ev) + "\n")
+            if os.path.getsize(LOG) > 1_000_000:
+                keep = open(LOG).read().splitlines()[-500:]; open(LOG, "w").write("\n".join(keep) + "\n")
+        except OSError: pass
+
+    def alert(self, a):
+        try: tmp = ALERT + ".tmp"; open(tmp, "w").write(json.dumps(a) + "\n"); os.replace(tmp, ALERT)
+        except OSError: pass
+
+    def block(self, ip):
+        if self.c.get("AUTOBLOCK") != "1": return False
+        try:
+            a = ipaddress.ip_address(ip)
+            if a.is_loopback or a.is_unspecified or a.is_multicast or ip in gateways(): return False
+            secs = max(60, min(86400, int(self.c.get("BLOCK_SECONDS", "3600"))))
+            nft(f"add element inet owee {'blocked4' if a.version == 4 else 'blocked6'} {{ {ip} timeout {secs}s }}")
+            return True
+        except ValueError: return False
+
+async def main():
+    c = conf(); s = Sentinel(c); servers = []; ok = []
+    for p in [int(x) for x in c["PORTS"].split() if x.isdigit() and 1 <= int(x) <= 65535][:12]:
+        try: servers.append(await asyncio.start_server(lambda r, w, p=p: s.handle(r, w, p), host=None, port=p, backlog=16)); ok.append(p)
+        except OSError as e: print(f"puerto {p} no disponible: {e}", flush=True)       # ocupado por un servicio real: se respeta
+    if ok: nft("add element inet owee decoy_tcp { " + ", ".join(map(str, ok)) + " }")
+    print("Centinela activo en los puertos", ok, flush=True)
+    stop = asyncio.Event(); loop = asyncio.get_running_loop()
+    for sig in (signal.SIGTERM, signal.SIGINT): loop.add_signal_handler(sig, stop.set)
+    await stop.wait()
+    nft("flush set inet owee decoy_tcp")
+    for sv in servers: sv.close()
+
+if __name__ == "__main__": asyncio.run(main())
