@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "왼쪽 아래 모서리",
 "Esquina inferior derecha": "오른쪽 아래 모서리",
 "Escritorios y esquinas": "데스크톱과 모서리",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "여러 데스크톱으로 창을 정리하세요. 단축키: Super+1…4 (이동), Super+Shift+1…4 (창 옮기기), Ctrl+Alt+←/→, Super+Tab (개요).",
 "Escritorios virtuales": "가상 데스크톱",
 "Cantidad de escritorios": "데스크톱 개수",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "패널에 데스크톱마다 점이 표시되며, 점을 누르면 이동합니다",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "언어를 생성하지 못했습니다.",
 "Permitir superar el 100 % (hasta 150 %)": "100 % 초과 허용(최대 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "스피커나 마이크 음량을 더 키웁니다. 100 %를 넘으면 소리가 왜곡될 수 있습니다",
-"Puerto": "포트"
+"Puerto": "포트",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "여러 데스크톱으로 창을 정리하세요. 단축키: Super+1…4(이동), Super+Shift+1…4(창 옮기기), Ctrl+Alt+←/→, Super+Tab(데스크톱과 창), Super+A(개요)."
 }

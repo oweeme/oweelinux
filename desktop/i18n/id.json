@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Sudut kiri bawah",
 "Esquina inferior derecha": "Sudut kanan bawah",
 "Escritorios y esquinas": "Desktop dan sudut",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Beberapa desktop untuk merapikan jendela. Pintasan: Super+1…4 (pindah), Super+Shift+1…4 (pindahkan jendela), Ctrl+Alt+←/→, Super+Tab (ikhtisar).",
 "Escritorios virtuales": "Desktop virtual",
 "Cantidad de escritorios": "Jumlah desktop",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "Panel menampilkan satu titik per desktop; klik salah satu untuk pindah",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Gagal membuat bahasa.",
 "Permitir superar el 100 % (hasta 150 %)": "Izinkan melebihi 100 % (hingga 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Menaikkan volume speaker atau mikrofon lebih jauh; di atas 100 % suara bisa terdistorsi",
-"Puerto": "Port"
+"Puerto": "Port",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Beberapa desktop untuk mengatur jendela. Pintasan: Super+1…4 (pindah), Super+Shift+1…4 (pindahkan jendela), Ctrl+Alt+←/→, Super+Tab (desktop dan jendela), Super+A (ikhtisar)."
 }

@@ -13,7 +13,8 @@ SRC = "/usr/libexec/owee"
 DEST = os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "owee", "shell")
 
 def unlocked():
-    try: return bool(os.popen("findmnt -no FSTYPE /usr 2>/dev/null").read().strip() == "overlay")
+    """/usr está protegido si se monta solo de lectura (ostree); tras `ostree admin unlock` se monta con una capa escribible."""
+    try: return "ro" not in os.popen("findmnt -no OPTIONS /usr 2>/dev/null").read().strip().split(",")
     except OSError: return False
 
 class Desarrollo(Page):

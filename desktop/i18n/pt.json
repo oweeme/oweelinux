@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Canto inferior esquerdo",
 "Esquina inferior derecha": "Canto inferior direito",
 "Escritorios y esquinas": "Áreas de trabalho e cantos",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Várias áreas de trabalho para organizar suas janelas. Atalhos: Super+1…4 (ir), Super+Shift+1…4 (mover a janela), Ctrl+Alt+←/→, Super+Tab (visão geral).",
 "Escritorios virtuales": "Áreas de trabalho virtuais",
 "Cantidad de escritorios": "Número de áreas de trabalho",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "O painel mostra um ponto por área de trabalho; clique em um para ir até ele",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Não foi possível gerar o idioma.",
 "Permitir superar el 100 % (hasta 150 %)": "Permitir passar de 100 % (até 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Aumenta mais o volume dos alto-falantes ou do microfone; acima de 100 % o som pode distorcer",
-"Puerto": "Porta"
+"Puerto": "Porta",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Várias áreas de trabalho para organizar suas janelas. Atalhos: Super+1…4 (ir), Super+Shift+1…4 (mover a janela), Ctrl+Alt+←/→, Super+Tab (áreas e janelas), Super+A (visão geral)."
 }

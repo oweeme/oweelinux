@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "左下角",
 "Esquina inferior derecha": "右下角",
 "Escritorios y esquinas": "桌面与热角",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "多个桌面可用来整理窗口。快捷键：Super+1…4（切换），Super+Shift+1…4（移动窗口），Ctrl+Alt+←/→，Super+Tab（总览）。",
 "Escritorios virtuales": "虚拟桌面",
 "Cantidad de escritorios": "桌面数量",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "面板为每个桌面显示一个点；点击即可切换",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "无法生成该语言。",
 "Permitir superar el 100 % (hasta 150 %)": "允许超过 100 %（最高 150 %）",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "进一步提高扬声器或麦克风的音量；超过 100 % 声音可能失真",
-"Puerto": "端口"
+"Puerto": "端口",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "多个桌面用来整理窗口。快捷键：Super+1…4（切换）、Super+Shift+1…4（移动窗口）、Ctrl+Alt+←/→、Super+Tab（桌面与窗口）、Super+A（总览）。"
 }

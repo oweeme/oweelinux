@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "左下の隅",
 "Esquina inferior derecha": "右下の隅",
 "Escritorios y esquinas": "デスクトップとコーナー",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "複数のデスクトップでウィンドウを整理できます。ショートカット: Super+1…4（移動）、Super+Shift+1…4（ウィンドウを移動）、Ctrl+Alt+←/→、Super+Tab（概要）。",
 "Escritorios virtuales": "仮想デスクトップ",
 "Cantidad de escritorios": "デスクトップの数",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "パネルにはデスクトップごとに点が表示されます。クリックでそのデスクトップに移動します",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "言語を生成できませんでした。",
 "Permitir superar el 100 % (hasta 150 %)": "100 % 超を許可（最大 150 %）",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "スピーカーやマイクの音量をさらに上げます。100 % を超えると音が歪むことがあります",
-"Puerto": "ポート"
+"Puerto": "ポート",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "複数のデスクトップでウィンドウを整理できます。ショートカット：Super+1…4（移動）、Super+Shift+1…4（ウィンドウを移動）、Ctrl+Alt+←/→、Super+Tab（デスクトップとウィンドウ）、Super+A（概要）。"
 }

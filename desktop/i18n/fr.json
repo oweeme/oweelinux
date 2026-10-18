@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Coin inférieur gauche",
 "Esquina inferior derecha": "Coin inférieur droit",
 "Escritorios y esquinas": "Bureaux et coins",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Plusieurs bureaux pour organiser vos fenêtres. Raccourcis : Super+1…4 (aller), Super+Maj+1…4 (déplacer la fenêtre), Ctrl+Alt+←/→, Super+Tab (vue d'ensemble).",
 "Escritorios virtuales": "Bureaux virtuels",
 "Cantidad de escritorios": "Nombre de bureaux",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "Le tableau de bord affiche un point par bureau ; cliquez pour y aller",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Impossible de générer la langue.",
 "Permitir superar el 100 % (hasta 150 %)": "Autoriser plus de 100 % (jusqu'à 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Augmente davantage le volume des haut-parleurs ou du micro ; au-dessus de 100 %, le son peut saturer",
-"Puerto": "Port"
+"Puerto": "Port",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Plusieurs bureaux pour organiser vos fenêtres. Raccourcis : Super+1…4 (aller), Super+Maj+1…4 (déplacer la fenêtre), Ctrl+Alt+←/→, Super+Tab (bureaux et fenêtres), Super+A (vue d'ensemble)."
 }

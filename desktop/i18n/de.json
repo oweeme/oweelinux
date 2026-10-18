@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Untere linke Ecke",
 "Esquina inferior derecha": "Untere rechte Ecke",
 "Escritorios y esquinas": "Arbeitsflächen und Ecken",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Mehrere Arbeitsflächen zum Ordnen deiner Fenster. Kürzel: Super+1…4 (wechseln), Super+Umschalt+1…4 (Fenster verschieben), Strg+Alt+←/→, Super+Tab (Übersicht).",
 "Escritorios virtuales": "Virtuelle Arbeitsflächen",
 "Cantidad de escritorios": "Anzahl der Arbeitsflächen",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "Das Panel zeigt pro Arbeitsfläche einen Punkt; Klick darauf wechselt dorthin",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Die Sprache konnte nicht erzeugt werden.",
 "Permitir superar el 100 % (hasta 150 %)": "Über 100 % erlauben (bis 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Erhöht die Lautstärke von Lautsprechern oder Mikrofon weiter; über 100 % kann der Ton verzerren",
-"Puerto": "Anschluss"
+"Puerto": "Anschluss",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Mehrere Arbeitsflächen, um deine Fenster zu ordnen. Kürzel: Super+1…4 (wechseln), Super+Umschalt+1…4 (Fenster verschieben), Strg+Alt+←/→, Super+Tab (Arbeitsflächen und Fenster), Super+A (Übersicht)."
 }

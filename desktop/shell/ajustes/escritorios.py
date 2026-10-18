@@ -34,7 +34,7 @@ def set_wheel(on):
 class Escritorios(Page):
     title = _("Escritorios"); icon = "owee-set-desktops"; group = "Personal"; order = 30; keywords = _("esquinas activas escritorios virtuales vista general ventanas espacios de trabajo")
     def build(self, app):
-        self.app = app; b = page_box(_("Escritorios y esquinas"), _("Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general)."))
+        self.app = app; b = page_box(_("Escritorios y esquinas"), _("Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general)."))
         b.append(heading(_("Panel")))
         b.append(row(_("Posición del panel"), dropdown([("top", _("Arriba")), ("bottom", _("Abajo")), ("left", _("Izquierda")), ("right", _("Derecha"))], app.cfg.get("panel_pos", "top"), lambda k: app.change(panel_pos=k)), _("Se mueve al instante; las ventanitas se abren hacia el lado contrario")))
         b.append(row(_("Tamaño del panel"), dropdown([("compact", _("Compacto")), ("normal", _("Normal")), ("large", _("Grande"))], app.cfg.get("panel_size", "normal"), lambda k: app.change(panel_size=k))))

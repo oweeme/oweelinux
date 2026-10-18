@@ -621,6 +621,9 @@ class Panel(Gtk.Application):
             if box is not None: box.set_orientation(o)
         self.bar.set_size_request(thick + 30 if vertical else -1, -1 if vertical else thick); win.set_default_size(thick + 30 if vertical else -1, -1 if vertical else thick)
         (win.add_css_class if vertical else win.remove_css_class)("vertical")
+        for box in (self.left_box, self.right_box):
+            c = box.get_first_child()
+            while c: c.set_halign(Gtk.Align.CENTER if vertical else Gtk.Align.FILL); c = c.get_next_sibling()
         self.set_margins(self.compact)
         def arrows(w):
             while w:

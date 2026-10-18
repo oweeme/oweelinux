@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "گوشهٔ پایین چپ",
 "Esquina inferior derecha": "گوشهٔ پایین راست",
 "Escritorios y esquinas": "میزکارها و گوشه‌ها",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "چند میزکار برای مرتب‌کردن پنجره‌ها. میان‌برها: Super+1…4 (رفتن)، Super+Shift+1…4 (انتقال پنجره)، Ctrl+Alt+←/→، Super+Tab (نمای کلی).",
 "Escritorios virtuales": "میزکارهای مجازی",
 "Cantidad de escritorios": "تعداد میزکارها",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "پنل برای هر میزکار یک نقطه نشان می‌دهد؛ روی یکی کلیک کنید تا به آن بروید",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "ساخت زبان ممکن نشد.",
 "Permitir superar el 100 % (hasta 150 %)": "اجازهٔ بیش از ۱۰۰٪ (تا ۱۵۰٪)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "صدای بلندگوها یا میکروفون را بیشتر بالا می‌برد؛ بالاتر از ۱۰۰٪ صدا ممکن است اعوجاج پیدا کند",
-"Puerto": "درگاه"
+"Puerto": "درگاه",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "چند میز کار برای مرتب کردن پنجره‌ها. میانبرها: Super+1…4 (رفتن)، Super+Shift+1…4 (جابه‌جایی پنجره)، Ctrl+Alt+←/→، Super+Tab (میزها و پنجره‌ها)، Super+A (نمای کلی)."
 }

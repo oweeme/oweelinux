@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Angolo in basso a sinistra",
 "Esquina inferior derecha": "Angolo in basso a destra",
 "Escritorios y esquinas": "Desktop e angoli",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Più desktop per ordinare le finestre. Scorciatoie: Super+1…4 (vai), Super+Maiusc+1…4 (sposta la finestra), Ctrl+Alt+←/→, Super+Tab (panoramica).",
 "Escritorios virtuales": "Desktop virtuali",
 "Cantidad de escritorios": "Numero di desktop",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "Il pannello mostra un punto per desktop; clic su uno per andarci",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Impossibile generare la lingua.",
 "Permitir superar el 100 % (hasta 150 %)": "Consenti oltre il 100 % (fino al 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Alza ancora di più il volume di altoparlanti o microfono; oltre il 100 % l'audio può distorcersi",
-"Puerto": "Porta"
+"Puerto": "Porta",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Più desktop per organizzare le finestre. Scorciatoie: Super+1…4 (vai), Super+Maiusc+1…4 (sposta la finestra), Ctrl+Alt+←/→, Super+Tab (desktop e finestre), Super+A (panoramica)."
 }

@@ -42,10 +42,11 @@ class Dispositivos(Page):
         self.holder.append(c)
 
     def scan(self):
+        self.gen = getattr(self, "gen", 0) + 1; self.mygen = self.gen          # varias lecturas a la vez (al abrir y al mostrar la página) no deben duplicar las tarjetas
         while (ch := self.holder.get_first_child()): self.holder.remove(ch)
         self.card(_("Procesador"), [(self.cpu(), "")])
         self.card(_("Memoria"), [(self.mem(), "")])
-        run(["lspci", "-k"], self.on_pci)
+        gen = self.gen; run(["lspci", "-k"], lambda out, code: gen == self.gen and self.on_pci(out, code))
 
     @staticmethod
     def cpu():
@@ -72,10 +73,10 @@ class Dispositivos(Page):
             name = head.split(": ", 1)[1] if ": " in head else head
             text = f"{name}  →  " + (_('controlador {0}', drv) if drv else _("SIN controlador"))
             groups[key].append((text, "ok" if drv else "bad"))
-        if code != 0 or not out.strip(): groups["other"].append((_("No se pudo leer la lista de dispositivos PCI (falta pciutils)."), ""))
+        if code != 0 or not out.strip(): self.card(_("Dispositivos"), [(_("No se pudo leer la lista de dispositivos PCI (falta pciutils)."), "")])
         for key, title in (("gpu", _("Gráficos")), ("audio", _("Sonido")), ("net", _("Red"))):
             if groups[key]: self.card(title, groups[key])
-        self.card(_("Almacenamiento"), [(l, "") for l in self.disks()] or [("?", "")])
+        if self.disks(): self.card(_("Almacenamiento"), [(l, "") for l in self.disks()])
         bat = self.battery()
         if bat: self.card(_("Batería"), bat)
         cams = [read(p) for p in sorted(glob.glob("/sys/class/video4linux/video*/name"))]

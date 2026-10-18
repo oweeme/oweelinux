@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Нижній лівий кут",
 "Esquina inferior derecha": "Нижній правий кут",
 "Escritorios y esquinas": "Стільниці та кути",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Кілька стільниць, щоб упорядкувати вікна. Скорочення: Super+1…4 (перейти), Super+Shift+1…4 (перемістити вікно), Ctrl+Alt+←/→, Super+Tab (огляд).",
 "Escritorios virtuales": "Віртуальні стільниці",
 "Cantidad de escritorios": "Кількість стільниць",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "Панель показує крапку для кожної стільниці; клацніть на одну, щоб перейти",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Не вдалося створити мову.",
 "Permitir superar el 100 % (hasta 150 %)": "Дозволити понад 100 % (до 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Додатково підвищує гучність динаміків або мікрофона; понад 100 % звук може спотворюватися",
-"Puerto": "Порт"
+"Puerto": "Порт",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Кілька робочих столів для впорядкування вікон. Скорочення: Super+1…4 (перейти), Super+Shift+1…4 (перемістити вікно), Ctrl+Alt+←/→, Super+Tab (столи й вікна), Super+A (огляд)."
 }

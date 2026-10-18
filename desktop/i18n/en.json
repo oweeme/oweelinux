@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Bottom-left corner",
 "Esquina inferior derecha": "Bottom-right corner",
 "Escritorios y esquinas": "Desktops and corners",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Several desktops to organize your windows. Shortcuts: Super+1…4 (go), Super+Shift+1…4 (move the window), Ctrl+Alt+←/→, Super+Tab (overview).",
 "Escritorios virtuales": "Virtual desktops",
 "Cantidad de escritorios": "Number of desktops",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "The panel shows one dot per desktop; click one to go to it",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Could not generate the language.",
 "Permitir superar el 100 % (hasta 150 %)": "Allow going above 100 % (up to 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Raises the volume of the speakers or microphone further; above 100 % the sound may distort",
-"Puerto": "Port"
+"Puerto": "Port",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Several desktops to organize your windows. Shortcuts: Super+1…4 (go), Super+Shift+1…4 (move the window), Ctrl+Alt+←/→, Super+Tab (desktops and windows), Super+A (overview)."
 }

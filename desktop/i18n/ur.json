@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "نیچے بائیں کونا",
 "Esquina inferior derecha": "نیچے دائیں کونا",
 "Escritorios y esquinas": "ڈیسک ٹاپس اور کونے",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "ونڈوز ترتیب دینے کے لیے کئی ڈیسک ٹاپس۔ شارٹ کٹس: Super+1…4 (جائیں)، Super+Shift+1…4 (ونڈو منتقل کریں)، Ctrl+Alt+←/→، Super+Tab (جائزہ)۔",
 "Escritorios virtuales": "ورچوئل ڈیسک ٹاپس",
 "Cantidad de escritorios": "ڈیسک ٹاپس کی تعداد",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "پینل ہر ڈیسک ٹاپ کے لیے ایک نقطہ دکھاتا ہے؛ کسی پر کلک کر کے وہاں جائیں",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "زبان نہیں بن سکی۔",
 "Permitir superar el 100 % (hasta 150 %)": "100 % سے اوپر کی اجازت (150 % تک)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "اسپیکر یا مائیک کی آواز مزید بڑھاتا ہے؛ 100 % سے اوپر آواز بگڑ سکتی ہے",
-"Puerto": "پورٹ"
+"Puerto": "پورٹ",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "ونڈوز ترتیب دینے کے لیے کئی ڈیسک ٹاپ۔ شارٹ کٹ: Super+1…4 (جائیں)، Super+Shift+1…4 (ونڈو منتقل کریں)، Ctrl+Alt+←/→، Super+Tab (ڈیسک ٹاپ اور ونڈوز)، Super+A (جائزہ)۔"
 }

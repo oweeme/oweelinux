@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "निचला बायाँ कोना",
 "Esquina inferior derecha": "निचला दायाँ कोना",
 "Escritorios y esquinas": "डेस्कटॉप और कोने",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "विंडो व्यवस्थित करने के लिए कई डेस्कटॉप। शॉर्टकट: Super+1…4 (जाएँ), Super+Shift+1…4 (विंडो भेजें), Ctrl+Alt+←/→, Super+Tab (अवलोकन)।",
 "Escritorios virtuales": "वर्चुअल डेस्कटॉप",
 "Cantidad de escritorios": "डेस्कटॉप की संख्या",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "पैनल हर डेस्कटॉप के लिए एक बिंदु दिखाता है; उस पर क्लिक करके वहाँ जाएँ",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "भाषा नहीं बन सकी।",
 "Permitir superar el 100 % (hasta 150 %)": "100 % से ऊपर की अनुमति (150 % तक)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "स्पीकर या माइक की आवाज़ और बढ़ाता है; 100 % से ऊपर आवाज़ बिगड़ सकती है",
-"Puerto": "पोर्ट"
+"Puerto": "पोर्ट",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "विंडो व्यवस्थित करने के लिए कई डेस्कटॉप। शॉर्टकट: Super+1…4 (जाएँ), Super+Shift+1…4 (विंडो खिसकाएँ), Ctrl+Alt+←/→, Super+Tab (डेस्कटॉप और विंडो), Super+A (अवलोकन)।"
 }

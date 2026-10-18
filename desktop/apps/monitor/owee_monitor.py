@@ -29,9 +29,12 @@ def snapshot():
             st = open(f"/proc/{pid}/stat").read(); i = st.rindex(")"); f = st[i + 2:].split()      # tras «(nombre)»: estado en f[0]; utime f[11], stime f[12]
             name = st[st.index("(") + 1:i]; j = int(f[11]) + int(f[12])
             rss = int(open(f"/proc/{pid}/statm").read().split()[1]) * PAGE; uid = os.stat(f"/proc/{pid}").st_uid
-            try: cmd = open(f"/proc/{pid}/cmdline", "rb").read().split(b"\0")[0].decode(errors="replace")
-            except OSError: cmd = ""
-            if cmd and "/" in cmd and name != os.path.basename(cmd)[:15]: name = os.path.basename(cmd)[:40] if os.path.basename(cmd) else name
+            try: args = [a.decode(errors="replace") for a in open(f"/proc/{pid}/cmdline", "rb").read().split(b"\0") if a]
+            except OSError: args = []
+            if args and name.startswith(("python", "sh", "bash", "node", "perl", "ruby", "java")):        # los intérpretes se muestran con el programa que ejecutan, no «python3»
+                script = next((a for a in args[1:] if not a.startswith("-")), "")
+                if script: name = os.path.basename(script)[:40]
+            elif args and "/" in args[0] and os.path.basename(args[0]) and name != os.path.basename(args[0])[:15]: name = os.path.basename(args[0])[:40]
             out[int(pid)] = (name, uid, j, rss)
         except (OSError, ValueError, IndexError): continue
     return out

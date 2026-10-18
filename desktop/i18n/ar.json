@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "الزاوية السفلية اليسرى",
 "Esquina inferior derecha": "الزاوية السفلية اليمنى",
 "Escritorios y esquinas": "أسطح المكتب والزوايا",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "عدّة أسطح مكتب لتنظيم نوافذك. الاختصارات: Super+1…4 (انتقال)، Super+Shift+1…4 (نقل النافذة)، Ctrl+Alt+←/→، Super+Tab (نظرة عامة).",
 "Escritorios virtuales": "أسطح المكتب الافتراضية",
 "Cantidad de escritorios": "عدد أسطح المكتب",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "تعرض اللوحة نقطة لكل سطح مكتب؛ انقر على واحدة للانتقال إليه",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "تعذّر إنشاء اللغة.",
 "Permitir superar el 100 % (hasta 150 %)": "السماح بتجاوز 100 % (حتى 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "يرفع صوت السماعات أو الميكروفون أكثر؛ فوق 100 % قد يتشوّه الصوت",
-"Puerto": "المنفذ"
+"Puerto": "المنفذ",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "عدة أسطح مكتب لترتيب نوافذك. الاختصارات: Super+1…4 (انتقال)، Super+Shift+1…4 (نقل النافذة)، Ctrl+Alt+←/→، Super+Tab (أسطح المكتب والنوافذ)، Super+A (نظرة عامة)."
 }

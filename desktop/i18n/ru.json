@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "Нижний левый угол",
 "Esquina inferior derecha": "Нижний правый угол",
 "Escritorios y esquinas": "Рабочие столы и углы",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "Несколько рабочих столов для упорядочивания окон. Сочетания: Super+1…4 (перейти), Super+Shift+1…4 (переместить окно), Ctrl+Alt+←/→, Super+Tab (обзор).",
 "Escritorios virtuales": "Виртуальные рабочие столы",
 "Cantidad de escritorios": "Количество рабочих столов",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "На панели — по точке на каждый стол; щёлкните точку, чтобы перейти",
@@ -637,5 +636,6 @@
 "No se pudo generar el idioma.": "Не удалось создать язык.",
 "Permitir superar el 100 % (hasta 150 %)": "Разрешить выше 100 % (до 150 %)",
 "Sube más el volumen de los altavoces o del micrófono; por encima del 100 % el sonido puede distorsionarse": "Увеличивает громкость динамиков или микрофона; выше 100 % звук может искажаться",
-"Puerto": "Порт"
+"Puerto": "Порт",
+"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (escritorios y ventanas), Super+A (vista general).": "Несколько рабочих столов для упорядочивания окон. Сочетания: Super+1…4 (перейти), Super+Shift+1…4 (переместить окно), Ctrl+Alt+←/→, Super+Tab (столы и окна), Super+A (обзор)."
 }
