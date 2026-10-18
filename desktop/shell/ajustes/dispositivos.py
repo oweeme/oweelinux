@@ -63,9 +63,11 @@ class Dispositivos(Page):
 
     def on_pci(self, out, code):
         groups = {"gpu": [], "audio": [], "net": [], "other": []}
-        for blk in out.strip().split("\n\n"):
-            lines = blk.splitlines()
-            if not lines: continue
+        blocks = []
+        for l in out.splitlines():                                       # cada dispositivo empieza en una línea sin sangría y le siguen las suyas con tabulador
+            if l and not l[0].isspace(): blocks.append([l])
+            elif blocks and l.strip(): blocks[-1].append(l)
+        for lines in blocks:
             head = lines[0].split(" ", 1)[1] if " " in lines[0] else lines[0]
             drv = next((l.split(":", 1)[1].strip() for l in lines if "Kernel driver in use" in l), "")
             low = head.lower()
