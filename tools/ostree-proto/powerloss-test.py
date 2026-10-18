@@ -20,7 +20,7 @@ import argparse, os, random, re, shutil, signal, socket, subprocess, sys, tempfi
 
 OVMF_CODE = "/usr/share/OVMF/OVMF_CODE_4M.fd"
 OVMF_VARS = "/usr/share/OVMF/OVMF_VARS_4M.fd"
-PROMPT = re.compile(rb"root@oweelinux-proto:[^\r\n]*# ")
+PROMPT = re.compile(rb"root@oweelinux:[^\r\n]*# ")
 
 
 class Vm:

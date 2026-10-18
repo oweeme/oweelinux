@@ -3,7 +3,7 @@
 import json, os
 from owee_i18n import _
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "font_size": 10, "backup_dest": "", "backup_last": 0, "font_family": "", "font_mono": "", "window_density": "normal", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}}
+DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "font_size": 10, "backup_dest": "", "backup_last": 0, "font_family": "", "font_mono": "", "window_density": "normal", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}, "audio_boost": False, "extra_langs": {}, "dev_mode": False, "panel_pos": "top", "panel_size": "normal"}
 ACCENTS = [(_("Teal"), "#2A9D8F"), (_("Coral"), "#F06548"), (_("Azul"), "#3B82C4"), (_("Violeta"), "#8B6FD6"), (_("Dorado"), "#D9A441"), (_("Verde"), "#5BA85B")]
 
 WALLPAPER_DIRS = ["/usr/share/backgrounds/oweelinux", os.path.expanduser("~/Pictures/Wallpapers"), os.path.expanduser("~/Imágenes/Fondos"), os.path.expanduser("~/.local/share/owee/wallpapers")]
@@ -30,6 +30,7 @@ def load():
         j = json.load(open(PATH))
         if j.get("mode") in ("dark", "light"): d["mode"] = j["mode"]
         if isinstance(j.get("lang"), str): d["lang"] = j["lang"]
+        if isinstance(j.get("extra_langs"), dict): d["extra_langs"] = {k: v for k, v in j["extra_langs"].items() if isinstance(v, dict)}       # idiomas añadidos por el usuario (owee_i18n.extra_langs)
         if isinstance(j.get("layouts"), list): d["layouts"] = [x for x in j["layouts"] if isinstance(x, str)][:4]       # distribuciones de teclado elegidas (la activa es layouts[layout_idx])
         try: d["font_size"] = max(8, min(24, int(j.get("font_size", 10))))                    # texto de la interfaz (pt)
         except (TypeError, ValueError): pass
@@ -51,8 +52,10 @@ def load():
         if isinstance(j.get("wallpaper"), str): d["wallpaper"] = j["wallpaper"]
         if str(j.get("clock_hours")) in ("12", "24"): d["clock_hours"] = str(j["clock_hours"])           # reloj del panel (página Fecha y hora)
         if isinstance(j.get("corners"), dict): d["corners"] = {k: str(v) for k, v in j["corners"].items() if k in ("tl", "tr", "bl", "br")}
-        for k in ("clock_seconds", "clock_date"):
+        for k in ("clock_seconds", "clock_date", "audio_boost", "dev_mode"):
             if isinstance(j.get(k), bool): d[k] = j[k]
+        if j.get("panel_pos") in ("top", "bottom", "left", "right"): d["panel_pos"] = j["panel_pos"]               # posición y tamaño del panel (Ajustes → Escritorios)
+        if j.get("panel_size") in ("compact", "normal", "large"): d["panel_size"] = j["panel_size"]
     except (OSError, ValueError, AttributeError): pass
     return d
 

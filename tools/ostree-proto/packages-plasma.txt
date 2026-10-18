@@ -139,3 +139,15 @@ rsync
 
 # Hora por red (sin ella los certificados HTTPS fallan en equipos con la hora atrasada)
 systemd-timesyncd
+
+# Herramientas de equipo: gestor de discos y particiones (KDE Partition Manager, reutiliza kpmcore), información de PCI/USB para la página «Dispositivos», datos de tabletas Wacom (libinput)
+partitionmanager
+pciutils
+usbutils
+libwacom-common
+pulseaudio-utils
+
+# Recursos: agente de contraseñas ligero (GTK3, ~20 MB en vez de ~180 MB del de KDE), antibloqueo por falta de memoria, control térmico de Intel
+mate-polkit
+earlyoom
+thermald

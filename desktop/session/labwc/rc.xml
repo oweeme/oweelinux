@@ -55,6 +55,7 @@
     <keybind key="W-Up"><action name="ToggleMaximize"/></keybind>
     <keybind key="W-Left"><action name="SnapToEdge"><direction>left</direction></action></keybind>
     <keybind key="W-Right"><action name="SnapToEdge"><direction>right</direction></action></keybind>
+    <keybind key="C-S-Escape"><action name="Execute" command="/usr/libexec/owee/apps/monitor/owee_monitor.py"/></keybind>
     <keybind key="Print"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --shot full"/></keybind>
     <keybind key="S-Print"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py --shot region"/></keybind>
     <keybind key="C-Print"><action name="Execute" command="/usr/libexec/owee/apps/capturadora/owee_capture.py"/></keybind>

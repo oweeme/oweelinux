@@ -29,6 +29,7 @@ class Acerca(Page):
         o = osrel(); b = page_box(_("Acerca de"))
         head = Gtk.Box(spacing=16, margin_bottom=8); head.append(Gtk.Image(icon_name="owee-logo", pixel_size=64))
         v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, valign=Gtk.Align.CENTER); v.append(Gtk.Label(label=o.get("PRETTY_NAME", "OweeLinux"), xalign=0, css_classes=["title"]))
+        v.append(Gtk.Label(label=_('Basado en {0}', o.get("OWEE_BASE", "Debian")), xalign=0, css_classes=["dim-label"]))
         v.append(Gtk.Label(label=_("Escritorio Lite · Python + GTK4 · GPLv3"), xalign=0, css_classes=["dim-label"])); head.append(v); b.append(head)
         b.append(row(_("Autor"), Gtk.Label(label="Hector Martinez", selectable=True)))
         b.append(row(_("Sitio web"), Gtk.LinkButton.new_with_label("https://www.oweeme.com", "www.oweeme.com")))

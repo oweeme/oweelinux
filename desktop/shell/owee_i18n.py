@@ -3,7 +3,7 @@ El texto original es el español del código; cada idioma tiene un catálogo `i1
 Marcadores: `{0}`, `{1}`… se rellenan con los argumentos extra:  _("Monitor {0}", nombre).
 Idiomas con catálogo propio de Owee: «qow» (romano) y «qow@owee» (escritura Owee Script, necesita la fuente Owee Sans).
 El idioma se lee UNA vez al arrancar (las apps se reinician al cambiarlo)."""
-import json, os
+import json, os, re
 
 LANGS = [  # (código, nombre en su propio idioma, locale del sistema): la ÚNICA lista de idiomas; Idioma, Teclado, Métodos de escritura y la sesión salen de aquí
     ("es", "Español", "es_ES.UTF-8"), ("en", "English", "en_US.UTF-8"), ("pt", "Português", "pt_BR.UTF-8"), ("fr", "Français", "fr_FR.UTF-8"), ("de", "Deutsch", "de_DE.UTF-8"),
@@ -29,20 +29,31 @@ SETTINGS = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/
 HERE = os.path.dirname(os.path.realpath(__file__))
 CAT_DIRS = [os.path.join(HERE, "..", "i18n"), "/usr/share/owee/i18n"]
 
+LOCDIR = os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "owee", "locales")      # idiomas añadidos por el usuario (sin permisos de administrador)
+
+def extra_langs():
+    """Idiomas añadidos en Ajustes → Idioma → «Añadir otro idioma»: {código: (nombre, locale)}. Su locale se genera en LOCDIR y se usa con LOCPATH."""
+    try: d = json.load(open(SETTINGS)).get("extra_langs", {})
+    except (OSError, ValueError, AttributeError): return {}
+    if not isinstance(d, dict): return {}
+    return {c: (str(v.get("name", c)), str(v.get("loc", c + ".UTF-8"))) for c, v in d.items() if isinstance(v, dict) and re.fullmatch(r"[a-z]{2,3}", c) and re.fullmatch(r"[A-Za-z_@.0-9-]{2,30}", str(v.get("loc", "")))}
+
+def all_langs(): return LANGS + [(c, n, l) for c, (n, l) in extra_langs().items()]
+
 def locale_of(code):
-    return next((l for c, _n, l in LANGS if c == code), "es_ES.UTF-8")
+    return next((l for c, _n, l in all_langs() if c == code), "es_ES.UTF-8")
 
 def system_default():
     """Idioma por defecto: el del entorno (LANG) si OweeLinux lo trae, si no el español."""
     code = (os.environ.get("LANGUAGE") or os.environ.get("LANG") or "es").split(":")[0].split(".")[0]
     if code.startswith("qow"): return "qow@owee" if "@owee" in os.environ.get("LANG", "") else "qow"
     short = code.split("_")[0]
-    return short if short in dict((c, n) for c, n, _l in LANGS) else "es"
+    return short if short in dict((c, n) for c, n, _l in all_langs()) else "es"
 
 def current():
     try: v = json.load(open(SETTINGS)).get("lang")
     except (OSError, ValueError, AttributeError): v = None
-    return v if v in dict((c, n) for c, n, _l in LANGS) else system_default()
+    return v if v in dict((c, n) for c, n, _l in all_langs()) else system_default()
 
 def _load(code):
     for d in CAT_DIRS:
@@ -55,14 +66,15 @@ LANG = current()
 def _apply_locale():
     """Las bibliotecas (GTK: calendario, diálogos de archivos, «Cancelar»…) toman el idioma de LANG: se ajusta ANTES de que se cargue GTK, solo si ese locale existe en el sistema."""
     import locale
+    if os.path.isdir(LOCDIR): os.environ["LOCPATH"] = LOCDIR + (":" + os.environ["LOCPATH"] if os.environ.get("LOCPATH") else "")
     loc = locale_of(LANG)
     for cand in (loc, loc.replace("UTF-8", "utf8")):
         try: locale.setlocale(locale.LC_ALL, cand)
         except locale.Error: continue
-        os.environ["LANG"] = cand; os.environ["LANGUAGE"] = cand.split(".")[0] + ":" + LANG.split("@")[0]
+        os.environ["LANG"] = cand; os.environ["LANGUAGE"] = cand.split(".")[0] + ":" + LANG.split("@")[0] + ("" if any(c == LANG for c, _n, _l in LANGS) else ":en")
         return True
     return False
-_CAT = {} if LANG == "es" else _load(LANG)
+_CAT = {} if LANG == "es" else (_load(LANG) or _load("en"))      # idioma sin traducción propia (uno añadido por el usuario): los textos de OweeLinux salen en inglés, no en español
 LOCALE_OK = _apply_locale()           # False: el locale del sistema no está generado (los textos propios sí cambian; los de GTK quedan en el idioma anterior)
 
 def _(msg, *args):

@@ -1,4 +1,4 @@
-PRETTY_NAME="OweeLinux 1 (Debian 13, Trixie)"
+PRETTY_NAME="OweeLinux 1"
 NAME="OweeLinux"
 VERSION="1 (trixie)"
 VERSION_ID="1"
@@ -7,6 +7,7 @@ ID=oweelinux
 ID_LIKE=debian
 LOGO=distributor-logo-oweelinux
 DEBIAN_VERSION_FULL=13.6
+OWEE_BASE="Debian 13 (Trixie)"
 HOME_URL="https://oweeme.com"
 SUPPORT_URL="https://oweeme.com"
 BUG_REPORT_URL="https://github.com/oweeme/oweelinux/issues"

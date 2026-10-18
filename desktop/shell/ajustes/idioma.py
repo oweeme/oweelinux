@@ -43,15 +43,65 @@ class Idioma(Page):
         b.append(heading(_("Idioma de la interfaz")))
         have = owee_i18n.installed_locales()
         opts = []
-        for code, name, loc in owee_i18n.LANGS:
+        for code, name, loc in owee_i18n.all_langs():
             ok = loc.lower().replace("utf8", "utf-8") in have or code == "es"
             opts.append((code, name if ok else name + "  ·  " + _("(sin instalar)")))
         self.dd = dropdown(opts, owee_i18n.LANG, self.choose)
         b.append(row(_("Idioma"), self.dd, _("Los mismos idiomas en los que puedes escribir (Teclado): 17 idiomas y Owee")))
+        add = Gtk.Button(label=_("Añadir otro idioma…"), halign=Gtk.Align.START); add.connect("clicked", lambda x: self.add_dialog()); b.append(add)
         self.note = Gtk.Label(xalign=0, wrap=True, css_classes=["dim-label"]); b.append(self.note)
         b.append(heading(_("Escribir en otros idiomas")))
         b.append(Gtk.Label(label=_("Al elegir un idioma se activa su método de escritura (por ejemplo pinyin para chino). Se cambia entre métodos con Ctrl + Espacio. Los métodos se gestionan en Teclado."), xalign=0, wrap=True, css_classes=["dim-label"]))
         return scrolled(b)
+
+    # ---- añadir un idioma que OweeLinux no trae de fábrica (italiano, griego, turco…): se genera su locale en ~/.local/share/owee/locales, sin permisos de administrador
+    @staticmethod
+    def supported():
+        """Locales UTF-8 que Debian puede generar (/usr/share/i18n/SUPPORTED) y cuyo idioma OweeLinux aún no trae: [(nombre, locale)]."""
+        have = {c for c, _n, _l in owee_i18n.all_langs()}; out = []; seen = set()
+        try: lines = open("/usr/share/i18n/SUPPORTED").read().splitlines()
+        except OSError: return out
+        for l in lines:
+            p = l.split()
+            if len(p) != 2 or p[1] != "UTF-8" or "@" in p[0] or not re.fullmatch(r"[a-z]{2,3}_[A-Z]{2}\.UTF-8", p[0]): continue
+            loc = p[0][:-6]; lang = loc.split("_")[0]
+            if lang in have or loc in seen: continue
+            seen.add(loc); name = loc; lg = tr = ""
+            try:
+                for ln in open("/usr/share/i18n/locales/" + loc, encoding="utf-8", errors="replace"):
+                    m = re.match(r'\s*(language|territory)\s+"(.*)"', ln)
+                    if m and m.group(1) == "language": lg = m.group(2)
+                    elif m: tr = m.group(2)
+                    if lg and tr: break
+            except OSError: pass
+            out.append((f"{lg} ({tr})" if lg and tr else loc, loc))
+        return sorted(out)
+
+    def add_dialog(self):
+        win = Gtk.Window(title=_("Añadir otro idioma"), transient_for=self.app.get_active_window(), modal=True, default_width=420, default_height=480)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=12, margin_end=12); win.set_child(box)
+        entry = Gtk.SearchEntry(placeholder_text=_("Buscar idioma…")); box.append(entry)
+        lst = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE); items = self.supported()
+        for name, loc in items: r = Gtk.ListBoxRow(); r.loc = loc; r.name = name; r.set_child(Gtk.Label(label=f"{name}  —  {loc}", xalign=0, margin_top=4, margin_bottom=4, margin_start=6)); lst.append(r)
+        lst.set_filter_func(lambda r: entry.get_text().strip().lower() in (r.name + " " + r.loc).lower()); entry.connect("search-changed", lambda e: lst.invalidate_filter())
+        box.append(Gtk.ScrolledWindow(child=lst, vexpand=True))
+        note = Gtk.Label(label=_("Las aplicaciones de KDE se traducen al idioma elegido; los textos propios de OweeLinux saldrán en inglés hasta que alguien aporte la traducción."), xalign=0, wrap=True, css_classes=["dim-label"]); box.append(note)
+        msg = Gtk.Label(xalign=0, wrap=True); box.append(msg)
+        bar = Gtk.Box(spacing=8, halign=Gtk.Align.END); cancel = Gtk.Button(label=_("Cancelar")); ok = Gtk.Button(label=_("Añadir"), css_classes=["suggested-action"]); bar.append(cancel); bar.append(ok); box.append(bar)
+        cancel.connect("clicked", lambda b: win.close())
+        def go(_b):
+            row = lst.get_selected_row()
+            if not row: return
+            ok.set_sensitive(False); msg.set_text(_("Generando el idioma… (unos segundos)"))
+            os.makedirs(owee_i18n.LOCDIR, exist_ok=True); loc = row.loc
+            run(["localedef", "-i", loc, "-f", "UTF-8", os.path.join(owee_i18n.LOCDIR, loc + ".UTF-8")], lambda out, code: self.added(win, msg, ok, row.name, loc, code), timeout=120)
+        ok.connect("clicked", go); win.present()
+
+    def added(self, win, msg, ok, name, loc, code):
+        if not os.path.isdir(os.path.join(owee_i18n.LOCDIR, loc + ".UTF-8")):
+            msg.set_text(_("No se pudo generar el idioma.")); ok.set_sensitive(True); return
+        lang = loc.split("_")[0]; extra = dict(self.app.cfg.get("extra_langs", {})); extra[lang] = {"name": name, "loc": loc + ".UTF-8"}
+        self.app.change(extra_langs=extra); win.close(); self.choose(lang)
 
     def choose(self, code):
         if code == owee_i18n.LANG: return

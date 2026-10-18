@@ -21,7 +21,7 @@ ROOT=$(dirname "$BOOT")
 id_of() { echo "$1" | owee-id "$ROOT"; }
 n=0; first=""; body=$(mktemp)
 for e in $(ls -1 "$BOOT"/loader/entries/ostree-*.conf | sort -r -V); do
-  title=$(sed -n 's/^title //p' "$e"); linux=$(sed -n 's/^linux //p' "$e")
+  title=$(sed -n 's/^title //p' "$e" | sed 's/ *(ostree[^)]*)//; s/Debian GNU\/Linux[^ ]* *//'); linux=$(sed -n 's/^linux //p' "$e")
   initrd=$(sed -n 's/^initrd //p' "$e"); opts=$(sed -n 's/^options //p' "$e")
   id=$(id_of "$opts"); [ -n "$first" ] || first=$id
   { echo "menuentry '$title' --id 'owee-$id' {"

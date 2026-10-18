@@ -7,13 +7,15 @@ command -v kbuildsycoca6 >/dev/null && { kbuildsycoca6 --noincremental >/dev/nul
 /usr/libexec/owee/owee-wallpaper --daemon &          # fondo fijo o presentación de imágenes (Ajustes → Fondo de pantalla)
 # mako no lee /etc/xdg/mako/config por sí solo: si el usuario no tiene su propio ~/.config/mako/config, se le pasa el de OweeLinux (estilo propio, tiempo de vida, modo silencio)
 if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/mako/config" ]; then mako & else mako -c /etc/xdg/mako/config & fi
-command -v fcitx5 >/dev/null && FCITX_NO_WAYLAND_DIAGNOSE=1 fcitx5 -d --replace >/dev/null 2>&1 &   # métodos de escritura (Ajustes → Teclado / Idioma)
+# Fcitx5 (métodos de escritura: chino, japonés, coreano, Owee…) solo se arranca si el usuario tiene alguno activado (~32 MB de RAM que casi nadie necesita); Ajustes → Teclado lo lanza al activar uno
+FP="${XDG_CONFIG_HOME:-$HOME/.config}/fcitx5/profile"
+if command -v fcitx5 >/dev/null && [ -f "$FP" ] && grep '^Name=' "$FP" | grep -qv 'keyboard-'; then FCITX_NO_WAYLAND_DIAGNOSE=1 fcitx5 -d --replace >/dev/null 2>&1 & fi
 /usr/libexec/owee/owee-apply-theme &             # tema de fábrica para apps GTK/Qt en el primer arranque de un usuario
 /usr/libexec/owee/owee-apply-display &           # resolución y escala guardadas en Ajustes
 /usr/libexec/owee/owee-idle &                    # bloqueo y suspensión por inactividad (Ajustes → Energía)
-for a in /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1; do [ -x "$a" ] && { "$a" & break; }; done   # ventana de contraseña para tareas de administrador
+for a in /usr/libexec/polkit-mate-authentication-agent-1 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1; do [ -x "$a" ] && { "$a" & break; }; done   # ventana de contraseña para tareas de administrador
 case "$PANEL" in
-  python) python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > "${XDG_RUNTIME_DIR:-/tmp}/owee-panel.log" 2>&1 & ;;
+  python) /usr/libexec/owee/owee-panel-run & ;;
   waybar) waybar -c /etc/xdg/waybar/config.jsonc -s /etc/xdg/waybar/style.css > "${XDG_RUNTIME_DIR:-/tmp}/owee-waybar.log" 2>&1 & ;;
   none) ;;
 esac

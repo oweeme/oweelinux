@@ -7,7 +7,7 @@ Uso:  add USUARIO "Nombre completo" [admin]   (clave por stdin)      passwd USUA
       autologin USUARIO SESION.desktop | off
       firstboot USUARIO "Nombre completo" IDIOMA DISTRIBUCIONES INDICE ZONA   (clave por stdin; solo el usuario owee-setup, una vez, sin otros usuarios)"""
 import grp, os, pwd, re, subprocess, sys
-NAME = re.compile(r"^[a-z_][a-z0-9_-]{0,30}$"); SESSION = re.compile(r"^[A-Za-z0-9_.-]{1,64}\.desktop$"); ADMIN = "sudo"; GROUPS = ["audio", "video", "plugdev", "netdev"]
+NAME = re.compile(r"^[a-z_][a-z0-9_-]{0,30}$"); SESSION = re.compile(r"^[A-Za-z0-9_.-]{1,64}\.desktop$"); ADMIN = "sudo"; GROUPS = ["audio", "video", "plugdev", "netdev", "systemd-journal"]
 SDDM = "/etc/sddm.conf.d/30-owee-autologin.conf"
 
 def die(msg, code=2): print("ERR: " + msg); sys.exit(code)            # el mensaje sale por stdout: Ajustes lo muestra tal cual

@@ -28,6 +28,7 @@ window.owee-overview { background: alpha(@win@, 0.94); color: @fg@; } .ov-head {
 .ov-card { padding: 10px 6px; border-radius: 14px; } .ov-btn:hover .ov-card { background: @hover@; } .ov-card.act { background: alpha(@fg@, 0.10); } .ov-card.min image { opacity: .4; } .ov-name { color: @fg@; font-size: 10pt; }
 .ov-card.sel { background: alpha(@fg@, 0.22); } .dv-col { padding: 10px; border-radius: 14px; background: alpha(@fg@, 0.05); } .dv-col.dv-cur { background: alpha(@fg@, 0.10); } .dv-head { font-weight: bold; } button.dv-move { padding: 0 6px; min-height: 0; min-width: 0; border-radius: 6px; background: alpha(@fg@, 0.10); background-image: none; box-shadow: none; border: none; color: @fg@; } button.dv-move:hover { background: @hover@; }
 window.owee-overview button.ov-btn { background: transparent; background-image: none; border: none; box-shadow: none; }
+window.owee-panel.vertical label { padding: 2px 2px; font-size: 9pt; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
@@ -224,7 +225,15 @@ class RecIndicator:
         self.lab = Gtk.Label(label="●  00:00"); self.box.append(self.lab)
         for sym, act, tip in (("✎", "present", _("Modo presentación (dibujar)")), ("📷", "camera", _("Mostrar u ocultar la cámara")), ("■", "stop", _("■ Detener"))):
             b = Gtk.Button(label=sym, tooltip_text=tip); b.connect("clicked", lambda _b, a=act: self.act(a)); self.box.append(b)
-        self.tick(); GLib.timeout_add_seconds(1, self.tick)
+        self.src = 0; self.check()
+        try:                                                         # se vigila el archivo de estado en vez de leerlo cada segundo: sin grabación, ningún despertar
+            self.mon = Gio.File.new_for_path(os.path.dirname(self.STATE)).monitor_directory(Gio.FileMonitorFlags.NONE, None)
+            self.mon.connect("changed", lambda m, f, o, ev: f.get_basename() == "owee-recording" and GLib.idle_add(lambda: (self.check(), False)[1]))
+        except GLib.Error: GLib.timeout_add_seconds(3, lambda: (self.check(), True)[1])
+
+    def check(self):
+        if os.path.exists(self.STATE) and not self.src: self.src = GLib.timeout_add_seconds(1, self.tick)
+        self.tick()
 
     def act(self, name):
         try: Gio.Subprocess.new(["gapplication", "action", "org.oweelinux.Capture", name], Gio.SubprocessFlags.STDERR_SILENCE)
@@ -232,7 +241,7 @@ class RecIndicator:
 
     def tick(self):
         try: t0 = int(open(self.STATE).read().strip())
-        except (OSError, ValueError): self.box.set_visible(False); return True
+        except (OSError, ValueError): self.box.set_visible(False); self.src = 0; return False
         s = max(0, int(time.time()) - t0); self.lab.set_text(f"●  {s // 60:02d}:{s % 60:02d}"); self.box.set_visible(True); return True
 
 class Reminders:
@@ -432,7 +441,7 @@ class Clock:
     Los nombres de día y mes están en español en el propio código (no dependen de que la imagen traiga el idioma instalado)."""
     def __init__(self):
         self.label = Gtk.Label(); self.btn = Gtk.MenuButton(child=self.label, has_frame=False); self.btn.add_css_class("owee-widget")
-        self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _: self.pop.get_visible() and self.today())
+        self.src = 0; self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _: (self.pop.get_visible() and self.today(), self.refresh()))
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=14, margin_end=14)
         self.big = Gtk.Label(xalign=0, css_classes=["clock-big"]); self.date = Gtk.Label(xalign=0, css_classes=["heading"])
         self.cal = Gtk.Calendar(show_week_numbers=True); self.go = Gtk.Button(label=_("Hoy")); self.go.connect("clicked", lambda b: self.today())
@@ -452,7 +461,14 @@ class Clock:
         self.label.set_text(hm + (f"   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}" if c.get("clock_date", True) else ""))
         if self.pop.get_visible():
             self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(_('{0}, {1} de {2} de {3}', DIAS[n.get_day_of_week() - 1].capitalize(), n.get_day_of_month(), MESES[n.get_month() - 1], n.get_year()))
-        return True
+        self.src = 0                                                                       # un despertar por minuto; por segundo solo con segundos activados o el calendario abierto
+        delay = 1 if (c.get("clock_seconds") or self.pop.get_visible()) else max(1, 60 - n.get_second())
+        self.src = GLib.timeout_add_seconds(delay, self.tick); return False
+
+    def refresh(self):
+        """Reprograma el reloj al instante (cambió el formato o se abrió/cerró el calendario)."""
+        if self.src: GLib.source_remove(self.src); self.src = 0
+        self.tick()
 
 class InputIndicator:
     """Indicador del teclado en el panel: muestra con qué escribes ahora (US, ES, 拼 pinyin, あ Mozc, 한 Hangul, Ow Owee) y, al hacer clic, deja elegir entre el teclado normal y los métodos
@@ -550,15 +566,15 @@ class Panel(Gtk.Application):
         LS.set_margin(win, LS.Edge.TOP, 6); LS.set_margin(win, LS.Edge.LEFT, 8); LS.set_margin(win, LS.Edge.RIGHT, 8)
         LS.auto_exclusive_zone_enable(win); win.set_default_size(-1, 30)
         LS.set_keyboard_mode(win, LS.KeyboardMode.ON_DEMAND)         # que las ventanitas (popovers) reciban teclado al hacer clic
-        bar = Gtk.CenterBox(); win.set_child(bar)
-        self.launcher = Launcher(); left = Gtk.Box(spacing=4); left.append(self.launcher.btn); bar.set_start_widget(left)
+        bar = self.bar = Gtk.CenterBox(); win.set_child(bar)
+        self.launcher = Launcher(); left = self.left_box = Gtk.Box(spacing=4); left.append(self.launcher.btn); bar.set_start_widget(left)
         try:
             from owee_desktops import DesktopSwitcher, Corners
             self.desks = DesktopSwitcher(); left.append(self.desks.box); self.corners = Corners(self, self.corner_action); self.corners.set_actions(owee_config.load().get("corners", {}))
         except Exception as e: print("[escritorios] desactivados:", e, flush=True)
         self.tasks = TaskBar(lambda: self.watcher); left.append(self.tasks.box)
         self.clock = Clock(); bar.set_center_widget(self.clock.btn)
-        right = Gtk.Box(spacing=4); bar.set_end_widget(right)
+        right = self.right_box = Gtk.Box(spacing=4); bar.set_end_widget(right)
         self.reminders = Reminders()                                          # avisos de eventos del Calendario
         self.clip = Clipboard(); right.append(self.clip.btn)                   # historial del portapapeles
         self.rec = RecIndicator(); right.append(self.rec.box)             # controles de la grabación de pantalla (solo mientras se graba)
@@ -569,7 +585,7 @@ class Panel(Gtk.Application):
         self.input = InputIndicator(); right.append(self.input.btn)       # con qué teclado/método escribes
         self.widgets = load_widgets(right)
         self.power = PowerMenu(); right.append(self.power.btn)             # widgets de usuario (Python, JavaScript...) a la izquierda de los del sistema
-        self.tick(); GLib.timeout_add_seconds(1, self.tick)
+        self.tick()
         self.win = win; self.compact = False
         from owee_switcher import Registry, WindowSwitcher, DesktopsView; self.registry = Registry()      # uso reciente y escritorio de cada ventana (antes del vigilante, que lo alimenta)
         try:                                           # con una ventana maximizada el panel se pega a los bordes y pierde las esquinas (como la barra de menús de macOS)
@@ -578,15 +594,44 @@ class Panel(Gtk.Application):
         except Exception as e: print("[ventanas] desactivado:", e, flush=True)
         from owee_overview import Overview; self.overview = Overview(self)
         self.switcher = WindowSwitcher(self); self.desktops_view = DesktopsView(self)       # Alt + Tab y Super + Tab         # vista general (esquinas activas, Super + A)
-        win.present()
+        self.apply_layout(); win.present()
         if os.environ.get("OWEE_DEBUG_LAYOUT"): GLib.timeout_add_seconds(4, lambda: (self.dump_layout(win), True)[1])
         GLib.timeout_add_seconds(5, lambda: (mem("5 s tras abrir"), False)[1])
         GLib.timeout_add_seconds(40, lambda: (mem("40 s tras abrir"), False)[1])
 
+    EDGES = {"top": (LS.Edge.TOP, LS.Edge.LEFT, LS.Edge.RIGHT), "bottom": (LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT), "left": (LS.Edge.LEFT, LS.Edge.TOP, LS.Edge.BOTTOM), "right": (LS.Edge.RIGHT, LS.Edge.TOP, LS.Edge.BOTTOM)}
+    ARROW = {"top": Gtk.ArrowType.DOWN, "bottom": Gtk.ArrowType.UP, "left": Gtk.ArrowType.RIGHT, "right": Gtk.ArrowType.LEFT}
+    THICK = {"compact": 26, "normal": 30, "large": 40}
+
+    def set_margins(self, flat):
+        """Margen flotante (6 px al borde y 8 a los lados); sin margen cuando la ventana activa está maximizada (modo compacto)."""
+        main, a, b = self.EDGES[getattr(self, "pos", "top")]
+        for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_margin(self.win, e, 0)
+        if not flat: LS.set_margin(self.win, main, 6); LS.set_margin(self.win, a, 8); LS.set_margin(self.win, b, 8)
+
+    def apply_layout(self):
+        """Posición (arriba, abajo, izquierda o derecha) y tamaño del panel, de Ajustes → Escritorios. Las ventanitas se abren hacia el lado contrario al borde."""
+        cfg = owee_config.load(); pos = cfg.get("panel_pos", "top"); size = cfg.get("panel_size", "normal")
+        if (pos, size) == getattr(self, "layout", None): return
+        self.layout = (pos, size); self.pos = pos; vertical = pos in ("left", "right"); win = self.win
+        for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(win, e, False)
+        for e in self.EDGES[pos]: LS.set_anchor(win, e, True)
+        o = Gtk.Orientation.VERTICAL if vertical else Gtk.Orientation.HORIZONTAL; thick = self.THICK[size]
+        for box in (self.bar, self.left_box, self.right_box, getattr(getattr(self, "desks", None), "box", None), getattr(getattr(self, "tasks", None), "box", None), getattr(getattr(self, "rec", None), "box", None), getattr(getattr(self, "tray", None), "box", None)):
+            if box is not None: box.set_orientation(o)
+        self.bar.set_size_request(thick + 30 if vertical else -1, -1 if vertical else thick); win.set_default_size(thick + 30 if vertical else -1, -1 if vertical else thick)
+        (win.add_css_class if vertical else win.remove_css_class)("vertical")
+        self.set_margins(self.compact)
+        def arrows(w):
+            while w:
+                if isinstance(w, Gtk.MenuButton): w.set_direction(self.ARROW[pos])
+                arrows(w.get_first_child()); w = w.get_next_sibling()
+        arrows(self.bar)
+        if os.environ.get("OWEE_DEBUG_LAYOUT"): print("[panel]", pos, size, flush=True)
+
     def set_compact(self, on):
         """Modo compacto: sin margen ni esquinas redondeadas mientras la ventana activa está maximizada o a pantalla completa."""
-        self.compact = bool(on)
-        for e, m in ((LS.Edge.TOP, 6), (LS.Edge.LEFT, 8), (LS.Edge.RIGHT, 8)): LS.set_margin(self.win, e, 0 if on else m)
+        self.compact = bool(on); self.set_margins(on)
         (self.win.add_css_class if on else self.win.remove_css_class)("compact")
         if os.environ.get("OWEE_DEBUG_LAYOUT"): print("[compacto]", on, flush=True)
 
@@ -606,6 +651,8 @@ class Panel(Gtk.Application):
         if cfg.get("lang") and cfg["lang"] != owee_i18n.LANG:             # cambió el idioma en Ajustes: el panel se reinicia a sí mismo para mostrarse en el idioma nuevo
             GLib.timeout_add(400, lambda: os.execv(sys.executable, [sys.executable] + sys.argv))
         if hasattr(self, "corners"): self.corners.set_actions(cfg.get("corners", {}))
+        if hasattr(self, "bar") and hasattr(self, "win"): self.apply_layout()
+        if hasattr(self, "clock"): self.clock.refresh()
         pal = owee_config.palette(cfg)
         self.prov.load_from_data(css_for(pal))
         Gtk.Settings.get_default().set_property("gtk-icon-theme-name", pal["icons"])       # iconos propios; el resto cae a breeze/Adwaita/hicolor
@@ -621,7 +668,7 @@ class Panel(Gtk.Application):
             if ok: out["tray"] = [int(r.get_x() + 8 + r.get_width() / 2), int(r.get_y() + 6 + r.get_height() / 2)]
         print("[layout] " + json.dumps(out), flush=True)
 
-    def tick(self): return self.clock.tick()
+    def tick(self): self.clock.refresh()
 
 if __name__ == "__main__":
     t0 = time.time(); mem("tras importar"); Panel().run(sys.argv)

@@ -13,7 +13,7 @@ from ajustes.base import Page
 from owee_i18n import _, N_
 import owee_i18n as _i18n; _i18n.apply_direction()
 
-PAGES = ["apariencia", "tipografia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "red", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "copias", "actualizaciones", "acerca"]
+PAGES = ["apariencia", "tipografia", "fondo", "escritorios", "idioma", "pantalla", "sonido", "red", "bluetooth", "teclado", "raton", "energia", "fechahora", "usuarios", "acceso", "aplicaciones", "atajos", "copias", "actualizaciones", "dispositivos", "desarrollo", "acerca"]
 GROUPS = ["Personal", "Dispositivos", "Sistema"]          # códigos internos (cada página dice a qué grupo pertenece); se traducen al mostrarlos
 _NOMBRES_DE_GRUPO = (N_("Personal"), N_("Dispositivos"), N_("Sistema"))                   # solo para que el extractor de textos los vea
 CSS = b"""
@@ -89,8 +89,9 @@ class App(Gtk.Application):
         self.search.connect("search-changed", lambda e: (self.nav.invalidate_filter(), self.select_first_visible()))
         side.append(Gtk.ScrolledWindow(child=self.nav, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER))
         box = Gtk.Box(); box.append(side); box.append(Gtk.Separator()); box.append(self.stack); win.set_child(box); win.present()
-        first = next((r for r in self.rows if r.page), None)
-        if first: self.nav.select_row(first)
+        first = next((r for r in self.rows if r.page), None); want = os.environ.get("OWEE_PAGE", "")          # OWEE_PAGE=dispositivos abre Ajustes directamente en esa página (también útil para pruebas)
+        pick = next((r for r in self.rows if want and r.page and type(r.page).__module__.split(".")[-1] == want), None) or first
+        if pick: self.nav.select_row(pick)
 
     def nav_filter(self, row):
         q = self.search.get_text().strip().lower()

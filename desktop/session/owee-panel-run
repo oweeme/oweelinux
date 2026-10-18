@@ -1,0 +1,15 @@
+#!/bin/sh
+# Arranca el panel de OweeLinux. Si el usuario preparó su propia copia de la interfaz (Ajustes → Opciones de desarrollador: ~/.local/share/owee/shell con la marca .enabled), arranca esa; si
+# su copia falla al empezar (sale con error en menos de 15 s) la marca como rota, avisa y arranca la original: nadie se queda sin escritorio por un cambio mal hecho.
+LOG="${XDG_RUNTIME_DIR:-/tmp}/owee-panel.log"
+OVR="${XDG_DATA_HOME:-$HOME/.local/share}/owee/shell"
+if [ -z "${OWEE_PANEL_PATH:-}" ] && [ -f "$OVR/owee_panel.py" ] && [ -f "$OVR/.enabled" ]; then
+  t0=$(date +%s); python3 "$OVR/owee_panel.py" > "$LOG" 2>&1; rc=$?
+  if [ "$rc" -eq 1 ] || [ "$rc" -eq 2 ]; then
+    if [ $(( $(date +%s) - t0 )) -lt 15 ]; then
+      mv "$OVR/.enabled" "$OVR/.disabled-after-error"
+      command -v notify-send >/dev/null && notify-send "OweeLinux" "Tu copia modificada de la interfaz falló al arrancar. Se usa la original (puedes revisar el error en $LOG)."
+    else exit 0; fi
+  else exit 0; fi
+fi
+exec python3 "${OWEE_PANEL_PATH:-/usr/libexec/owee/owee_panel.py}" > "$LOG" 2>&1

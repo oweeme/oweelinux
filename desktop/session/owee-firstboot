@@ -13,6 +13,8 @@ if grep -q 'owee.mode=try' /proc/cmdline 2>/dev/null; then
   id live >/dev/null 2>&1 || useradd -m -u 1000 -s /bin/bash -G audio,video,plugdev,netdev -c "OweeLinux (prueba)" live
   passwd -d live >/dev/null 2>&1
   [ -d /var/home/live ] || { mkdir -p /var/home/live && cp -a /etc/skel/. /var/home/live/ 2>/dev/null; }
+  # sin bloqueo ni suspensión por inactividad: el usuario «live» no tiene clave y una pantalla bloqueada parecería un equipo colgado
+  install -d /var/home/live/.config/owee; echo '{"lock_min": 0, "suspend_min": 0}' > /var/home/live/.config/owee/power.json
   chown -R live:live /var/home/live; chmod 0700 /var/home/live
   # SOLO en este modo en vivo: el usuario «live» puede hacer tareas de administrador sin clave (la regla vive en /run: desaparece al apagar)
   mkdir -p /run/polkit-1/rules.d; printf 'polkit.addRule(function (action, subject) { if (subject.user == "live") return polkit.Result.YES; });\n' > /run/polkit-1/rules.d/49-owee-live.rules

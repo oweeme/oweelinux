@@ -7,7 +7,7 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_overview.py owee_switcher.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
@@ -91,6 +91,19 @@ Icon=owee-calendar
 Categories=Office;Calendar;
 Keywords=calendario;agenda;eventos;fecha;
 EOD
+# Monitor del sistema propio (procesos, CPU, memoria; «Forzar cierre» para lo que se cuelga). Atajo Ctrl+Mayús+Esc
+install -Dm0755 "$D/apps/monitor/owee_monitor.py" "$R/usr/libexec/owee/apps/monitor/owee_monitor.py"
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-monitor.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Monitor del sistema
+GenericName=Monitor del sistema
+Comment=Procesos, CPU y memoria; cerrar lo que se cuelga
+Exec=/usr/libexec/owee/apps/monitor/owee_monitor.py
+Icon=utilities-system-monitor
+Categories=System;Monitor;
+Keywords=procesos;tareas;memoria;cpu;matar;colgado;monitor;
+EOD
 # Capturadora propia (reemplaza a Spectacle): capturas con editor, vídeo con audio y cámara, modo presentación
 for f in "$D"/apps/capturadora/*.py; do install -Dm0755 "$f" "$R/usr/libexec/owee/apps/capturadora/$(basename "$f")"; done
 install -Dm0644 "$R/usr/share/icons/Owee/scalable/actions/owee-capture.svg" "$R/usr/share/icons/hicolor/scalable/apps/owee-capture.svg"
@@ -166,6 +179,51 @@ printf 'XDG_DESKTOP_DIR="$HOME/Desktop"\nXDG_DOCUMENTS_DIR="$HOME/Documents"\nXD
 # apt/apt-get explican cómo instalar en un sistema inmutable (apt de verdad se conserva como .real y sigue funcionando en contenedores y al construir)
 install -d "$R/usr/libexec/owee"
 for b in apt apt-get; do [ -x "$R/usr/bin/$b" ] && [ ! -e "$R/usr/libexec/owee/$b.real" ] && mv "$R/usr/bin/$b" "$R/usr/libexec/owee/$b.real"; install -Dm0755 "$D/session/owee-apt-shim" "$R/usr/bin/$b"; done
+# Brillo de la pantalla (y del teclado): el paquete brightnessctl de Debian NO trae la regla de permisos y /sys/class/backlight/*/brightness solo lo escribe root, así que ni Ajustes ni las teclas Fn podían cambiarlo
+install -Dm0644 /dev/stdin "$R/usr/lib/udev/rules.d/90-owee-backlight.rules" <<'EOR'
+ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video /sys/class/backlight/%k/brightness", RUN+="/bin/chmod g+w /sys/class/backlight/%k/brightness"
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="*kbd_backlight*", RUN+="/bin/chgrp video /sys/class/leds/%k/brightness", RUN+="/bin/chmod g+w /sys/class/leds/%k/brightness"
+EOR
+# Rendimiento y recursos (equipos de 2-4 GB y discos lentos): ajustes conservadores
+install -Dm0644 /dev/stdin "$R/usr/lib/sysctl.d/90-owee.conf" <<'EOS'
+# zram hace barato el intercambio: se usa antes de tirar la caché de archivos; sin lecturas por adelantado en zram; caché de nombres de archivo más duradera; escrituras a disco más suaves
+vm.swappiness = 100
+vm.page-cluster = 0
+vm.vfs_cache_pressure = 50
+vm.dirty_background_ratio = 5
+vm.dirty_ratio = 15
+vm.watermark_boost_factor = 0
+kernel.nmi_watchdog = 0
+EOS
+install -Dm0644 /dev/stdin "$R/usr/lib/udev/rules.d/60-owee-ioscheduler.rules" <<'EOS'
+# planificador de disco según el tipo: HDD con bfq (reparte bien entre apps), SSD y NVMe sin planificador (lo mejor para memorias flash)
+ACTION=="add|change", KERNEL=="sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
+ACTION=="add|change", KERNEL=="sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]*", ATTR{queue/scheduler}="none"
+EOS
+install -Dm0644 /dev/stdin "$R/usr/lib/systemd/system.conf.d/90-owee.conf" <<'EOS'
+[Manager]
+# un servicio que no responde no debe retrasar el apagado más de 15 s
+DefaultTimeoutStopSec=15s
+EOS
+install -Dm0644 /dev/stdin "$R/usr/lib/systemd/journald.conf.d/90-owee.conf" <<'EOS'
+[Journal]
+# registros acotados: no llenan un disco pequeño ni la RAM del modo en vivo
+SystemMaxUse=150M
+RuntimeMaxUse=40M
+Compress=yes
+EOS
+install -Dm0644 /dev/stdin "$ETC/default/zramswap" <<'EOS'
+# zram: memoria comprimida como intercambio (50 % de la RAM, comprime ~3:1 con zstd)
+ALGO=zstd
+PERCENT=50
+PRIORITY=100
+EOS
+install -Dm0644 /dev/stdin "$ETC/default/earlyoom" <<'EOS'
+# earlyoom: si la memoria Y el intercambio casi se agotan (menos del 4 % y 5 %), cierra el programa más pesado en vez de dejar el equipo congelado. Nunca toca el escritorio ni el sistema; prefiere navegadores y apps pesadas.
+EARLYOOM_ARGS="-r 0 -m 4,2 -s 5,2 --avoid '(^|/)(labwc|sddm|sddm-helper|Xwayland|pipewire|wireplumber|systemd|systemd-logind|dbus-daemon|NetworkManager|polkitd|polkit-mate-authentication-agent-1|mako|foot|python3)$' --prefer '(^|/)(QtWebEngineProc|falkon|chrome|chromium|firefox|firefox-esr|electron|java|code|slack|discord|steam)$'"
+EOS
+mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
 echo "sesión Lite instalada en $R"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-settings.desktop" <<'EOD'
 [Desktop Entry]

@@ -44,7 +44,12 @@ rm -f "$R"/vmlinuz "$R"/vmlinuz.old "$R"/initrd.img "$R"/initrd.img.old   # enla
 
 # 4. Configuración mínima de prueba (imagen desechable, NO es la de producción)
 : > "$R/etc/machine-id"
-echo oweelinux-proto > "$R/etc/hostname"
+echo oweelinux > "$R/etc/hostname"
+cat > "$R/etc/issue" <<'EOI'
+OweeLinux 1 \n \l
+
+EOI
+echo "OweeLinux 1" > "$R/etc/issue.net"; : > "$R/etc/motd"      # el aviso de la consola dice «OweeLinux», no «Debian GNU/Linux»
 mkdir -p "$R/etc/systemd/system/serial-getty@ttyS0.service.d"
 cat > "$R/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf" <<'EOC'
 [Service]
