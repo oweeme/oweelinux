@@ -73,7 +73,9 @@ ln -sf /usr/lib/systemd/system/systemd-networkd.service \
 if [ "${OWEE_DEV_REMOTE:-0}" = 1 ]; then
   printf '[remote "owee"]\nurl=http://10.0.2.2:8000/pub\ngpg-verify=false\n' > "$R/etc/ostree/remotes.d/owee.conf"
 else
-  printf '[remote "owee"]\nurl=https://updates.oweeme.com/ostree\ngpg-verify=true\n' > "$R/etc/ostree/remotes.d/owee.conf"
+  printf '[remote "owee"]\nurl=%s\ngpg-verify=true\n' "${OWEE_UPDATE_URL:-https://updates.oweeme.com/ostree}" > "$R/etc/ostree/remotes.d/owee.conf"
+  HERE_P=$(cd "$(dirname "$0")" && pwd)
+  [ -f "$HERE_P/keys/oweelinux.gpg" ] && install -Dm0644 "$HERE_P/keys/oweelinux.gpg" "$R/usr/share/ostree/trusted.gpg.d/oweelinux.gpg"     # clave pública REAL de publicación (gen-release-key.sh)
 fi
 
 # 4a. SOLO PRUEBAS: usuario sin contraseña con inicio de sesión automático (OWEE_TEST_USER=1).
