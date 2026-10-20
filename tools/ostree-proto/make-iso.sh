@@ -35,7 +35,9 @@ SHIM="$R/usr/lib/shim/shimx64.efi.signed"; MM="$R/usr/lib/shim/mmx64.efi.signed"
 if [ -f "$SHIM" ] && [ -f "$GRS" ]; then
   # Secure Boot: shim firmado por Microsoft → GRUB firmado de Debian → núcleo firmado de Debian. El GRUB firmado trae sus módulos dentro y lee su configuración de EFI/debian/grub.cfg
   log "  con shim y GRUB firmados (arranca con Secure Boot activado)"
-  EFISZ=$(( ($(stat -c %s "$SHIM") + $(stat -c %s "$GRS") + $(stat -c %s "$MM" 2>/dev/null || echo 0)) / 1048576 + 4 ))
+  # al arrancar desde el CD, GRUB lee EFI/debian/grub.cfg del propio CD (ISO9660), no de la partición FAT
+  mkdir -p "$T/iso/EFI/debian" "$T/iso/EFI/BOOT"; cp "$T/early.cfg" "$T/iso/EFI/debian/grub.cfg"; cp "$T/early.cfg" "$T/iso/EFI/BOOT/grub.cfg"
+  EFISZ=$(( ($(stat -c %s "$SHIM") + $(stat -c %s "$GRS") + $(stat -c %s "$MM" 2>/dev/null || echo 0)) / 1048576 + 4 )); [ "$EFISZ" -ge 20 ] || EFISZ=20   # FAT16 necesita un mínimo de clusters
   dd if=/dev/zero of="$T/iso/boot/grub/efi.img" bs=1M count="$EFISZ" status=none; mkfs.vfat -F16 "$T/iso/boot/grub/efi.img" >/dev/null
   mmd -i "$T/iso/boot/grub/efi.img" ::/EFI ::/EFI/BOOT ::/EFI/debian ::/boot ::/boot/grub
   mcopy -i "$T/iso/boot/grub/efi.img" "$SHIM" ::/EFI/BOOT/BOOTX64.EFI; mcopy -i "$T/iso/boot/grub/efi.img" "$GRS" ::/EFI/BOOT/grubx64.efi
@@ -44,7 +46,7 @@ if [ -f "$SHIM" ] && [ -f "$GRS" ]; then
 else
   log "  AVISO: no hay shim/GRUB firmados en el sistema de trabajo: GRUB sin firmar (solo con Secure Boot desactivado)"
   grub-mkstandalone -O x86_64-efi -o "$T/BOOTX64.EFI" --modules="part_gpt part_msdos fat iso9660 search search_label linux normal echo configfile gzio all_video" "boot/grub/grub.cfg=$T/early.cfg" 2>/dev/null
-  EFIMB=$(( $(stat -c %s "$T/BOOTX64.EFI") / 1048576 + 4 ))
+  EFIMB=$(( $(stat -c %s "$T/BOOTX64.EFI") / 1048576 + 4 )); [ "$EFISZ" -ge 20 ] || EFISZ=20   # FAT16 necesita un mínimo de clusters
   dd if=/dev/zero of="$T/iso/boot/grub/efi.img" bs=1M count="$EFIMB" status=none; mkfs.vfat -F16 "$T/iso/boot/grub/efi.img" >/dev/null
   mmd -i "$T/iso/boot/grub/efi.img" ::/EFI ::/EFI/BOOT; mcopy -i "$T/iso/boot/grub/efi.img" "$T/BOOTX64.EFI" ::/EFI/BOOT/BOOTX64.EFI
 fi

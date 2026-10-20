@@ -1,0 +1,103 @@
+#!/bin/bash
+# owee-dev — cajas de desarrollo y programas .deb en OweeLinux, sin permisos de administrador y sin tocar el sistema base (inmutable).
+# Usa distrobox + Podman: dentro de una caja Debian, apt update / upgrade / install funcionan como siempre.
+#   owee-dev init [--with python,go,rust,php,java,ada,node] [--name dev]   crea la caja de desarrollo con esos lenguajes (por defecto: herramientas de compilación, git y Python)
+#   owee-dev enter [--name dev]                                           abre una terminal dentro de la caja
+#   owee-dev deb ARCHIVO.deb                                               instala un .deb (Yandex, Chrome, un editor…) en la caja «apps» y lo añade al menú
+#   owee-dev remove PAQUETE                                                lo quita de la caja «apps» y del menú
+#   owee-dev update                                                        actualiza todas las cajas (apt upgrade dentro de cada una)
+#   owee-dev check                                                         comprueba que Podman y distrobox pueden funcionar sin privilegios
+set -u
+USERN=$(id -un); BOX=dev; APPS=apps; IMG=${OWEE_DEV_IMAGE:-docker.io/library/debian:trixie}
+say() { printf '%s\n' "$*"; }
+die() { printf 'owee-dev: %s\n' "$*" >&2; exit "${2:-1}"; }
+
+check() {
+  command -v podman >/dev/null && command -v distrobox >/dev/null || die "faltan podman o distrobox en el sistema" 3
+  grep -q "^$USERN:" /etc/subuid 2>/dev/null && grep -q "^$USERN:" /etc/subgid 2>/dev/null \
+    || die "tu usuario no tiene rangos de identificadores para contenedores sin privilegios. Un administrador debe ejecutar:
+  sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $USERN
+y luego cierras la sesión y vuelves a entrar" 4
+  podman info >/dev/null 2>&1 || die "Podman no arranca para tu usuario (¿falta espacio en tu carpeta personal o falta la red?). Prueba: podman info" 5
+  say "OK: Podman y distrobox listos para $USERN"
+}
+
+pkgs_for() {   # lenguaje → paquetes Debian
+  case "$1" in
+    python) echo "python3 python3-pip python3-venv pipx" ;;
+    go)     echo "golang" ;;
+    rust)   echo "rustc cargo" ;;
+    php)    echo "php-cli composer" ;;
+    java)   echo "default-jdk maven" ;;
+    ada)    echo "gnat gprbuild" ;;
+    node)   echo "nodejs npm" ;;
+    c|base) echo "" ;;
+    *) die "lenguaje desconocido: $1 (opciones: python go rust php java ada node)" 2 ;;
+  esac
+}
+
+ensure_box() {   # ensure_box NOMBRE  → la crea si no existe
+  distrobox list 2>/dev/null | awk -F'|' 'NR>1{gsub(/ /,"",$2); print $2}' | grep -qx "$1" && return 0
+  say "Creando la caja «$1» (la primera vez baja la imagen de Debian; puede tardar unos minutos)…"
+  distrobox create --yes --name "$1" --image "$IMG" --pull >/dev/null 2>&1 || distrobox create --yes --name "$1" --image "$IMG" || die "no se pudo crear la caja «$1» (¿hay internet?)" 6
+}
+
+in_box() { local b=$1; shift; distrobox enter --name "$b" -- "$@"; }
+
+cmd_init() {
+  local with="python" name=$BOX
+  while [ $# -gt 0 ]; do case "$1" in --with) with=$2; shift 2 ;; --name) name=$2; shift 2 ;; *) die "opción desconocida: $1" 2 ;; esac; done
+  check; ensure_box "$name"
+  local p="build-essential git curl pkg-config ca-certificates"
+  for l in $(echo "$with" | tr ',' ' '); do p="$p $(pkgs_for "$l")"; done
+  say "Instalando en «$name»: $p"
+  in_box "$name" sudo apt-get update >/dev/null && in_box "$name" sudo env DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y $p || die "falló la instalación de paquetes" 7
+  mkdir -p "$HOME/.local/share/applications"
+  local term; term=$(command -v foot || command -v konsole || echo foot)
+  cat > "$HOME/.local/share/applications/owee-dev-$name.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Terminal de desarrollo ($name)
+Comment=Terminal dentro de la caja de desarrollo «$name» (apt funciona aquí)
+Exec=$term -e distrobox enter --name $name
+Icon=utilities-terminal
+Categories=Development;
+Terminal=false
+EOF
+  say "Listo. Abre «Terminal de desarrollo ($name)» en el menú, o escribe: distrobox enter $name"
+}
+
+cmd_enter() { local n=$BOX; [ "${1:-}" = "--name" ] && n=${2:-$BOX}; check; ensure_box "$n"; exec distrobox enter --name "$n"; }
+
+cmd_deb() {
+  local f=${1:-}; [ -n "$f" ] && [ -f "$f" ] || die "uso: owee-dev deb ARCHIVO.deb" 2
+  f=$(realpath "$f"); head -c 8 "$f" | grep -q '^!<arch>' || die "$f no parece un paquete .deb" 2
+  check; ensure_box "$APPS"
+  local pkg; pkg=$(in_box "$APPS" dpkg-deb -f "$f" Package 2>/dev/null | tr -d '\r') ; [ -n "$pkg" ] || die "no pude leer el nombre del paquete" 8
+  say "Instalando «$pkg» (con sus dependencias) en la caja «$APPS»…"
+  in_box "$APPS" sudo apt-get update >/dev/null; in_box "$APPS" sudo env DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y "$f" || die "la instalación falló" 9
+  local n=0 d
+  for d in $(in_box "$APPS" dpkg -L "$pkg" 2>/dev/null | grep -E '/usr/share/applications/[^/]+\.desktop$'); do
+    in_box "$APPS" distrobox-export --app "$(basename "$d" .desktop)" >/dev/null 2>&1 && n=$((n + 1)) && say "  añadido al menú: $(basename "$d" .desktop)"
+  done
+  [ "$n" -gt 0 ] && say "Listo: «$pkg» aparece en el menú de aplicaciones." || say "Instalado en la caja, pero no trae lanzador de escritorio; se ejecuta con: distrobox enter $APPS -- $pkg"
+}
+
+cmd_remove() {
+  local pkg=${1:-}; [ -n "$pkg" ] || die "uso: owee-dev remove PAQUETE" 2
+  check
+  for d in $(in_box "$APPS" dpkg -L "$pkg" 2>/dev/null | grep -E '/usr/share/applications/[^/]+\.desktop$'); do in_box "$APPS" distrobox-export --app "$(basename "$d" .desktop)" --delete >/dev/null 2>&1; done
+  in_box "$APPS" sudo env DEBIAN_FRONTEND=noninteractive apt-get remove -y "$pkg" && say "«$pkg» quitado."
+}
+
+cmd_update() { check; distrobox upgrade --all; }
+
+case "${1:-}" in
+  init) shift; cmd_init "$@" ;;
+  enter) shift; cmd_enter "$@" ;;
+  deb) shift; cmd_deb "$@" ;;
+  remove) shift; cmd_remove "$@" ;;
+  update) cmd_update ;;
+  check) check ;;
+  *) sed -n 2,11p "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac

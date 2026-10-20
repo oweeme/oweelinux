@@ -7,7 +7,7 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run owee-firewall owee-centinela owee-centinela-ctl; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run owee-firewall owee-centinela owee-centinela-ctl owee-dev; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_overview.py owee_switcher.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
@@ -19,7 +19,7 @@ install -Dm0644 "$D/session/labwc-setup/rc.xml" "$R/usr/share/owee/labwc-setup/r
 # Fcitx5 por defecto (también para usuarios nuevos): sin icono propio en la bandeja (lo reemplaza el indicador del panel) y sin avisos (el de «Wayland Diagnose» no aplica con labwc)
 printf '[Behavior]\nDisabledAddons=notificationitem,notifications\n' | install -Dm0644 /dev/stdin "$ETC/xdg/fcitx5/config"
 # Reproductor de vídeo y música por defecto: mpv (ligero; con controles en pantalla al abrirlo desde el lanzador o desde Dolphin), para las grabaciones de la Capturadora y cualquier archivo multimedia
-{ echo "[Default Applications]"; for t in video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp audio/mpeg audio/mp4 audio/ogg audio/flac audio/x-wav audio/webm audio/aac audio/opus; do echo "$t=mpv.desktop"; done; } | install -Dm0644 /dev/stdin "$ETC/xdg/mimeapps.list"
+{ echo "[Default Applications]"; for t in video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp audio/mpeg audio/mp4 audio/ogg audio/flac audio/x-wav audio/webm audio/aac audio/opus; do echo "$t=mpv.desktop"; done; echo "application/vnd.debian.binary-package=owee-dev-deb.desktop"; } | install -Dm0644 /dev/stdin "$ETC/xdg/mimeapps.list"
 # Instalador (Calamares): scripts, configuración y marca. Solo se activa en el medio de instalación (marca en /var, ver build.sh); si falta el paquete calamares, no se instala nada.
 if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
   install -Dm0755 "$D/installer/owee-install-deploy" "$R/usr/libexec/owee/installer/owee-install-deploy"; install -Dm0755 "$D/installer/owee-install-disk" "$R/usr/libexec/owee/installer/owee-install-disk"
@@ -226,6 +226,25 @@ EOS
 mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
 # Fcitx5 no debe arrancarse solo por D-Bus (lo activaban Ajustes y el panel nada más abrirse, +32 MB): se lanza cuando el usuario activa un método de escritura (Ajustes → Teclado) o ya tiene uno
 rm -f "$R/usr/share/dbus-1/services/org.fcitx.Fcitx5.service"
+# owee-dev: cajas de desarrollo y programas .deb (Podman + distrobox, sin root); un .deb abre el asistente en una terminal
+ln -sf /usr/libexec/owee/owee-dev "$R/usr/bin/owee-dev"
+install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-dev-deb.desktop" <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=Instalar programa .deb (en una caja)
+Comment=Instala un paquete .deb con sus dependencias en la caja «apps», sin tocar el sistema
+Exec=foot -e sh -c 'owee-dev deb "$1"; echo; printf "Pulsa Intro para cerrar"; read x' sh %f
+Icon=package-x-generic
+MimeType=application/vnd.debian.binary-package;
+NoDisplay=true
+Categories=System;
+EOD
+# sin LLMNR ni mDNS en el resolutor: no hace falta en un escritorio y deja puertos abiertos
+install -Dm0644 /dev/stdin "$R/usr/lib/systemd/resolved.conf.d/90-owee.conf" <<'EOS'
+[Resolve]
+LLMNR=no
+MulticastDNS=no
+EOS
 # Seguridad: cortafuegos (bloquea lo entrante; activo por defecto), Centinela (señuelo de red pasivo; apagado por defecto) y endurecimiento del kernel
 install -Dm0644 "$D/session/owee-firewall.service" "$R/usr/lib/systemd/system/owee-firewall.service"
 install -Dm0644 "$D/session/owee-centinela.service" "$R/usr/lib/systemd/system/owee-centinela.service"

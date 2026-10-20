@@ -22,7 +22,7 @@ try:
             r = json.loads(f.readline())
             if "return" in r or "error" in r: return r
     cmd("qmp_capabilities"); t0 = time.time()
-    KEYS = {" ": "spc", "\n": "ret", ".": "dot", "-": "minus", "_": "shift-minus", "/": "slash"}
+    KEYS = {" ": "spc", "\n": "ret", ".": "dot", "-": "minus", "_": "shift+minus", "/": "slash", ",": "comma", "(": "shift+9", ")": "shift+0", "$": "shift+4", "=": "equal", ";": "semicolon", ":": "shift+semicolon", "'": "apostrophe", "|": "shift+backslash", "&": "shift+7", ">": "shift+dot", "<": "shift+comma", "*": "shift+8", "#": "shift+3", "~": "shift+grave", "%": "shift+5", "!": "shift+1", "\"": "shift+apostrophe", "[": "bracket_left", "]": "bracket_right", "\\": "backslash"}
     def press(k): cmd("send-key", keys=[{"type": "qcode", "data": q} for q in k.split("+")]); time.sleep(0.12)
     def typ(text):
         for ch in text: press(KEYS.get(ch) or ("shift+" + ch.lower() if ch.isupper() else ch))
