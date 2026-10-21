@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "Quelqu'un scanne votre ordinateur depuis {0} (ports {1}).",
 "Lo bloqueé.": "Je l'ai bloqué.",
 "Quedó anotado.": "C'est enregistré.",
-"Centinela": "Sentinelle"
+"Centinela": "Sentinelle",
+"Versión reducida lista": "Version allégée prête",
+"Queda muy poco espacio en el disco para grabar.": "Il reste très peu d'espace disque pour enregistrer.",
+"Tamaño del archivo": "Taille du fichier",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "Équilibrée et Légère réduisent la vidéo à la fin, en arrière-plan ; en cas d'échec, l'original est conservé",
+"Original (máxima calidad, pesa más)": "Original (qualité maximale, fichier plus lourd)",
+"Equilibrada": "Équilibrée",
+"Ligera (ideal para WhatsApp y Telegram)": "Légère (idéale pour WhatsApp et Telegram)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · la version allégée se prépare en arrière-plan et remplacera ce fichier",
+"Reduciendo el tamaño en segundo plano…": "Réduction de la taille en arrière-plan…"
 }

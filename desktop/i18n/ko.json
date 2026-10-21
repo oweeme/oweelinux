@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "{0}에서 컴퓨터를 스캔하고 있습니다(포트 {1}).",
 "Lo bloqueé.": "차단했습니다.",
 "Quedó anotado.": "기록했습니다.",
-"Centinela": "센티널"
+"Centinela": "센티널",
+"Versión reducida lista": "축소된 버전이 준비되었습니다",
+"Queda muy poco espacio en el disco para grabar.": "녹화할 디스크 공간이 거의 남지 않았습니다.",
+"Tamaño del archivo": "파일 크기",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "'균형'과 '가벼움'은 녹화가 끝난 뒤 백그라운드에서 영상을 줄입니다. 문제가 생기면 원본이 유지됩니다",
+"Original (máxima calidad, pesa más)": "원본 (최고 화질, 용량 큼)",
+"Equilibrada": "균형",
+"Ligera (ideal para WhatsApp y Telegram)": "가벼움 (WhatsApp, Telegram에 적합)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · 축소된 버전을 백그라운드에서 만드는 중이며 이 파일을 대체합니다",
+"Reduciendo el tamaño en segundo plano…": "백그라운드에서 크기를 줄이는 중…"
 }

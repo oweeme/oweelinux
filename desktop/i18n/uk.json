@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "Хтось сканує ваш комп'ютер з {0} (порти {1}).",
 "Lo bloqueé.": "Я заблокував.",
 "Quedó anotado.": "Записано в журнал.",
-"Centinela": "Вартовий"
+"Centinela": "Вартовий",
+"Versión reducida lista": "Зменшену версію готово",
+"Queda muy poco espacio en el disco para grabar.": "На диску залишилося дуже мало місця для запису.",
+"Tamaño del archivo": "Розмір файлу",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "«Збалансована» і «Легка» зменшують відео після завершення у фоновому режимі; якщо щось піде не так, оригінал збережеться",
+"Original (máxima calidad, pesa más)": "Оригінал (найкраща якість, більший розмір)",
+"Equilibrada": "Збалансована",
+"Ligera (ideal para WhatsApp y Telegram)": "Легка (ідеально для WhatsApp і Telegram)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · зменшена версія готується у фоні та замінить цей файл",
+"Reduciendo el tamaño en segundo plano…": "Зменшення розміру у фоні…"
 }

@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "{0} からあなたのパソコンがスキャンされています（ポート {1}）。",
 "Lo bloqueé.": "ブロックしました。",
 "Quedó anotado.": "記録しました。",
-"Centinela": "センチネル"
+"Centinela": "センチネル",
+"Versión reducida lista": "軽量版ができました",
+"Queda muy poco espacio en el disco para grabar.": "録画するにはディスクの空き容量が足りません。",
+"Tamaño del archivo": "ファイルサイズ",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "「バランス」と「軽量」は録画後にバックグラウンドで動画を小さくします。失敗した場合は元のファイルが残ります",
+"Original (máxima calidad, pesa más)": "オリジナル（最高画質、ファイルが大きい）",
+"Equilibrada": "バランス",
+"Ligera (ideal para WhatsApp y Telegram)": "軽量（WhatsApp や Telegram に最適）",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · 軽量版をバックグラウンドで作成中です。完成するとこのファイルに置き換わります",
+"Reduciendo el tamaño en segundo plano…": "バックグラウンドでサイズを縮小しています…"
 }

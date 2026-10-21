@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "有人正在从 {0} 扫描你的电脑（端口 {1}）。",
 "Lo bloqueé.": "我已将其拦截。",
 "Quedó anotado.": "已记录。",
-"Centinela": "哨兵"
+"Centinela": "哨兵",
+"Versión reducida lista": "缩小后的版本已就绪",
+"Queda muy poco espacio en el disco para grabar.": "磁盘空间太少，无法录制。",
+"Tamaño del archivo": "文件大小",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "“均衡”和“轻量”会在结束后于后台缩小视频；如果出错，会保留原文件",
+"Original (máxima calidad, pesa más)": "原始（最高画质，文件较大）",
+"Equilibrada": "均衡",
+"Ligera (ideal para WhatsApp y Telegram)": "轻量（适合 WhatsApp 和 Telegram）",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · 缩小后的版本正在后台生成，并将替换此文件",
+"Reduciendo el tamaño en segundo plano…": "正在后台缩小文件…"
 }

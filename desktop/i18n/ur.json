@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "کوئی {0} سے آپ کے کمپیوٹر کو سکین کر رہا ہے (پورٹ {1})۔",
 "Lo bloqueé.": "میں نے بلاک کر دیا۔",
 "Quedó anotado.": "ریکارڈ ہو گیا۔",
-"Centinela": "سنٹینل"
+"Centinela": "سنٹینل",
+"Versión reducida lista": "چھوٹا ورژن تیار ہے",
+"Queda muy poco espacio en el disco para grabar.": "ریکارڈ کرنے کے لیے ڈسک پر بہت کم جگہ بچی ہے۔",
+"Tamaño del archivo": "فائل کا سائز",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "«متوازن» اور «ہلکا» ختم ہونے پر پس منظر میں ویڈیو چھوٹی کرتے ہیں؛ کچھ گڑبڑ ہو تو اصل فائل محفوظ رہتی ہے",
+"Original (máxima calidad, pesa más)": "اصل (بہترین معیار، بڑی فائل)",
+"Equilibrada": "متوازن",
+"Ligera (ideal para WhatsApp y Telegram)": "ہلکا (WhatsApp اور Telegram کے لیے موزوں)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · چھوٹا ورژن پس منظر میں تیار ہو رہا ہے اور اس فائل کی جگہ لے لے گا",
+"Reduciendo el tamaño en segundo plano…": "پس منظر میں سائز کم کیا جا رہا ہے…"
 }

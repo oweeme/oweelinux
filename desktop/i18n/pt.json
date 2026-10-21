@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "Alguém está escaneando seu computador a partir de {0} (portas {1}).",
 "Lo bloqueé.": "Eu bloqueei.",
 "Quedó anotado.": "Ficou registrado.",
-"Centinela": "Sentinela"
+"Centinela": "Sentinela",
+"Versión reducida lista": "Versão reduzida pronta",
+"Queda muy poco espacio en el disco para grabar.": "Há muito pouco espaço no disco para gravar.",
+"Tamaño del archivo": "Tamanho do arquivo",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "Equilibrada e Leve reduzem o vídeo ao terminar, em segundo plano; se algo falhar, o original é mantido",
+"Original (máxima calidad, pesa más)": "Original (máxima qualidade, arquivo maior)",
+"Equilibrada": "Equilibrada",
+"Ligera (ideal para WhatsApp y Telegram)": "Leve (ideal para WhatsApp e Telegram)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · a versão reduzida está sendo preparada em segundo plano e substituirá este arquivo",
+"Reduciendo el tamaño en segundo plano…": "Reduzindo o tamanho em segundo plano…"
 }

@@ -220,8 +220,9 @@ PERCENT=50
 PRIORITY=100
 EOS
 install -Dm0644 /dev/stdin "$ETC/default/earlyoom" <<'EOS'
-# earlyoom: si la memoria Y el intercambio casi se agotan (menos del 4 % y 5 %), cierra el programa más pesado en vez de dejar el equipo congelado. Nunca toca el escritorio ni el sistema; prefiere navegadores y apps pesadas.
-EARLYOOM_ARGS="-r 0 -m 4,2 -s 5,2 --avoid '(^|/)(labwc|sddm|sddm-helper|Xwayland|pipewire|wireplumber|systemd|systemd-logind|dbus-daemon|NetworkManager|polkitd|polkit-mate-authentication-agent-1|mako|foot|python3)$' --prefer '(^|/)(QtWebEngineProc|falkon|chrome|chromium|firefox|firefox-esr|electron|java|code|slack|discord|steam)$'"
+# earlyoom: actúa ANTES de que el equipo se ahogue (a partir de menos del 8 % de memoria disponible; a menos del 4 % ya sin pedir permiso). Con zram hay intercambio de sobra, así que no espera a que se llene (-s 100): cuando se llena ya está todo bloqueado.
+# Nunca toca el escritorio, el sonido ni los servicios del sistema (los nombres se comparan truncados a 15 letras); prefiere navegadores, grabadoras y apps pesadas.
+EARLYOOM_ARGS="-r 0 -m 8,4 -s 100,100 --avoid '(^|/)(labwc|sddm.*|Xwayland|Xorg|pipewire.*|wireplumber|systemd.*|dbus-daemon|NetworkManager|wpa_supplicant|polkitd|polkit-mate.*|mako|foot|python3|fcitx5|swaybg|swayidle|xdg-.*|flatpak-.*|dconf-service|gvfs.*|kded6|udisksd|upowerd|bluetoothd)$' --prefer '(^|/)(QtWebEngineProc|falkon|chrome|chromium|firefox|firefox-esr|electron|java|code|slack|discord|steam|wf-recorder|ffmpeg|DesktopEditors|editors_helper)$'"
 EOS
 mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
 # Fcitx5 no debe arrancarse solo por D-Bus (lo activaban Ajustes y el panel nada más abrirse, +32 MB): se lanza cuando el usuario activa un método de escritura (Ajustes → Teclado) o ya tiene uno

@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "Jemand scannt deinen Computer von {0} aus (Ports {1}).",
 "Lo bloqueé.": "Ich habe ihn gesperrt.",
 "Quedó anotado.": "Es wurde protokolliert.",
-"Centinela": "Wächter"
+"Centinela": "Wächter",
+"Versión reducida lista": "Verkleinerte Version fertig",
+"Queda muy poco espacio en el disco para grabar.": "Auf dem Datenträger ist zu wenig Platz für eine Aufnahme.",
+"Tamaño del archivo": "Dateigröße",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "„Ausgewogen“ und „Leicht“ verkleinern das Video nach der Aufnahme im Hintergrund; bei einem Fehler bleibt das Original erhalten",
+"Original (máxima calidad, pesa más)": "Original (beste Qualität, größere Datei)",
+"Equilibrada": "Ausgewogen",
+"Ligera (ideal para WhatsApp y Telegram)": "Leicht (ideal für WhatsApp und Telegram)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · die verkleinerte Version wird im Hintergrund erstellt und ersetzt diese Datei",
+"Reduciendo el tamaño en segundo plano…": "Größe wird im Hintergrund reduziert…"
 }

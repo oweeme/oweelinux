@@ -670,5 +670,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).",
 "Lo bloqueé.",
 "Quedó anotado.",
-"Centinela"
+"Centinela",
+"Versión reducida lista",
+"Queda muy poco espacio en el disco para grabar.",
+"Tamaño del archivo",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original",
+"Original (máxima calidad, pesa más)",
+"Equilibrada",
+"Ligera (ideal para WhatsApp y Telegram)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo",
+"Reduciendo el tamaño en segundo plano…"
 ]

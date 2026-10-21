@@ -12,7 +12,7 @@ def dirs():
     return (os.path.join(_dir(GLib.UserDirectory.DIRECTORY_PICTURES, "Pictures"), "Screenshots"), os.path.join(_dir(GLib.UserDirectory.DIRECTORY_VIDEOS, "Videos"), "Screen Recordings"))
 DIR_IMG, DIR_VID = dirs()
 CFG = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.join(HOME, ".config")), "owee", "capture.json")
-DEFAULTS = {"timer": 0, "cursor": False, "clipboard": True, "fps": 30, "audio_system": True, "audio_mic": False, "camera": False, "quality": "media"}
+DEFAULTS = {"timer": 0, "cursor": False, "clipboard": True, "fps": 24, "audio_system": True, "audio_mic": False, "camera": False, "quality": "media"}
 
 def load_cfg():
     try: d = json.load(open(CFG))
@@ -24,6 +24,58 @@ def save_cfg(d):
 
 def stamp(): return datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 def have(p): return shutil.which(p) is not None
+
+# Temporales de grabación: en el disco (no en /tmp, que es memoria RAM: una grabación larga se comería la memoria del equipo)
+CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME", os.path.join(HOME, ".cache")), "owee", "rec")
+# Calidad: (preset y crf al grabar, reducción posterior). Al grabar se usa poca CPU (ultrafast) y al terminar, en segundo plano y con prioridad baja, se reduce el archivo.
+QUALITY = {"alta": ("veryfast", 23, None),
+           "media": ("ultrafast", 26, {"height": 720, "crf": 27, "fps": 0, "abr": "96k"}),
+           "ligera": ("ultrafast", 26, {"height": 720, "crf": 31, "fps": 20, "abr": "64k"})}
+MIN_FREE = 1 << 30      # no se empieza a grabar con menos de 1 GB libre
+
+_SCOPE = None
+def scope_prefix():
+    """Prefijo `systemd-run --user --scope` con límites de memoria HOLGADOS (alto 45 % y máximo 60 % de la RAM): no estorba a ninguna grabación normal, pero si algo se descontrola
+    se frena/cierra la grabación en vez de congelar todo el equipo. Si systemd de usuario no está disponible, se graba sin límite."""
+    global _SCOPE
+    if _SCOPE is None:
+        _SCOPE = []
+        if have("systemd-run") and os.environ.get("XDG_RUNTIME_DIR"):
+            try:
+                kb = int(next(l.split()[1] for l in open("/proc/meminfo") if l.startswith("MemTotal:")))
+                high = max(1 << 30, kb * 1024 * 45 // 100); top = max(3 << 29, kb * 1024 * 60 // 100)
+                pre = ["systemd-run", "--user", "--scope", "--quiet", "-p", f"MemoryHigh={high}", "-p", f"MemoryMax={top}"]
+                if subprocess.run(pre + ["true"], capture_output=True, timeout=5).returncode == 0: _SCOPE = pre
+            except Exception: pass
+    return list(_SCOPE)
+
+def prune_stale():
+    """Borra temporales de grabaciones antiguas que quedaron por un cierre brusco (más de un día y sin su proceso)."""
+    try:
+        for d in os.listdir(CACHE):
+            p = os.path.join(CACHE, d)
+            try: pid = int(d.split("-")[1])
+            except (IndexError, ValueError): pid = 0
+            if time.time() - os.path.getmtime(p) > 86400 and not os.path.exists(f"/proc/{pid}"): shutil.rmtree(p, ignore_errors=True)
+    except OSError: pass
+
+def reduce_in_background(path, q):
+    """Reduce `path` (MP4) según la calidad elegida, sin bloquear nada: proceso aparte con prioridad baja que sigue aunque se cierre la capturadora.
+    Escribe en un archivo temporal y solo reemplaza al original si el resultado es más pequeño; si algo falla, el original queda intacto."""
+    r = QUALITY[q][2]
+    if not r or not have("ffmpeg"): return False
+    tmp = path[:-4] + ".reduciendo.mp4"
+    vf = f"scale=-2:'min({r['height']},ih)'" + (f",fps={r['fps']}" if r["fps"] else "")
+    thr = str(max(1, (os.cpu_count() or 2) // 2))
+    ff = ["ffmpeg", "-y", "-loglevel", "error", "-i", path, "-vf", vf, "-c:v", "libx264", "-preset", "veryfast", "-crf", str(r["crf"]), "-pix_fmt", "yuv420p", "-threads", thr,
+          "-c:a", "aac", "-b:a", r["abr"], "-movflags", "+faststart", tmp]
+    script = ('in=$1; tmp=$2; title=$3; shift 3\n'
+              'if command -v ionice >/dev/null 2>&1; then nice -n 15 ionice -c3 "$@" >/dev/null 2>&1; else nice -n 15 "$@" >/dev/null 2>&1; fi || { rm -f "$tmp"; exit 1; }\n'
+              'before=$(stat -c %s "$in"); after=$(stat -c %s "$tmp")\n'
+              'if [ "$after" -gt 0 ] && [ "$after" -lt "$before" ]; then mv -f "$tmp" "$in"; else rm -f "$tmp"; after=$before; fi\n'
+              'notify-send -i owee-capture "$title" "$((before / 1048576)) MB → $((after / 1048576)) MB   $in" >/dev/null 2>&1 || true')
+    subprocess.Popen(["sh", "-c", script, "owee-reducir", path, tmp, _("Versión reducida lista")] + ff, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    return True
 
 def select_region():
     """Deja elegir una zona con el ratón (slurp). Devuelve 'x,y WxH' o None si se cancela (Esc)."""
@@ -57,13 +109,16 @@ def audio_sources():
 class Recorder:
     """Grabación de pantalla. start() lanza wf-recorder (vídeo) y, si se pide, pw-record por cada fuente de audio; stop() cierra con SIGINT (así los archivos quedan válidos),
     mezcla el audio con ffmpeg y deja un MP4 en ~/Videos/Screen Recordings. Un fallo en una fuente de audio no estropea el vídeo."""
-    def __init__(self): self.procs = []; self.tmp = None; self.out = None; self.t0 = 0; self.running = False
+    def __init__(self): self.procs = []; self.tmp = None; self.out = None; self.t0 = 0; self.running = False; self.quality = "media"
 
-    def start(self, geometry=None, fps=30, system=False, mic=False):
+    def start(self, geometry=None, fps=24, system=False, mic=False, quality="media"):
         if not have("wf-recorder"): raise RuntimeError(_("Falta «wf-recorder» (grabación de pantalla)."))
-        os.makedirs(DIR_VID, exist_ok=True); self.out = os.path.join(DIR_VID, f"grabacion-{stamp()}.mp4"); self.tmp = os.path.join("/tmp", f"owee-rec-{os.getpid()}-{stamp()}")
+        os.makedirs(DIR_VID, exist_ok=True); os.makedirs(CACHE, exist_ok=True); prune_stale()
+        if shutil.disk_usage(CACHE).free < MIN_FREE: raise RuntimeError(_("Queda muy poco espacio en el disco para grabar."))
+        self.quality = quality if quality in QUALITY else "media"; preset, crf, _r = QUALITY[self.quality]
+        self.out = os.path.join(DIR_VID, f"grabacion-{stamp()}.mp4"); self.tmp = os.path.join(CACHE, f"rec-{os.getpid()}-{stamp()}")
         os.makedirs(self.tmp, exist_ok=True); self.audio = []
-        v = ["wf-recorder", "-f", os.path.join(self.tmp, "video.mkv"), "-r", str(fps), "-c", "libx264", "-p", "preset=veryfast", "-p", "crf=24", "-p", "pix_fmt=yuv420p"] + (["-g", geometry] if geometry else [])   # el puntero se graba por defecto
+        v = scope_prefix() + ["wf-recorder", "-f", os.path.join(self.tmp, "video.mkv"), "-r", str(fps), "-c", "libx264", "-p", f"preset={preset}", "-p", f"crf={crf}", "-p", "pix_fmt=yuv420p"] + (["-g", geometry] if geometry else [])   # el puntero se graba por defecto
         self.procs = [subprocess.Popen(v, stdout=subprocess.DEVNULL, stderr=open(os.path.join(self.tmp, "wf.log"), "w"), start_new_session=True)]
         sys_t, mic_t = audio_sources()
         if system and sys_t:
@@ -87,7 +142,7 @@ class Recorder:
         if not self.running: raise RuntimeError(_("No hay una grabación en curso."))
         self.running = False
         for _n, _f, p in self.audio: self._term(p)
-        self._term(self.procs[0]); video = os.path.join(self.tmp, "video.mkv")
+        self._term(self.procs[0], 60); video = os.path.join(self.tmp, "video.mkv")
         if not os.path.exists(video) or os.path.getsize(video) < 1000: err = open(os.path.join(self.tmp, "wf.log")).read().strip()[-200:]; self.cleanup(); raise RuntimeError(_("La grabación quedó vacía. ") + err)
         wavs = [f for _n, f, _p in self.audio if os.path.exists(f) and os.path.getsize(f) > 2000]
         if wavs and have("ffmpeg"):
@@ -99,11 +154,16 @@ class Recorder:
         if cmd:
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             if r.returncode != 0 or not os.path.exists(self.out): shutil.copy(video, self.out.replace(".mp4", ".mkv")); self.out = self.out.replace(".mp4", ".mkv")   # al menos el vídeo no se pierde
-        out = self.out; self.cleanup(); return out
+        out = self.out; self.cleanup()
+        if out.endswith(".mp4"): reduce_in_background(out, self.quality)
+        return out
 
-    def _term(self, p):
+    def _term(self, p, wait=8):
+        """Pide cerrar con SIGINT (los archivos quedan válidos) y espera `wait` s; si no, SIGTERM y, como último recurso, SIGKILL. wf-recorder recibe mucho más margen: con la CPU ocupada tarda en vaciar su cola."""
         try:
-            os.killpg(p.pid, signal.SIGINT); p.wait(timeout=8)
+            os.killpg(p.pid, signal.SIGINT)
+            try: p.wait(timeout=wait)
+            except subprocess.TimeoutExpired: os.killpg(p.pid, signal.SIGTERM); p.wait(timeout=10)
         except (ProcessLookupError, subprocess.TimeoutExpired):
             try: os.killpg(p.pid, signal.SIGKILL)
             except ProcessLookupError: pass

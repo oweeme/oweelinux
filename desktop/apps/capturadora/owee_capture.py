@@ -139,6 +139,8 @@ class App(Gtk.Application):
             btn = Gtk.Button(label=label, css_classes=["big"] + (["rec"] if cls == "rec" else [])); btn.connect("clicked", lambda _b, m=mode: self.start_recording(m)); b.append(btn)
         sys_t, mic_t = core.audio_sources()
         b.append(self.row(_("Fotogramas por segundo"), self.drop("fps", [(15, "15"), (24, "24"), (30, "30"), (60, "60")])))
+        b.append(self.row(_("Tamaño del archivo"), self.drop("quality", [("alta", _("Original (máxima calidad, pesa más)")), ("media", _("Equilibrada")), ("ligera", _("Ligera (ideal para WhatsApp y Telegram)"))]),
+                          _("Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original")))
         sw = self.sw("audio_system"); sw.set_sensitive(bool(sys_t)); b.append(self.row(_("Audio del sistema"), sw, "" if sys_t else _("No se detectó una salida de audio")))
         sm = self.sw("audio_mic"); sm.set_sensitive(bool(mic_t)); b.append(self.row(_("Micrófono"), sm, "" if mic_t else _("No se detectó un micrófono")))
         cs = self.sw("camera"); b.append(self.row(_("Mostrar mi cámara en la grabación"), cs, _("Una burbuja redonda que puedes arrastrar; la rueda cambia su tamaño")))
@@ -202,7 +204,7 @@ class App(Gtk.Application):
                 if not geometry: self.after_cancel(); return False
             def begin():
                 if self.cfg["camera"]: self.toggle_camera(force=True)
-                def work(): self.rec.start(geometry, int(self.cfg["fps"]), bool(self.cfg["audio_system"]), bool(self.cfg["audio_mic"])); return True
+                def work(): self.rec.start(geometry, int(self.cfg["fps"]), bool(self.cfg["audio_system"]), bool(self.cfg["audio_mic"]), str(self.cfg["quality"])); return True
                 def done(_r, err):
                     if err: self.say(err); self.close_cam(); self.after_cancel(); return
                     self.show_pill()
@@ -230,6 +232,7 @@ class App(Gtk.Application):
     def stop_recording(self):
         if not self.rec.running: return
         if self.pill: self.timer_l.set_text(_("Guardando…"))
+        self.close_cam()                  # la cámara se apaga al instante; guardar puede tardar unos segundos
         try: os.remove(self.STATE)
         except OSError: pass
         def done(path, err):
@@ -238,7 +241,9 @@ class App(Gtk.Application):
             if self.pres: self.pres.finish()
             if err: self.say(err)
             else:
-                self.say(_("Grabación guardada: ") + path); self.notify(_("Grabación guardada"), path)
+                lite = core.QUALITY.get(self.rec.quality, (0, 0, None))[2] is not None and path.endswith(".mp4")
+                self.say(_("Grabación guardada: ") + path + (_(" · la versión reducida se prepara en segundo plano y reemplazará a este archivo") if lite else ""))
+                self.notify(_("Grabación guardada"), path + (("\n" + _("Reduciendo el tamaño en segundo plano…")) if lite else ""))
                 self.restore_main()
             GLib.idle_add(self.quit_if_idle)
         core.run_async(self.rec.stop, done)

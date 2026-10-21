@@ -664,5 +664,14 @@
 "Alguien está escaneando tu equipo desde {0} (puertos {1}).": "Seseorang memindai komputer Anda dari {0} (port {1}).",
 "Lo bloqueé.": "Saya memblokirnya.",
 "Quedó anotado.": "Sudah dicatat.",
-"Centinela": "Penjaga"
+"Centinela": "Penjaga",
+"Versión reducida lista": "Versi yang diperkecil sudah siap",
+"Queda muy poco espacio en el disco para grabar.": "Ruang disk untuk merekam hampir habis.",
+"Tamaño del archivo": "Ukuran file",
+"Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original": "«Seimbang» dan «Ringan» memperkecil video setelah selesai, di latar belakang; jika ada yang gagal, file asli tetap disimpan",
+"Original (máxima calidad, pesa más)": "Asli (kualitas terbaik, file lebih besar)",
+"Equilibrada": "Seimbang",
+"Ligera (ideal para WhatsApp y Telegram)": "Ringan (ideal untuk WhatsApp dan Telegram)",
+" · la versión reducida se prepara en segundo plano y reemplazará a este archivo": " · versi yang diperkecil sedang disiapkan di latar belakang dan akan menggantikan file ini",
+"Reduciendo el tamaño en segundo plano…": "Memperkecil ukuran di latar belakang…"
 }
