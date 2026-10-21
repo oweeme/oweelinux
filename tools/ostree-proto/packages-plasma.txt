@@ -156,3 +156,4 @@ nftables
 apparmor
 iproute2
 plymouth
+desktop-file-utils

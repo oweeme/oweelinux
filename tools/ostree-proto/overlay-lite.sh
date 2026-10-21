@@ -19,7 +19,7 @@ install -Dm0644 "$D/session/labwc-setup/rc.xml" "$R/usr/share/owee/labwc-setup/r
 # Fcitx5 por defecto (también para usuarios nuevos): sin icono propio en la bandeja (lo reemplaza el indicador del panel) y sin avisos (el de «Wayland Diagnose» no aplica con labwc)
 printf '[Behavior]\nDisabledAddons=notificationitem,notifications\n' | install -Dm0644 /dev/stdin "$ETC/xdg/fcitx5/config"
 # Reproductor de vídeo y música por defecto: mpv (ligero; con controles en pantalla al abrirlo desde el lanzador o desde Dolphin), para las grabaciones de la Capturadora y cualquier archivo multimedia
-{ echo "[Default Applications]"; for t in video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp audio/mpeg audio/mp4 audio/ogg audio/flac audio/x-wav audio/webm audio/aac audio/opus; do echo "$t=mpv.desktop"; done; echo "application/vnd.debian.binary-package=owee-dev-deb.desktop"; } | install -Dm0644 /dev/stdin "$ETC/xdg/mimeapps.list"
+{ echo "[Default Applications]"; for t in video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp audio/mpeg audio/mp4 audio/ogg audio/flac audio/x-wav audio/webm audio/aac audio/opus; do echo "$t=mpv.desktop"; done; echo "application/vnd.debian.binary-package=owee-dev-deb.desktop"; for t in x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml; do echo "$t=org.kde.falkon.desktop"; done; } | install -Dm0644 /dev/stdin "$ETC/xdg/mimeapps.list"
 # Instalador (Calamares): scripts, configuración y marca. Solo se activa en el medio de instalación (marca en /var, ver build.sh); si falta el paquete calamares, no se instala nada.
 if [ "${OWEE_INSTALLER:-0}" = 1 ]; then
   install -Dm0755 "$D/installer/owee-install-deploy" "$R/usr/libexec/owee/installer/owee-install-deploy"; install -Dm0755 "$D/installer/owee-install-disk" "$R/usr/libexec/owee/installer/owee-install-disk"
@@ -227,6 +227,7 @@ EOS
 mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
 # Fcitx5 no debe arrancarse solo por D-Bus (lo activaban Ajustes y el panel nada más abrirse, +32 MB): se lanza cuando el usuario activa un método de escritura (Ajustes → Teclado) o ya tiene uno
 rm -f "$R/usr/share/dbus-1/services/org.fcitx.Fcitx5.service"
+printf '#!/bin/sh\n# El selector «Abrir con…» llama a gnome-software; en OweeLinux la tienda es Discover\nexec plasma-discover "$@"\n' | install -Dm0755 /dev/stdin "$R/usr/bin/gnome-software"
 # Un escritorio no necesita esperar a que haya red para arrancar (NetworkManager-wait-online retrasaba el inicio unos 9 s)
 mkdir -p "$ETC/systemd/system"; ln -sf /dev/null "$ETC/systemd/system/NetworkManager-wait-online.service"
 # owee-dev: cajas de desarrollo y programas .deb (Podman + distrobox, sin root); un .deb abre el asistente en una terminal
@@ -287,3 +288,5 @@ Icon=preferences-system
 Categories=Settings;
 Keywords=ajustes;tema;fondo;color;apariencia;
 EOD
+# Índice de aplicaciones (mimeinfo.cache), al final, cuando ya están todos los .desktop: sin él, GIO y los portales no saben qué abre cada tipo de archivo y salía «No hay aplicaciones…»
+[ -x "$R/usr/bin/update-desktop-database" ] && chroot "$R" update-desktop-database -q /usr/share/applications || echo "(aviso: sin update-desktop-database; falta desktop-file-utils)"
