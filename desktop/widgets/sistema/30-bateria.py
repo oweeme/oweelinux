@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# owee-interval: 15
+# owee-interval: 30
 # Widget del sistema: BATERÍA (/sys/class/power_supply). Se oculta en equipos sin batería.
 # OWEE_POWER_SUPPLY_DIR cambia la carpeta (para pruebas con una batería simulada).
 import glob, json, os

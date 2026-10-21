@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# owee-interval: 10
+# owee-interval: 30
 # Widget del sistema: BLUETOOTH (BlueZ, con `bluetoothctl`). Clic: enciende/apaga y conecta o desconecta los dispositivos ya emparejados. Sin adaptador, se oculta.
 # Para cambiarlo, copia este archivo a ~/.config/owee/widgets/ con el MISMO nombre.
 import json, os, re, subprocess, sys

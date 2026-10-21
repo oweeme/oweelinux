@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=OweeLinux
+Description=Logo de OweeLinux: koi sobre fondo verde oscuro, con una barra fina de progreso
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/oweelinux
+ScriptFile=/usr/share/plymouth/themes/oweelinux/oweelinux.script

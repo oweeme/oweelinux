@@ -12,7 +12,13 @@ echo "kernel: $KVER"
 mkdir -p "$R/proc" "$R/sys" "$R/dev"
 if [ ! -f "$R/usr/lib/modules/$KVER/initramfs.img" ]; then   # reintentable: no repetir si ya está hecho
   install -m0644 "$R/boot/vmlinuz-$KVER" "$R/usr/lib/modules/$KVER/vmlinuz"
-  chroot "$R" dracut --force --no-hostonly --add ostree --install /usr/lib/x86_64-linux-gnu/libkmod.so.2 --kver "$KVER" \
+  # Pantalla de arranque con el logo (Plymouth): el tema tiene que estar ANTES de generar el initramfs, que es donde arranca el splash
+  PLYMOD=""; HERE=$(cd "$(dirname "$0")" && pwd); PLY="$HERE/../../desktop/theme/plymouth/oweelinux"
+  if [ -x "$R/usr/sbin/plymouthd" ] && [ -d "$PLY" ]; then
+    mkdir -p "$R/usr/share/plymouth/themes/oweelinux" "$R/etc/plymouth"; cp "$PLY"/* "$R/usr/share/plymouth/themes/oweelinux/"
+    printf '[Daemon]\nTheme=oweelinux\nShowDelay=0\nDeviceTimeout=5\n' > "$R/etc/plymouth/plymouthd.conf"; PLYMOD="plymouth"
+  else echo "(aviso: sin Plymouth: el arranque mostrará texto en vez del logo)"; fi
+  chroot "$R" dracut --force --no-hostonly --add "ostree $PLYMOD" --install /usr/lib/x86_64-linux-gnu/libkmod.so.2 --kver "$KVER" \
       "/usr/lib/modules/$KVER/initramfs.img"
 fi
 rm -rf "$R"/boot/* "$R"/var/lib/initramfs-tools

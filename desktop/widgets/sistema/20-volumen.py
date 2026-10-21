@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# owee-interval: 3
+# owee-interval: 5
 # Widget del sistema: VOLUMEN (WirePlumber, con `wpctl`). Para cambiarlo, copia este archivo a ~/.config/owee/widgets/ con el MISMO nombre.
 # Clic: abre un deslizante y un botón de silencio. Sin tarjeta de sonido, se oculta.
 import json, os, subprocess, sys

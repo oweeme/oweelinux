@@ -150,10 +150,9 @@ pulseaudio-utils
 # Recursos: agente de contraseñas ligero (GTK3, ~20 MB en vez de ~180 MB del de KDE), antibloqueo por falta de memoria, control térmico de Intel
 mate-polkit
 earlyoom
-thermald
 
 # Seguridad: cortafuegos nftables y AppArmor (perfiles en modo aviso: base para afinar después)
 nftables
 apparmor
-apparmor-profiles
 iproute2
+plymouth

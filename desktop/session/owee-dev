@@ -42,7 +42,7 @@ ensure_box() {   # ensure_box NOMBRE  → la crea si no existe
   distrobox create --yes --name "$1" --image "$IMG" --pull >/dev/null 2>&1 || distrobox create --yes --name "$1" --image "$IMG" || die "no se pudo crear la caja «$1» (¿hay internet?)" 6
 }
 
-in_box() { local b=$1; shift; distrobox enter --name "$b" -- "$@"; }
+in_box() { local b=$1; shift; env -u LD_PRELOAD distrobox enter --name "$b" -- "$@"; }   # LD_PRELOAD (capa de paneles del escritorio) no existe dentro de la caja: daba errores en cada orden
 
 cmd_init() {
   local with="python" name=$BOX
@@ -59,7 +59,7 @@ cmd_init() {
 Type=Application
 Name=Terminal de desarrollo ($name)
 Comment=Terminal dentro de la caja de desarrollo «$name» (apt funciona aquí)
-Exec=$term -e distrobox enter --name $name
+Exec=$term -e env -u LD_PRELOAD distrobox enter --name $name
 Icon=utilities-terminal
 Categories=Development;
 Terminal=false
@@ -67,7 +67,7 @@ EOF
   say "Listo. Abre «Terminal de desarrollo ($name)» en el menú, o escribe: distrobox enter $name"
 }
 
-cmd_enter() { local n=$BOX; [ "${1:-}" = "--name" ] && n=${2:-$BOX}; check; ensure_box "$n"; exec distrobox enter --name "$n"; }
+cmd_enter() { local n=$BOX; [ "${1:-}" = "--name" ] && n=${2:-$BOX}; check; ensure_box "$n"; exec env -u LD_PRELOAD distrobox enter --name "$n"; }
 
 cmd_deb() {
   local f=${1:-}; [ -n "$f" ] && [ -f "$f" ] || die "uso: owee-dev deb ARCHIVO.deb" 2

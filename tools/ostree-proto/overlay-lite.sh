@@ -227,6 +227,8 @@ EOS
 mkdir -p "$ETC/systemd/system/timers.target.wants"; ln -sf /usr/lib/systemd/system/fstrim.timer "$ETC/systemd/system/timers.target.wants/fstrim.timer"
 # Fcitx5 no debe arrancarse solo por D-Bus (lo activaban Ajustes y el panel nada más abrirse, +32 MB): se lanza cuando el usuario activa un método de escritura (Ajustes → Teclado) o ya tiene uno
 rm -f "$R/usr/share/dbus-1/services/org.fcitx.Fcitx5.service"
+# Un escritorio no necesita esperar a que haya red para arrancar (NetworkManager-wait-online retrasaba el inicio unos 9 s)
+mkdir -p "$ETC/systemd/system"; ln -sf /dev/null "$ETC/systemd/system/NetworkManager-wait-online.service"
 # owee-dev: cajas de desarrollo y programas .deb (Podman + distrobox, sin root); un .deb abre el asistente en una terminal
 ln -sf /usr/libexec/owee/owee-dev "$R/usr/bin/owee-dev"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-dev-deb.desktop" <<'EOD'

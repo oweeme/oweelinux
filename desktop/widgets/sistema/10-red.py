@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# owee-interval: 10
+# owee-interval: 20
 # Widget del sistema: RED (NetworkManager, con `nmcli`). Icono de cable/WiFi/sin red. Clic: datos de la conexión, interruptor de WiFi y lista de redes
 # cercanas para conectarse (las redes con clave piden la contraseña en un campo; las ya guardadas se conectan con un clic).
 # Para cambiarlo, copia este archivo a ~/.config/owee/widgets/ con el MISMO nombre.
