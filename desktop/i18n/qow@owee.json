@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "  ",
 "Esquina inferior derecha": "  ",
 "Escritorios y esquinas": "  ",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": " :  . : «Super»+… ( ), «Super»+«Shift»+… ( ), «Ctrl»+«Alt»+←/→, «Super»+«Tab» ().",
 "Escritorios virtuales": "",
 "Cantidad de escritorios": " ",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "     ;     ",
@@ -545,5 +544,17 @@
 "Continuar": "",
 "¿Dónde va tu carpeta personal (/home)?": "     ?",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "     ;  .       .",
-"Dentro del mismo disco que el sistema (lo normal)": "    ()"
+"Dentro del mismo disco que el sistema (lo normal)": "    ()",
+"Monitor del sistema": "",
+"Nombre": "",
+"Almacenamiento": "",
+"Arriba": "",
+"Abajo": "",
+"Izquierda": "",
+"Derecha": "",
+"Puerto": "",
+"Seguridad": "",
+"Abrir": "",
+"Cerrar": "",
+"ninguno": ""
 }

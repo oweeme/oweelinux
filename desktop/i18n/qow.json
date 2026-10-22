@@ -179,7 +179,6 @@
 "Esquina inferior izquierda": "gu doma-kado kore",
 "Esquina inferior derecha": "gu doma-kado-no kore",
 "Escritorios y esquinas": "meka-tabe re kore",
-"Varios escritorios para ordenar tus ventanas. Atajos: Super+1…4 (ir), Super+Mayús+1…4 (mover la ventana), Ctrl+Alt+←/→, Super+Tab (vista general).": "meka-tabe gore-pa: loke-kopa seta. sape-nado: «Super»+be…fo (to duma), «Super»+«Shift»+be…fo (loke-kopa duma-dare), «Ctrl»+«Alt»+←/→, «Super»+«Tab» (luma-salo).",
 "Escritorios virtuales": "meka-tabe-seta",
 "Cantidad de escritorios": "meka-tabe bema",
 "El panel muestra un punto por escritorio; clic en uno para ir a él": "loke-tabe bo meka-tabe be pota loke-pema; pota tada-kade ke to duma",
@@ -545,5 +544,17 @@
 "Continuar": "pu-duma",
 "¿Dónde va tu carpeta personal (/home)?": "tu kuma doke-kopa ka-kore mora ka?",
 "Puedes usar una partición que ya tiene tus archivos: se conserva tal cual (no se formatea). Ese disco no se podrá elegir para instalar el sistema.": "doke-kopa ko mora-doke tu kade pode; telo no. meka-gume le bo meka-gora fena no pode.",
-"Dentro del mismo disco que el sistema (lo normal)": "meka-gora meka-gume se bo (foma-ko)"
+"Dentro del mismo disco que el sistema (lo normal)": "meka-gora meka-gume se bo (foma-ko)",
+"Monitor del sistema": "meka-paku",
+"Nombre": "sena-nara",
+"Almacenamiento": "mena-kopa",
+"Arriba": "go",
+"Abajo": "gu",
+"Izquierda": "doma-kado",
+"Derecha": "doma-kado-no",
+"Puerto": "rela-nado",
+"Seguridad": "fadu",
+"Abrir": "bure",
+"Cerrar": "kose",
+"ninguno": "bema-nuse"
 }
