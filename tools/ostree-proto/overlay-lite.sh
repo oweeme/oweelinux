@@ -230,6 +230,14 @@ rm -f "$R/usr/share/dbus-1/services/org.fcitx.Fcitx5.service"
 printf '#!/bin/sh\n# El selector «Abrir con…» llama a gnome-software; en OweeLinux la tienda es Discover\nexec plasma-discover "$@"\n' | install -Dm0755 /dev/stdin "$R/usr/bin/gnome-software"
 # Un escritorio no necesita esperar a que haya red para arrancar (NetworkManager-wait-online retrasaba el inicio unos 9 s)
 mkdir -p "$ETC/systemd/system"; ln -sf /dev/null "$ETC/systemd/system/NetworkManager-wait-online.service"
+# Inicio de sesión de OweeLinux (tema SDDM «owee») y bloqueo de pantalla (gtklock): el aspecto se elige en Ajustes → Acceso
+T="$R/usr/share/sddm/themes/owee"; mkdir -p "$T"
+for f in Main.qml metadata.desktop theme.conf logo.png; do install -m0644 "$D/sddm/owee/$f" "$T/$f"; done
+ln -sf /usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg "$T/background-default.jpg"          # imagen por defecto: el fondo de OweeLinux
+ln -sf /var/lib/owee/login/theme.conf.user "$T/theme.conf.user"                                         # lo que elige el usuario vive en /var (el tema, en /usr, es de solo lectura)
+printf '[Theme]\nCurrent=owee\n' | install -Dm0644 /dev/stdin "$ETC/sddm.conf.d/25-owee-login-theme.conf"
+printf 'd /var/lib/owee/login 0755 root root -\n' | install -Dm0644 /dev/stdin "$R/usr/lib/tmpfiles.d/owee-login.conf"
+install -Dm0644 "$D/session/gtklock-layout.ui.in" "$R/usr/share/owee/gtklock/layout.ui.in"
 # owee-dev: cajas de desarrollo y programas .deb (Podman + distrobox, sin root); un .deb abre el asistente en una terminal
 ln -sf /usr/libexec/owee/owee-dev "$R/usr/bin/owee-dev"
 install -Dm0644 /dev/stdin "$R/usr/share/applications/owee-dev-deb.desktop" <<'EOD'

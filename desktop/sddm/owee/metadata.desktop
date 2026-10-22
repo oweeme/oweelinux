@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=OweeLinux
+Description=Inicio de sesión de OweeLinux: formulario a la izquierda, al centro o a la derecha, con imagen de fondo o a un lado
+Author=OweeLinux
+Version=1.0
+Type=sddm-theme
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-API=2.0
+QtVersion=6

@@ -5,6 +5,7 @@ Reglas: solo estas órdenes, argumentos validados estrictamente, las contraseña
 Uso:  add USUARIO "Nombre completo" [admin]   (clave por stdin)      passwd USUARIO   (clave por stdin)
       delete USUARIO [keephome]               admin USUARIO on|off   rename USUARIO "Nombre completo"
       autologin USUARIO SESION.desktop | off
+      logintheme [tema=owee|estandar] [position=left|center|right] [style=full|side] [blur=0|1] [background=none|keep|/ruta/imagen] [textos: password, hint, wrong, suspend, reboot, poweroff]
       firstboot USUARIO "Nombre completo" IDIOMA DISTRIBUCIONES INDICE ZONA   (clave por stdin; solo el usuario owee-setup, una vez, sin otros usuarios)"""
 import grp, os, pwd, re, subprocess, sys
 NAME = re.compile(r"^[a-z_][a-z0-9_-]{0,30}$"); SESSION = re.compile(r"^[A-Za-z0-9_.-]{1,64}\.desktop$"); ADMIN = "sudo"; GROUPS = ["audio", "video", "plugdev", "netdev", "systemd-journal"]
@@ -112,5 +113,45 @@ elif op == "autologin" and len(a) in (2, 3):
         if len(a) != 3 or not SESSION.match(a[2]): die("sesión no válida")
         text = f"[Autologin]\nUser={u.pw_name}\nSession={a[2]}\nRelogin=false\n"
     tmp = SDDM + ".tmp"; open(tmp, "w").write(text); os.replace(tmp, SDDM)
+elif op == "logintheme" and 1 <= len(a) <= 14:
+    # Aspecto del inicio de sesión (tema «owee» de SDDM): escribe theme.conf.user en /var/lib/owee/login (el tema lo enlaza). Todo se valida; la imagen la lee y reduce el USUARIO que llama (no root), así nadie puede usar esto para leer archivos ajenos.
+    D = "/var/lib/owee/login"; CONF = D + "/theme.conf.user"; THEME = "/etc/sddm.conf.d/29-owee-theme-user.conf"
+    kv = {}
+    for x in a[1:]:
+        if "=" not in x: die("argumento no válido: " + x[:40])
+        k, v = x.split("=", 1); kv[k] = v
+    ALLOWED = {"tema", "position", "style", "blur", "background", "password", "hint", "wrong", "suspend", "reboot", "poweroff"}
+    if set(kv) - ALLOWED: die("opción desconocida: " + ", ".join(sorted(set(kv) - ALLOWED)))
+    if kv.get("tema", "owee") not in ("owee", "estandar"): die("tema no válido")
+    if kv.get("position", "center") not in ("left", "center", "right"): die("posición no válida")
+    if kv.get("style", "full") not in ("full", "side"): die("estilo no válido")
+    if kv.get("blur", "0") not in ("0", "1"): die("desenfoque no válido")
+    for k in ("password", "hint", "wrong", "suspend", "reboot", "poweroff"):
+        if k in kv and (not 1 <= len(kv[k]) <= 80 or any(ord(ch) < 32 or ch in '"\\' for ch in kv[k])): die("texto no válido: " + k)
+    old = {}
+    try:
+        for l in open(CONF, encoding="utf-8").read().splitlines():
+            if "=" in l and not l.startswith("["): k, v = l.split("=", 1); old[k.strip()] = v.strip().strip('"')
+    except OSError: pass
+    os.makedirs(D, exist_ok=True); os.chmod(D, 0o755)
+    cfg = {**old, **{k: v for k, v in kv.items() if k not in ("tema", "background", "blur")}}
+    bg = kv.get("background", "keep")
+    if bg == "none": cfg["background"] = ""; 
+    elif bg != "keep":
+        if not bg.startswith("/") or ".." in bg.split("/") or not os.path.isfile(bg): die("imagen no válida")
+        uid = int(os.environ.get("PKEXEC_UID", "-1"))
+        if uid < 1000: die("no se pudo saber quién llama")
+        pw_ = pwd.getpwuid(uid); blur = ",gblur=sigma=14" if kv.get("blur", "0") == "1" else ""
+        r = subprocess.run(["ffmpeg", "-v", "error", "-i", bg, "-vf", f"scale='min(1920,iw)':-2{blur}", "-frames:v", "1", "-q:v", "3", "-f", "image2pipe", "-c:v", "mjpeg", "-"], capture_output=True, timeout=60, user=uid, group=pw_.pw_gid, env={"PATH": "/usr/bin:/bin", "HOME": "/tmp"})
+        if r.returncode != 0 or len(r.stdout) < 2000: die("no se pudo leer la imagen (¿es una imagen válida?)")
+        tmpi = D + "/background.jpg.tmp"; open(tmpi, "wb").write(r.stdout); os.chmod(tmpi, 0o644); os.replace(tmpi, D + "/background.jpg"); cfg["background"] = D + "/background.jpg"
+    lines = ["[General]"] + [f'{k}="{v}"' for k, v in cfg.items() if k in ALLOWED and k not in ("tema", "blur")]
+    tmpc = CONF + ".tmp"; open(tmpc, "w", encoding="utf-8").write("\n".join(lines) + "\n"); os.chmod(tmpc, 0o644); os.replace(tmpc, CONF)
+    if "tema" in kv:                                                        # «estandar» = el tema Breeze de SDDM; «owee» = el de OweeLinux (quita la excepción)
+        if kv["tema"] == "estandar":
+            os.makedirs("/etc/sddm.conf.d", exist_ok=True); open(THEME, "w").write("[Theme]\nCurrent=breeze\n")
+        else:
+            try: os.remove(THEME)
+            except OSError: pass
 else: die(__doc__)
 print("ok")

@@ -26,3 +26,10 @@ Objetivo: al encender, sin menús ni texto: el logo del koi sobre fondo verde os
 
 ## Probar
 `~/oweelinux-dist/probar-en-qemu.sh ISO` (instalar) y luego `probar-en-qemu.sh --disco` (arrancar lo instalado, para ver el logo). Con `--secureboot` se prueba con Secure Boot activado.
+
+## Bloqueo de pantalla e inicio de sesión (aspecto configurable)
+- **Bloqueo** (`desktop/session/owee-lock`): usa **gtklock** (verifica con PAM) con un diseño propio: reloj, fecha, tu nombre y foto, campo de contraseña **siempre visible** y la indicación «Escribe tu contraseña y pulsa Intro» (antes el campo estaba oculto hasta pulsar una tecla y no se sabía qué hacer). Si gtklock faltara, vuelve a swaylock.
+- **Inicio de sesión** (`desktop/sddm/owee`, tema de SDDM hecho en QML, sin dependencias extra): reloj, fecha, usuario, contraseña, apagar/reiniciar/reposo. Formulario a la **izquierda, centro o derecha**; **imagen de fondo completa** o **imagen en un lado** con un panel liso para el formulario; imagen del escritorio, otra imagen o solo color; desenfoque opcional.
+- **Dónde se elige:** Ajustes → Acceso → «Aspecto del acceso». El bloqueo cambia al instante; el inicio de sesión es del sistema y se aplica con «Aplicar al inicio de sesión» (pide la clave de administrador). «Ver el inicio de sesión» lo muestra en una ventana de prueba.
+- **Cómo funciona:** `owee-account-helper logintheme …` (polkit, ya existente) valida todo, reduce/desenfoca la imagen **con los permisos del usuario que llama** (no root) y escribe `/var/lib/owee/login/theme.conf.user`, que el tema (en `/usr`, de solo lectura) enlaza. «Usar el aspecto de OweeLinux» apagado = tema estándar (Breeze).
+- **Si el login no se viera** (un tema roto dejaría el greeter en negro): Ctrl+Alt+F3, entrar y ejecutar `sudo rm -f /etc/sddm.conf.d/25-owee-login-theme.conf && sudo systemctl restart sddm` para volver al tema estándar.

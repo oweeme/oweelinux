@@ -139,8 +139,8 @@ class App(Gtk.Application):
             btn = Gtk.Button(label=label, css_classes=["big"] + (["rec"] if cls == "rec" else [])); btn.connect("clicked", lambda _b, m=mode: self.start_recording(m)); b.append(btn)
         sys_t, mic_t = core.audio_sources()
         b.append(self.row(_("Fotogramas por segundo"), self.drop("fps", [(15, "15"), (24, "24"), (30, "30"), (60, "60")])))
-        b.append(self.row(_("Tamaño del archivo"), self.drop("quality", [("alta", _("Original (máxima calidad, pesa más)")), ("media", _("Equilibrada")), ("ligera", _("Ligera (ideal para WhatsApp y Telegram)"))]),
-                          _("Equilibrada y Ligera reducen el vídeo al terminar, en segundo plano; si algo falla se conserva el original")))
+        b.append(self.row(_("Calidad del vídeo"), self.drop("quality", [("original", _("Original (máxima calidad, pesa más)")), ("buena", _("Buena (nítida, más ligera que la original)")), ("media", _("Intermedia (720p, recomendada)")), ("ligera", _("Básica (la más pequeña, ideal para WhatsApp y Telegram)"))]),
+                          _("Original y Buena se guardan tal cual al grabar; Intermedia y Básica reducen el vídeo al terminar, en segundo plano, y si algo falla se conserva el original")))
         sw = self.sw("audio_system"); sw.set_sensitive(bool(sys_t)); b.append(self.row(_("Audio del sistema"), sw, "" if sys_t else _("No se detectó una salida de audio")))
         sm = self.sw("audio_mic"); sm.set_sensitive(bool(mic_t)); b.append(self.row(_("Micrófono"), sm, "" if mic_t else _("No se detectó un micrófono")))
         cs = self.sw("camera"); b.append(self.row(_("Mostrar mi cámara en la grabación"), cs, _("Una burbuja redonda que puedes arrastrar; la rueda cambia su tamaño")))

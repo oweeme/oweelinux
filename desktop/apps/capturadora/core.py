@@ -17,7 +17,10 @@ DEFAULTS = {"timer": 0, "cursor": False, "clipboard": True, "fps": 24, "audio_sy
 def load_cfg():
     try: d = json.load(open(CFG))
     except (OSError, ValueError): d = {}
-    return {**DEFAULTS, **{k: v for k, v in d.items() if k in DEFAULTS}}
+    cfg = {**DEFAULTS, **{k: v for k, v in d.items() if k in DEFAULTS}}
+    if cfg["quality"] == "alta": cfg["quality"] = "original"       # nombre de la versión anterior
+    if cfg["quality"] not in QUALITY: cfg["quality"] = "media"
+    return cfg
 
 def save_cfg(d):
     os.makedirs(os.path.dirname(CFG), exist_ok=True); tmp = CFG + ".tmp"; open(tmp, "w").write(json.dumps(d, indent=1)); os.replace(tmp, CFG)
@@ -28,9 +31,10 @@ def have(p): return shutil.which(p) is not None
 # Temporales de grabación: en el disco (no en /tmp, que es memoria RAM: una grabación larga se comería la memoria del equipo)
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME", os.path.join(HOME, ".cache")), "owee", "rec")
 # Calidad: (preset y crf al grabar, reducción posterior). Al grabar se usa poca CPU (ultrafast) y al terminar, en segundo plano y con prioridad baja, se reduce el archivo.
-QUALITY = {"alta": ("veryfast", 23, None),
-           "media": ("ultrafast", 26, {"height": 720, "crf": 27, "fps": 0, "abr": "96k"}),
-           "ligera": ("ultrafast", 26, {"height": 720, "crf": 31, "fps": 20, "abr": "64k"})}
+QUALITY = {"original": ("veryfast", 20, None),                                                                   # máxima fidelidad, sin reducir
+           "buena": ("veryfast", 25, None),                                                                       # nítida y más ligera: se graba directo con buena compresión (recomprimir después pesaba MÁS)
+           "media": ("ultrafast", 26, {"height": 720, "crf": 27, "fps": 0, "abr": "96k"}),                        # intermedia (recomendada): graba rápido y reduce a 720p al terminar
+           "ligera": ("ultrafast", 26, {"height": 720, "crf": 31, "fps": 20, "abr": "64k"})}                      # básica: 720p a 20 fps, la más pequeña
 MIN_FREE = 1 << 30      # no se empieza a grabar con menos de 1 GB libre
 
 _SCOPE = None

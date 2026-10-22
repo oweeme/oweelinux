@@ -39,10 +39,63 @@ class Acceso(Page):
         b.append(row(_("Mostrar el fondo de pantalla al bloquear"), switch(app.cfg.get("lock_wallpaper", True), lambda on: app.change(lock_wallpaper=on)), _("Si no, se usa el color del tema")))
         test = Gtk.Button(label=_("Bloquear ahora"), halign=Gtk.Align.START); test.connect("clicked", lambda _b: self.lock_now()); b.append(test)
         b.append(Gtk.Label(label=_("Super + L bloquea al instante. El bloqueo por inactividad y la suspensión se eligen en Energía. Para volver, escribe tu contraseña."), xalign=0, wrap=True, css_classes=["dim-label"]))
+        self.look(b)
         b.append(heading(_("Inicio de sesión")))
         self.holder = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6); b.append(self.holder)
         self.status = Gtk.Label(xalign=0, wrap=True, css_classes=["dim-label"]); b.append(self.status)
         self.loading = False; self.fill(); return scrolled(b)
+
+
+    # ── aspecto del bloqueo y del inicio de sesión ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+    def look(self, b):
+        """Posición, imagen y desenfoque. El bloqueo los usa al instante; el inicio de sesión (SDDM) es del sistema y se aplica con el botón (pide la clave de administrador)."""
+        c = self.app.cfg
+        b.append(heading(_("Aspecto del acceso")))
+        b.append(Gtk.Label(label=_("Cómo se ven el bloqueo de pantalla y el inicio de sesión: el formulario a un lado o al centro, con una imagen de fondo."), xalign=0, wrap=True, css_classes=["dim-label"]))
+        b.append(row(_("Posición del formulario"), dropdown([("left", _("Izquierda")), ("center", _("Centro")), ("right", _("Derecha"))], c.get("access_pos", "center"), lambda k: self.app.change(access_pos=k))))
+        b.append(row(_("Estilo del inicio de sesión"), dropdown([("full", _("Imagen de fondo")), ("side", _("Imagen en un lado"))], c.get("access_style", "full"), lambda k: self.app.change(access_style=k)),
+                     _("«Imagen en un lado» deja un panel liso para el formulario y la imagen entera al otro lado. Solo para el inicio de sesión.")))
+        self.img_lbl = Gtk.Label(label=os.path.basename(c.get("access_image", "")) or "", xalign=0, css_classes=["dim-label"])
+        b.append(row(_("Imagen"), dropdown([("desktop", _("La del escritorio")), ("image", _("Otra imagen…")), ("color", _("Solo color"))], c.get("access_bg", "desktop"), self.pick_image)))
+        b.append(self.img_lbl)
+        b.append(row(_("Desenfocar la imagen"), switch(bool(c.get("access_blur", False)), lambda on: self.app.change(access_blur=on)), _("Suaviza la foto para que el formulario se lea mejor")))
+        btns = Gtk.Box(spacing=8)
+        ap = Gtk.Button(label=_("Aplicar al inicio de sesión"), css_classes=["suggested-action"]); ap.connect("clicked", lambda _b: self.apply_login()); btns.append(ap)
+        pv = Gtk.Button(label=_("Ver el inicio de sesión")); pv.connect("clicked", lambda _b: self.preview_login()); btns.append(pv)
+        b.append(btns)
+        self.std_loading = True
+        b.append(row(_("Usar el aspecto de OweeLinux en el inicio de sesión"), switch(not os.path.exists("/etc/sddm.conf.d/29-owee-theme-user.conf"), self.toggle_theme), _("Si lo apagas se usa el inicio de sesión estándar de SDDM")))
+        self.std_loading = False
+
+    def pick_image(self, k):
+        self.app.change(access_bg=k)
+        if k != "image": return
+        dlg = Gtk.FileDialog(); dlg.set_title(_("Elige una imagen")); flt = Gtk.FileFilter(); flt.set_name(_("Imágenes")); flt.add_mime_type("image/*"); dlg.set_default_filter(flt)
+        def done(d, res):
+            try: f = d.open_finish(res)
+            except GLib.Error: return
+            if f and f.get_path(): self.app.change(access_image=f.get_path()); self.img_lbl.set_text(os.path.basename(f.get_path()))
+        dlg.open(self.status.get_root(), None, done)
+
+    def login_image(self):
+        c = self.app.cfg
+        if c.get("access_bg") == "color": return "none"
+        p = c.get("access_image") if c.get("access_bg") == "image" and c.get("access_image") else c.get("wallpaper", "")
+        return p if p and os.path.isfile(p) else "none"
+
+    def apply_login(self):
+        c = self.app.cfg
+        self.apply(["logintheme", "position=" + c.get("access_pos", "center"), "style=" + c.get("access_style", "full"), "blur=" + ("1" if c.get("access_blur") else "0"), "background=" + self.login_image(),
+                    "password=" + _("Contraseña"), "hint=" + _("Escribe tu contraseña y pulsa Intro"), "wrong=" + _("Contraseña incorrecta"), "suspend=" + _("Reposo"), "reboot=" + _("Reiniciar"), "poweroff=" + _("Apagar")])
+
+    def toggle_theme(self, on):
+        if not self.std_loading: self.apply(["logintheme", "tema=" + ("owee" if on else "estandar")])
+
+    def preview_login(self):
+        """Abre el inicio de sesión en una ventana de prueba (modo de prueba de SDDM: no entra ni cierra nada). Se cierra con la ventana."""
+        if not have("sddm-greeter-qt6"): self.status.set_text(_("No se encontró el programa de inicio de sesión.")); return
+        try: Gio.Subprocess.new(["sddm-greeter-qt6", "--test-mode", "--theme", "/usr/share/sddm/themes/owee"], Gio.SubprocessFlags.NONE)
+        except GLib.Error as e: self.status.set_text(str(e))
 
     def lock_now(self):
         for p in ("/usr/libexec/owee/owee-lock", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "session", "owee-lock")):

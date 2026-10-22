@@ -157,3 +157,5 @@ apparmor
 iproute2
 plymouth
 desktop-file-utils
+gtklock
+gtklock-userinfo-module

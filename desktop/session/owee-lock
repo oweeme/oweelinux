@@ -1,15 +1,66 @@
 #!/usr/bin/env python3
-"""Bloquea la pantalla con swaylock usando los colores del tema y, si se quiere (Ajustes → Acceso), el fondo de pantalla. Lo usan el atajo Super + L, el menú de apagado,
-la inactividad (owee-idle) y la suspensión. Si ya hay un bloqueo, no hace nada."""
-import os, subprocess, sys
+"""Bloquea la pantalla. Usa gtklock (verifica la contraseña con PAM, como cualquier bloqueo serio) con el diseño de OweeLinux: reloj, fecha, tu nombre y foto, el campo de contraseña SIEMPRE visible y una
+indicación de qué hacer. El aspecto se elige en Ajustes → Acceso: posición (izquierda, centro, derecha), imagen (fondo de escritorio, otra imagen o solo color) y desenfoque.
+Si gtklock no está instalado, se usa swaylock como antes. Lo usan el atajo Super + L, el menú de apagado, la inactividad (owee-idle) y la suspensión. Si ya hay un bloqueo, no hace nada."""
+import hashlib, html, os, shutil, subprocess, sys
 for d in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell")): sys.path.append(d)
 import owee_config
-if subprocess.run(["pgrep", "-x", "swaylock"], stdout=subprocess.DEVNULL).returncode == 0: sys.exit(0)
+from owee_i18n import _
+if any(subprocess.run(["pgrep", "-x", n], stdout=subprocess.DEVNULL).returncode == 0 for n in ("swaylock", "gtklock")): sys.exit(0)
 c = owee_config.load(); p = owee_config.palette(c); h = lambda x: x.lstrip("#")[:6]
-args = ["swaylock", "-f", "-c", h(p["win"]), "--indicator-radius", "90", "--indicator-thickness", "8", "--inside-color", h(p["pop"]) + "d9", "--inside-clear-color", h(p["pop"]) + "d9",
-        "--inside-ver-color", h(p["pop"]) + "d9", "--inside-wrong-color", "F06548d9", "--ring-color", h(p["accent"]), "--ring-ver-color", h(p["accent"]), "--ring-clear-color", h(p["dim"]),
-        "--ring-wrong-color", "F06548", "--key-hl-color", h(p["fg"]), "--bs-hl-color", "F06548", "--line-color", "00000000", "--separator-color", "00000000", "--text-color", h(p["fg"]),
-        "--text-clear-color", h(p["fg"]), "--text-ver-color", h(p["fg"]), "--text-wrong-color", h(p["fg"])]
-wp = c.get("wallpaper") or owee_config.DEFAULT_WALLPAPER
-if c.get("lock_wallpaper", True) and os.path.isfile(wp): args += ["-i", wp, "-s", "fill"]
-os.execvp("swaylock", args)
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+def background():
+    """Ruta de la imagen del bloqueo (ya desenfocada si se pidió) o None para solo color."""
+    src = c.get("access_image") or ""
+    if c.get("access_bg", "desktop") == "color": return None
+    if not (src and os.path.isfile(src)): src = c.get("wallpaper") or owee_config.DEFAULT_WALLPAPER
+    if not (c.get("lock_wallpaper", True) and os.path.isfile(src)): return None
+    if not c.get("access_blur", False): return src
+    cache = os.path.join(os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache")), "owee"); os.makedirs(cache, exist_ok=True)
+    key = hashlib.sha1(f"{src}{os.path.getmtime(src)}".encode()).hexdigest()[:12]; out = os.path.join(cache, f"lock-bg-{key}.jpg")
+    if not os.path.exists(out) and shutil.which("ffmpeg"):
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-vf", "scale='min(1920,iw)':-2,gblur=sigma=16", "-frames:v", "1", "-q:v", "3", out], timeout=30, stdout=subprocess.DEVNULL)
+    return out if os.path.exists(out) else src
+
+def gtklock():
+    run = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-lock"); os.makedirs(run, exist_ok=True)
+    pos = c.get("access_pos", "center"); pos = pos if pos in ("left", "center", "right") else "center"
+    tpl = next((f for f in ("/usr/share/owee/gtklock/layout.ui.in", os.path.join(HERE, "gtklock-layout.ui.in")) if os.path.exists(f)), None)
+    if not tpl: return False
+    e = lambda t: html.escape(t, quote=False)
+    lay = open(tpl, encoding="utf-8").read()
+    for k, v in (("{MARGIN}", "120" if pos != "center" else "100"), ("{HALIGN}", {"left": "start", "center": "center", "right": "end"}[pos]), ("{PASSWORD}", e(_("Contraseña"))),
+                 ("{UNLOCK}", e(_("Entrar"))), ("{HINT}", e(_("Escribe tu contraseña y pulsa Intro")))): lay = lay.replace(k, v)
+    open(os.path.join(run, "layout.ui"), "w", encoding="utf-8").write(lay)
+    bg = background()
+    css = f"""window {{ background-color: #{h(p['win'])}; }}
+#window-box {{ background-color: rgba(0, 0, 0, 0.38); border-radius: 22px; padding: 34px 44px; }}
+#clock-label {{ font-size: 68pt; font-weight: 300; color: #{h(p['fg'])}; }}
+#date-label {{ font-size: 15pt; color: #{h(p['fg'])}; }}
+#input-label {{ color: #{h(p['fg'])}; }}
+#input-field {{ background-color: rgba(255, 255, 255, 0.14); color: #{h(p['fg'])}; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; padding: 10px 14px; min-height: 26px; }}
+#input-field:focus {{ border-color: #{h(p['accent'])}; }}
+#unlock-button {{ background-image: none; background-color: #{h(p['accent'])}; color: #ffffff; border: none; border-radius: 8px; padding: 6px 18px; }}
+#hint-label {{ color: #{h(p['fg'])}; font-size: 12pt; opacity: 0.85; }}
+#error-label, #warning-label {{ color: #F06548; }}
+#user-name, #user-label {{ color: #{h(p['fg'])}; font-size: 14pt; }}
+"""
+    open(os.path.join(run, "style.css"), "w", encoding="utf-8").write(css)
+    args = ["gtklock", "--daemonize", "--style", os.path.join(run, "style.css"), "--layout", os.path.join(run, "layout.ui"), "--time-format", "%H:%M", "--date-format", "%A, %d %B %Y"]
+    if bg: args += ["--background", bg]
+    for m in ("/usr/lib/x86_64-linux-gnu/gtklock/userinfo-module.so", "/usr/lib/gtklock/userinfo-module.so"):
+        if os.path.exists(m): args += ["--modules", m]; break
+    os.execvp("gtklock", args)
+
+def swaylock():
+    args = ["swaylock", "-f", "-c", h(p["win"]), "--indicator-radius", "90", "--indicator-thickness", "8", "--indicator-idle-visible", "--inside-color", h(p["pop"]) + "d9", "--inside-clear-color", h(p["pop"]) + "d9",
+            "--inside-ver-color", h(p["pop"]) + "d9", "--inside-wrong-color", "F06548d9", "--ring-color", h(p["accent"]), "--ring-ver-color", h(p["accent"]), "--ring-clear-color", h(p["dim"]),
+            "--ring-wrong-color", "F06548", "--key-hl-color", h(p["fg"]), "--bs-hl-color", "F06548", "--line-color", "00000000", "--separator-color", "00000000", "--text-color", h(p["fg"]),
+            "--text-clear-color", h(p["fg"]), "--text-ver-color", h(p["fg"]), "--text-wrong-color", h(p["fg"])]
+    bg = background()
+    if bg: args += ["-i", bg, "-s", "fill"]
+    os.execvp("swaylock", args)
+
+if shutil.which("gtklock") and os.environ.get("OWEE_LOCK") != "swaylock": gtklock()
+swaylock()
