@@ -120,7 +120,7 @@ elif op == "logintheme" and 1 <= len(a) <= 14:
     for x in a[1:]:
         if "=" not in x: die("argumento no válido: " + x[:40])
         k, v = x.split("=", 1); kv[k] = v
-    ALLOWED = {"tema", "position", "style", "blur", "background", "password", "hint", "wrong", "suspend", "reboot", "poweroff"}
+    ALLOWED = {"tema", "position", "style", "variant", "blur", "background", "password", "hint", "wrong", "suspend", "reboot", "poweroff"}
     if set(kv) - ALLOWED: die("opción desconocida: " + ", ".join(sorted(set(kv) - ALLOWED)))
     if kv.get("tema", "owee") not in ("owee", "estandar"): die("tema no válido")
     if kv.get("position", "center") not in ("left", "center", "right"): die("posición no válida")
@@ -135,6 +135,7 @@ elif op == "logintheme" and 1 <= len(a) <= 14:
     except OSError: pass
     os.makedirs(D, exist_ok=True); os.chmod(D, 0o755)
     cfg = {**old, **{k: v for k, v in kv.items() if k not in ("tema", "background", "blur")}}
+    if "style" in cfg: cfg["variant"] = cfg.pop("style")           # en el tema la clave se llama «variant»: «style» la usa SDDM para el estilo de Qt
     bg = kv.get("background", "keep")
     if bg == "none": cfg["background"] = ""; 
     elif bg != "keep":
@@ -145,7 +146,7 @@ elif op == "logintheme" and 1 <= len(a) <= 14:
         r = subprocess.run(["ffmpeg", "-v", "error", "-i", bg, "-vf", f"scale='min(1920,iw)':-2{blur}", "-frames:v", "1", "-q:v", "3", "-f", "image2pipe", "-c:v", "mjpeg", "-"], capture_output=True, timeout=60, user=uid, group=pw_.pw_gid, env={"PATH": "/usr/bin:/bin", "HOME": "/tmp"})
         if r.returncode != 0 or len(r.stdout) < 2000: die("no se pudo leer la imagen (¿es una imagen válida?)")
         tmpi = D + "/background.jpg.tmp"; open(tmpi, "wb").write(r.stdout); os.chmod(tmpi, 0o644); os.replace(tmpi, D + "/background.jpg"); cfg["background"] = D + "/background.jpg"
-    lines = ["[General]"] + [f'{k}="{v}"' for k, v in cfg.items() if k in ALLOWED and k not in ("tema", "blur")]
+    lines = ["[General]"] + [f'{k}="{v}"' for k, v in cfg.items() if k in ALLOWED and k not in ("tema", "blur", "style")]
     tmpc = CONF + ".tmp"; open(tmpc, "w", encoding="utf-8").write("\n".join(lines) + "\n"); os.chmod(tmpc, 0o644); os.replace(tmpc, CONF)
     if "tema" in kv:                                                        # «estandar» = el tema Breeze de SDDM; «owee» = el de OweeLinux (quita la excepción)
         if kv["tema"] == "estandar":

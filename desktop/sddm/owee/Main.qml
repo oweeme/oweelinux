@@ -1,5 +1,5 @@
 // Inicio de sesión de OweeLinux. Solo usa QtQuick (sin Controls): ligero y sin dependencias raras.
-// Se configura con theme.conf(.user): position = left|center|right · style = full|side · background = imagen (ruta o relativa al tema) · bgcolor · accent y los textos.
+// Se configura con theme.conf(.user): position = left|center|right · variant = full|side · background = imagen (ruta o relativa al tema) · bgcolor · accent y los textos.
 import QtQuick
 
 Rectangle {
@@ -8,7 +8,7 @@ Rectangle {
     color: config.bgcolor || "#102019"
 
     readonly property string pos: (config.position === "left" || config.position === "right") ? config.position : "center"
-    readonly property bool side: config.style === "side" && pos !== "center"
+    readonly property bool side: config.variant === "side" && pos !== "center"
     readonly property color accent: config.accent || "#2A9D8F"
     readonly property string bgSource: {
         var b = config.background || "";
@@ -160,7 +160,12 @@ Rectangle {
     }
 
     // nombres por posición: se leen de los elementos del Repeater (los roles numéricos del modelo no son estables entre versiones)
-    Repeater { id: sessionRepeater; model: sessionModel; delegate: Item { property string sname: model.name }; onItemAdded: root.sessLabel = root.sessionName() }
+    Repeater {
+        id: sessionRepeater
+        model: sessionModel
+        delegate: Item { property string sname: model.name }
+        onItemAdded: root.sessLabel = root.sessionName()
+    }
     function userName() { var it = userRepeater.itemAt(root.userIndex); return it ? it.uname : "" }
     function sessionName() { var it = sessionRepeater.itemAt(root.sessionIndex); return it ? it.sname : "" }
     function doLogin() { if (pw.text.length === 0) return; sddm.login(userName(), pw.text, root.sessionIndex) }
