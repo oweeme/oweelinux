@@ -3,7 +3,7 @@
 import json, os
 from owee_i18n import _
 PATH = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "owee", "settings.json")
-DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "font_size": 10, "backup_dest": "", "backup_last": 0, "font_family": "", "font_mono": "", "window_density": "normal", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}, "audio_boost": False, "access_pos": "center", "access_style": "full", "access_bg": "desktop", "access_image": "", "access_blur": False, "extra_langs": {}, "dev_mode": False, "panel_pos": "top", "panel_size": "normal"}
+DEFAULTS = {"wallpaper_mode": "single", "slideshow": [], "slideshow_minutes": 10, "slideshow_shuffle": True, "lang": "", "layouts": [], "layout_idx": 0, "lock_wallpaper": True, "access_anim": True, "font_size": 10, "backup_dest": "", "backup_last": 0, "font_family": "", "font_mono": "", "window_density": "normal", "theme": "koi", "mode": "dark", "accent": "#2A9D8F", "wallpaper": "/usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg", "clock_hours": "24", "clock_seconds": False, "clock_date": True, "corners": {"tl": "overview", "tr": "none", "bl": "none", "br": "none"}, "audio_boost": False, "access_pos": "center", "access_style": "full", "access_bg": "desktop", "access_image": "", "access_blur": False, "extra_langs": {}, "dev_mode": False, "panel_pos": "top", "panel_size": "normal"}
 ACCENTS = [(_("Teal"), "#2A9D8F"), (_("Coral"), "#F06548"), (_("Azul"), "#3B82C4"), (_("Violeta"), "#8B6FD6"), (_("Dorado"), "#D9A441"), (_("Verde"), "#5BA85B")]
 
 WALLPAPER_DIRS = ["/usr/share/backgrounds/oweelinux", os.path.expanduser("~/Pictures/Wallpapers"), os.path.expanduser("~/Imágenes/Fondos"), os.path.expanduser("~/.local/share/owee/wallpapers")]
@@ -40,6 +40,7 @@ def load():
         if isinstance(j.get("backup_dest"), str): d["backup_dest"] = j["backup_dest"]
         if isinstance(j.get("backup_last"), int): d["backup_last"] = j["backup_last"]
         if isinstance(j.get("lock_wallpaper"), bool): d["lock_wallpaper"] = j["lock_wallpaper"]
+        if isinstance(j.get("access_anim"), bool): d["access_anim"] = j["access_anim"]
         if j.get("access_pos") in ("left", "center", "right"): d["access_pos"] = j["access_pos"]                  # aspecto del bloqueo y del inicio de sesión (Ajustes → Acceso)
         if j.get("access_style") in ("full", "side"): d["access_style"] = j["access_style"]
         if j.get("access_bg") in ("desktop", "image", "color"): d["access_bg"] = j["access_bg"]

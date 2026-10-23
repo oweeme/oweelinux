@@ -52,6 +52,8 @@ install -Dm0644 "$D/session/49-owee-setup.rules" "$R/usr/share/polkit-1/rules.d/
 install -Dm0644 "$D/session/owee-firstboot.service" "$R/usr/lib/systemd/system/owee-firstboot.service"
 mkdir -p "$R/usr/lib/systemd/system/sysinit.target.wants"; ln -sf ../owee-firstboot.service "$R/usr/lib/systemd/system/sysinit.target.wants/owee-firstboot.service"
 for f in "$D"/widgets/ejemplos/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets-ejemplos/$(basename "$f")"; done
+mkdir -p "$R/usr/share/owee/koi"; cp "$D"/theme/koi/*.png "$R/usr/share/owee/koi/"      # kois del bloqueo animado
+install -Dm0644 "$D/../docs/CREAR_WIDGETS.md" "$R/usr/share/doc/oweelinux/CREAR_WIDGETS.md"; install -Dm0644 "$D/../docs/EXTENSIONES.md" "$R/usr/share/doc/oweelinux/EXTENSIONES.md"      # guía para crear widgets y apps
 python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" >/dev/null; python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" "#17231e" Owee-Light >/dev/null
 install -Dm0644 "$D/theme/themerc" "$R/usr/share/themes/Owee/openbox-3/themerc"; install -Dm0644 "$D/theme/themerc-light" "$R/usr/share/themes/Owee-Light/openbox-3/themerc"
 install -Dm0644 "$D/waybar/config.jsonc" "$ETC/xdg/waybar/config.jsonc"; install -Dm0644 "$D/waybar/style.css" "$ETC/xdg/waybar/style.css"

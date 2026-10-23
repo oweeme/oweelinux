@@ -37,6 +37,7 @@ class Acceso(Page):
     def build(self, app):
         self.app = app; b = page_box(_("Acceso"), _("Cómo se bloquea la pantalla y cómo se entra al encender el equipo."))
         b.append(heading(_("Pantalla de bloqueo")))
+        b.append(row(_("Bloqueo animado (kois nadando)"), switch(app.cfg.get("access_anim", True), lambda on: app.change(access_anim=on)), _("Si tu equipo va lento al bloquear, apágalo")))
         b.append(row(_("Mostrar el fondo de pantalla al bloquear"), switch(app.cfg.get("lock_wallpaper", True), lambda on: app.change(lock_wallpaper=on)), _("Si no, se usa el color del tema")))
         test = Gtk.Button(label=_("Bloquear ahora"), halign=Gtk.Align.START); test.connect("clicked", lambda _b: self.lock_now()); b.append(test)
         b.append(Gtk.Label(label=_("Super + L bloquea al instante. El bloqueo por inactividad y la suspensión se eligen en Energía. Para volver, escribe tu contraseña."), xalign=0, wrap=True, css_classes=["dim-label"]))

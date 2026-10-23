@@ -54,8 +54,16 @@ def gtklock_args():
     for k, v in (("{MARGIN}", "120" if pos != "center" else "100"), ("{HALIGN}", {"left": "start", "center": "center", "right": "end"}[pos]), ("{PASSWORD}", e(_("Contraseña"))),
                  ("{UNLOCK}", e(_("Entrar"))), ("{HINT}", e(_("Escribe tu contraseña y pulsa Intro")))): lay = lay.replace(k, v)
     open(os.path.join(run, "layout.ui"), "w", encoding="utf-8").write(lay)
-    css = f"""window {{ background-color: #{h(p['win'])}; }}
-#window-box {{ background-color: rgba(0, 0, 0, 0.38); border-radius: 22px; padding: 34px 44px; }}
+    bg = background(); anim = c.get("access_anim", True) and all(os.path.exists(f"/usr/share/owee/koi/koi{i}{r}.png") for i in (1, 2, 3) for r in ("", "r"))
+    win_css = f"window {{ background-color: #{h(p['win'])}; }}\n"
+    if anim:
+        # Fondo ANIMADO con CSS puro (GTK anima background-position): la imagen de fondo y, encima, cinco kois que cruzan la pantalla a distintas alturas y velocidades.
+        K = "file:///usr/share/owee/koi/"; fish = [("koi1", -25, 14, 125, 30), ("koi2r", 125, 40, -25, 28), ("koi3", -40, 62, 130, 70), ("koi1r", 140, 78, -30, 66), ("koi2", -30, 88, 125, 84)]
+        imgs = ", ".join(f'url("{K}{n}.png")' for n, *_ in fish) + (f', url("file://{bg}")' if bg else "")
+        pos = lambda i: ", ".join(f"{(x0, x1)[i]}% {(y0, y1)[i]}%" for _n, x0, y0, x1, y1 in [(f[0], f[1], f[2], f[3], f[4]) for f in fish]) + (", 0 0" if bg else "")
+        win_css = (f"window {{ background-color: #{h(p['win'])}; background-image: {imgs}; background-repeat: no-repeat; background-size: " + ", ".join(["auto"] * len(fish)) + (", 100% 100%" if bg else "") +
+                   f"; background-position: {pos(0)}; animation: nadar 90s linear infinite; }}\n@keyframes nadar {{ from {{ background-position: {pos(0)}; }} to {{ background-position: {pos(1)}; }} }}\n")
+    css = win_css + f"""#window-box {{ background-color: rgba(0, 0, 0, 0.38); border-radius: 22px; padding: 34px 44px; }}
 #clock-label {{ font-size: 68pt; font-weight: 300; color: #{h(p['fg'])}; }}
 #date-label {{ font-size: 15pt; color: #{h(p['fg'])}; }}
 #input-label {{ color: #{h(p['fg'])}; }}
@@ -68,8 +76,7 @@ def gtklock_args():
 """
     open(os.path.join(run, "style.css"), "w", encoding="utf-8").write(css)
     args = ["gtklock", "--style", os.path.join(run, "style.css"), "--layout", os.path.join(run, "layout.ui"), "--time-format", "%H:%M", "--date-format", "%A, %d %B %Y"]
-    bg = background()
-    if bg: args += ["--background", bg]
+    if bg and not anim: args += ["--background", bg]
     for m in ("/usr/lib/x86_64-linux-gnu/gtklock/userinfo-module.so", "/usr/lib/gtklock/userinfo-module.so"):
         if os.path.exists(m): args += ["--modules", m]; break
     return args

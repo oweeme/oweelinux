@@ -96,6 +96,7 @@ class App(Gtk.Application):
         if getattr(self, "reopen", False): self.reopen = False; self.pending_main = True; GLib.timeout_add(300, lambda: (setattr(self, "pending_main", False), self.show_main(), False)[2])
     def show_main(self):
         if self.win: self.win.present(); return
+        if not self.rec.running and core.leftovers(): self.recover_orphans()      # una grabación anterior se cortó de golpe: se guarda lo que quedó
         w = self.win = Gtk.ApplicationWindow(application=self, title=_("Capturadora"), icon_name="owee-capture", default_width=480, default_height=560); w.add_css_class("cap")
         w.connect("close-request", lambda x: (setattr(self, "win", None), GLib.idle_add(self.quit_if_idle), False)[2])
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin_top=16, margin_bottom=16, margin_start=18, margin_end=18); w.set_child(root)

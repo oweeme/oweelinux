@@ -136,6 +136,20 @@ def orphans():
         if t: found.setdefault(t, []).append(int(d))
     return found
 
+def leftovers():
+    """Carpetas temporales de grabaciones que se cortaron de golpe (la Capturadora y wf-recorder murieron, p. ej. por falta de memoria) pero conservan vídeo: [carpetas]. La Capturadora viva de este
+    mismo usuario (el número del nombre es su PID) no cuenta."""
+    out = []
+    try: names = os.listdir(CACHE)
+    except OSError: return out
+    live = set(orphans())
+    for d in names:
+        p = os.path.join(CACHE, d)
+        try: pid = int(d.split("-")[1])
+        except (IndexError, ValueError): continue
+        if d.startswith("rec-") and p not in live and not os.path.exists(f"/proc/{pid}") and os.path.exists(os.path.join(p, "video.mkv")) and os.path.getsize(os.path.join(p, "video.mkv")) > 1000: out.append(p)
+    return out
+
 def recover_orphans():
     """Detiene las grabaciones huérfanas (SIGINT: los archivos quedan válidos) y guarda lo grabado hasta ese momento. Devuelve la lista de rutas guardadas. Bloquea: llamar desde un hilo."""
     saved = []
@@ -156,6 +170,11 @@ def recover_orphans():
             wavs = [f for f in (os.path.join(tmp, "sistema.wav"), os.path.join(tmp, "mic.wav")) if os.path.exists(f) and os.path.getsize(f) > 2000]
             saved.append(mux(video, wavs, os.path.join(DIR_VID, f"grabacion-{stamp()}.mp4")))
         shutil.rmtree(tmp, ignore_errors=True)
+    for tmp in leftovers():                                                    # lo que quedó de una grabación que se cortó: se guarda el vídeo (y el audio, si hay)
+        os.makedirs(DIR_VID, exist_ok=True)
+        wavs = [f for f in (os.path.join(tmp, "sistema.wav"), os.path.join(tmp, "mic.wav")) if os.path.exists(f) and os.path.getsize(f) > 2000]
+        try: saved.append(mux(os.path.join(tmp, "video.mkv"), wavs, os.path.join(DIR_VID, f"grabacion-recuperada-{stamp()}.mp4"))); shutil.rmtree(tmp, ignore_errors=True)
+        except Exception: pass
     return saved
 
 class Recorder:
