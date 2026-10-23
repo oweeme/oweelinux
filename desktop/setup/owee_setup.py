@@ -45,7 +45,7 @@ class KoiPond(Gtk.DrawingArea):
     """Tres kois nadando en círculos sobre ondas suaves, dibujados con cairo (sin imágenes): se ven mientras el equipo se prepara. Se anima solo mientras la ventana está visible."""
     KOIS = [((0.99, 0.92, 0.68), (0.95, 0.34, 0.23), 0.0, 170, 62, 0.55), ((0.96, 0.95, 0.92), (0.25, 0.22, 0.20), 2.1, 150, 50, -0.45), ((0.97, 0.62, 0.30), (0.99, 0.92, 0.68), 4.2, 100, 40, 0.70)]
     def __init__(self):
-        super().__init__(content_width=520, content_height=190); self.set_draw_func(self.draw); self.t0 = time.time(); self.add_tick_callback(lambda *_a: (self.queue_draw(), True)[1])
+        super().__init__(content_width=520, content_height=150); self.set_draw_func(self.draw); self.t0 = time.time(); self.add_tick_callback(lambda *_a: (self.queue_draw(), True)[1])
 
     @staticmethod
     def koi(cr, x, y, ang, wag, body, spot):
@@ -76,10 +76,12 @@ class Setup(Gtk.Application):
         style(); self.lang = owee_i18n.LANG
         self.win = Gtk.ApplicationWindow(application=self, title=_("Bienvenido a OweeLinux"), default_width=760, default_height=560)
         if not os.environ.get("OWEE_SETUP_WINDOWED"): self.win.fullscreen()
-        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, spacing=18, width_request=560)
-        outer.append(Gtk.Image(icon_name="owee-logo", pixel_size=128))
-        self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.SLIDE_LEFT_RIGHT, hhomogeneous=True); outer.append(self.stack)
-        self.err = Gtk.Label(wrap=True, css_classes=["bad"]); outer.append(self.err)
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, spacing=14, width_request=560, margin_top=12, margin_bottom=12)
+        inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
+        inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=96))
+        self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.SLIDE_LEFT_RIGHT, hhomogeneous=True, vhomogeneous=False, interpolate_size=True); inner.append(self.stack)
+        self.err = Gtk.Label(wrap=True, css_classes=["bad"]); inner.append(self.err)
+        scroll = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, propagate_natural_height=True, vexpand=True, child=inner); outer.append(scroll)      # si la pantalla es baja, el contenido se desplaza; los botones quedan SIEMPRE a la vista
         nav = Gtk.Box(spacing=10); self.back = Gtk.Button(label=_("Atrás")); self.next = Gtk.Button(label=_("Siguiente"), css_classes=["suggested-action"], hexpand=True, halign=Gtk.Align.END)
         self.back.connect("clicked", lambda _b: self.go(-1)); self.next.connect("clicked", lambda _b: self.go(1)); nav.append(self.back); nav.append(self.next); outer.append(nav)
         self.win.set_child(outer)
