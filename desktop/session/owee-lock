@@ -34,6 +34,16 @@ def background():
         if r.returncode != 0: log("ffmpeg no pudo preparar la imagen: " + r.stderr[:200])
     return out if os.path.exists(out) else (src if src.lower().endswith((".jpg", ".jpeg", ".png")) else None)
 
+def sync_face():
+    """gtklock muestra ~/.face: si la foto se eligió en Ajustes (vive en /var/lib/owee/faces) y no hay una propia en ~/.face, se enlaza."""
+    try:
+        src = f"/var/lib/owee/faces/{os.environ.get('USER') or os.getlogin()}.face.icon"; dst = os.path.expanduser("~/.face")
+        if os.path.isfile(src) and (os.path.islink(dst) or not os.path.exists(dst)):
+            if os.path.islink(dst): os.remove(dst)
+            os.symlink(src, dst)
+        elif not os.path.isfile(src) and os.path.islink(dst) and os.readlink(dst).startswith("/var/lib/owee/faces/"): os.remove(dst)
+    except OSError as e: log(f"foto: {e}")
+
 def gtklock_args():
     run = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-lock"); os.makedirs(run, exist_ok=True)
     pos = c.get("access_pos", "center"); pos = pos if pos in ("left", "center", "right") else "center"
@@ -75,6 +85,7 @@ def swaylock_args():
 
 def supervise():
     """Corre en segundo plano (proceso aparte): ejecuta gtklock y, si termina con error, retoma el bloqueo con swaylock (bloqueante) hasta que se desbloquee."""
+    sync_face()
     args = gtklock_args() if shutil.which("gtklock") and os.environ.get("OWEE_LOCK") != "swaylock" else None
     if args:
         log("gtklock: " + " ".join(args[:1] + args[-4:]))
