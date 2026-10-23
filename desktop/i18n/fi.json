@@ -714,5 +714,7 @@
 "No se pudo leer la imagen (¿es una imagen válida?)": "Kuvaa ei voitu lukea (onko se kelvollinen kuva?)",
 "Polaco": "Puola",
 "Finés": "Suomi",
-"Sueco": "Ruotsi"
+"Sueco": "Ruotsi",
+"Protector de pantalla (kois) tras": "Näytönsäästäjä (koi-kalat) kun on kulunut",
+"Se quita al mover el ratón o pulsar una tecla": "Poistuu, kun liikutat hiirtä tai painat näppäintä"
 }

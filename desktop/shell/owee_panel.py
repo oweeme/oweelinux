@@ -235,6 +235,15 @@ class RecIndicator:
         if os.path.exists(self.STATE) and not self.src: self.src = GLib.timeout_add_seconds(1, self.tick)
         self.tick()
 
+    @staticmethod
+    def alive():
+        for d in os.listdir("/proc"):
+            if d.isdigit():
+                try:
+                    if open(f"/proc/{d}/comm").read().strip() == "wf-recorder": return True
+                except OSError: pass
+        return False
+
     def act(self, name):
         try: Gio.Subprocess.new(["gapplication", "action", "org.oweelinux.Capture", name], Gio.SubprocessFlags.STDERR_SILENCE)
         except GLib.Error: pass
@@ -242,6 +251,11 @@ class RecIndicator:
     def tick(self):
         try: t0 = int(open(self.STATE).read().strip())
         except (OSError, ValueError): self.box.set_visible(False); self.src = 0; return False
+        self.n = getattr(self, "n", 0) + 1
+        if self.n % 5 == 0 and not self.alive():                      # la grabación terminó sin avisar (la Capturadora falló): se quita el aviso para que no quede un «detener» que no hace nada
+            try: os.remove(self.STATE)
+            except OSError: pass
+            self.box.set_visible(False); self.src = 0; return False
         s = max(0, int(time.time()) - t0); self.lab.set_text(f"●  {s // 60:02d}:{s % 60:02d}"); self.box.set_visible(True); return True
 
 class Reminders:

@@ -714,5 +714,7 @@
 "No se pudo leer la imagen (¿es una imagen válida?)": "Could not read the image (is it a valid image?)",
 "Polaco": "Polish",
 "Finés": "Finnish",
-"Sueco": "Swedish"
+"Sueco": "Swedish",
+"Protector de pantalla (kois) tras": "Screensaver (koi) after",
+"Se quita al mover el ratón o pulsar una tecla": "It goes away when you move the mouse or press a key"
 }

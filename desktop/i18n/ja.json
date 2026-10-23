@@ -714,5 +714,7 @@
 "No se pudo leer la imagen (¿es una imagen válida?)": "画像を読み込めませんでした(有効な画像ですか?)",
 "Polaco": "ポーランド語",
 "Finés": "フィンランド語",
-"Sueco": "スウェーデン語"
+"Sueco": "スウェーデン語",
+"Protector de pantalla (kois) tras": "スクリーンセーバー(鯉)まで",
+"Se quita al mover el ratón o pulsar una tecla": "マウスを動かすかキーを押すと消えます"
 }

@@ -9,6 +9,7 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gio, GLib, Gdk
 from owee_i18n import _, N_
 import owee_i18n, owee_config, owee_keys
+from owee_koi import KoiPond
 owee_i18n.apply_direction()
 from ajustes.teclado import LAYOUTS
 from ajustes.usuarios import suggest_username, HELPERS
@@ -40,34 +41,6 @@ def zones():
 def current_tz():
     try: return open("/etc/timezone").read().strip() or "UTC"
     except OSError: return "UTC"
-
-class KoiPond(Gtk.DrawingArea):
-    """Tres kois nadando en círculos sobre ondas suaves, dibujados con cairo (sin imágenes): se ven mientras el equipo se prepara. Se anima solo mientras la ventana está visible."""
-    KOIS = [((0.99, 0.92, 0.68), (0.95, 0.34, 0.23), 0.0, 170, 62, 0.55), ((0.96, 0.95, 0.92), (0.25, 0.22, 0.20), 2.1, 150, 50, -0.45), ((0.97, 0.62, 0.30), (0.99, 0.92, 0.68), 4.2, 100, 40, 0.70)]
-    def __init__(self):
-        super().__init__(content_width=520, content_height=150); self.set_draw_func(self.draw); self.t0 = time.time(); self.add_tick_callback(lambda *_a: (self.queue_draw(), True)[1])
-
-    @staticmethod
-    def koi(cr, x, y, ang, wag, body, spot):
-        cr.save(); cr.translate(x, y); cr.rotate(ang)
-        cr.set_source_rgb(*body); cr.move_to(-24, 0); cr.curve_to(-38, -8 + wag * 5, -50, -16 + wag * 11, -60, -13 + wag * 15); cr.curve_to(-52, -2 + wag * 8, -52, 2 + wag * 8, -60, 13 + wag * 15)   # cola
-        cr.curve_to(-50, 16 + wag * 11, -38, 8 + wag * 5, -24, 0); cr.fill()
-        for sgn in (-1, 1):                                                                                                                              # aletas
-            cr.save(); cr.translate(8, sgn * 11); cr.rotate(sgn * (0.5 + wag * 0.25)); cr.scale(1, 0.45); cr.arc(0, 0, 10, 0, 2 * math.pi); cr.restore(); cr.set_source_rgb(*body); cr.fill()
-        cr.save(); cr.scale(1, 0.42); cr.arc(0, 0, 32, 0, 2 * math.pi); cr.restore(); cr.set_source_rgb(*body); cr.fill()                                  # cuerpo
-        cr.set_source_rgb(*spot)
-        for dx, dy, r in ((-6, -3, 6), (8, 4, 5), (-16, 3, 4)): cr.arc(dx, dy, r, 0, 2 * math.pi); cr.fill()                                           # manchas
-        cr.set_source_rgb(0.12, 0.10, 0.09); cr.arc(22, -4, 1.8, 0, 2 * math.pi); cr.arc(22, 4, 1.8, 0, 2 * math.pi); cr.fill()                          # ojos
-        cr.restore()
-
-    def draw(self, area, cr, w, h):
-        t = time.time() - self.t0
-        for k in range(3):                                                                                                                               # ondas
-            cr.set_source_rgba(0.16, 0.62, 0.56, 0.12 * (1 - ((t * 20 + k * 50) % 150) / 150)); cr.set_line_width(2); cr.arc(w / 2, h / 2, 20 + (t * 20 + k * 50) % 150, 0, 2 * math.pi); cr.stroke()
-        for i, (body, spot, phase, rx, ry, speed) in enumerate(self.KOIS):
-            a = t * speed + phase; x = w / 2 + rx * math.cos(a); y = h / 2 + ry * math.sin(a)
-            ang = math.atan2(ry * math.cos(a) * (1 if speed > 0 else -1), -rx * math.sin(a) * (1 if speed > 0 else -1))
-            self.koi(cr, x, y, ang, math.sin(t * 6 + i * 2), body, spot)
 
 class Setup(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.Setup"); self.page = 0

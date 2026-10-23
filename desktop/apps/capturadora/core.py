@@ -110,6 +110,54 @@ def audio_sources():
         except Exception: return False
     return ("@DEFAULT_AUDIO_SINK@" if ok("@DEFAULT_AUDIO_SINK@") else None), ("@DEFAULT_AUDIO_SOURCE@" if ok("@DEFAULT_AUDIO_SOURCE@") else None)
 
+def mux(video, wavs, out):
+    """Junta el vídeo y el audio (si hay) en `out` (MP4) con ffmpeg sin recodificar el vídeo. Devuelve la ruta final: si algo falla se conserva el vídeo tal cual (MKV), nunca se pierde."""
+    if wavs and have("ffmpeg"):
+        cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", video] + sum([["-i", w] for w in wavs], [])
+        cmd += (["-filter_complex", f"{''.join(f'[{i + 1}:a]' for i in range(len(wavs)))}amix=inputs={len(wavs)}:normalize=0[a]", "-map", "0:v", "-map", "[a]"] if len(wavs) > 1 else ["-map", "0:v", "-map", "1:a"])
+        cmd += ["-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", out]
+    elif have("ffmpeg"): cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-c:v", "copy", out]
+    else: mkv = out.replace(".mp4", ".mkv"); shutil.copy(video, mkv); return mkv
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    if r.returncode != 0 or not os.path.exists(out): mkv = out.replace(".mp4", ".mkv"); shutil.copy(video, mkv); return mkv      # al menos el vídeo no se pierde
+    return out
+
+def orphans():
+    """Grabaciones que siguen en marcha sin que la Capturadora las controle (la aplicación se cerró o falló): {carpeta temporal: [pids]}. Se reconocen por su carpeta en la caché."""
+    found = {}; me = os.getuid()
+    for d in os.listdir("/proc"):
+        if not d.isdigit(): continue
+        try:
+            if os.stat(f"/proc/{d}").st_uid != me: continue
+            args = open(f"/proc/{d}/cmdline", "rb").read().decode(errors="replace").split("\0")
+        except OSError: continue
+        if not args or os.path.basename(args[0]) not in ("wf-recorder", "pw-record"): continue
+        t = next((os.path.dirname(a) for a in args if a.startswith(CACHE + os.sep) and "/rec-" in a), None)
+        if t: found.setdefault(t, []).append(int(d))
+    return found
+
+def recover_orphans():
+    """Detiene las grabaciones huérfanas (SIGINT: los archivos quedan válidos) y guarda lo grabado hasta ese momento. Devuelve la lista de rutas guardadas. Bloquea: llamar desde un hilo."""
+    saved = []
+    for tmp, pids in orphans().items():
+        for pid in pids:
+            try: os.kill(pid, signal.SIGINT)
+            except OSError: pass
+        for _i in range(150):
+            if not any(os.path.exists(f"/proc/{p}") for p in pids): break
+            time.sleep(0.4)
+        for pid in pids:
+            if os.path.exists(f"/proc/{pid}"):
+                try: os.kill(pid, signal.SIGKILL)
+                except OSError: pass
+        video = os.path.join(tmp, "video.mkv")
+        if os.path.exists(video) and os.path.getsize(video) > 1000:
+            os.makedirs(DIR_VID, exist_ok=True)
+            wavs = [f for f in (os.path.join(tmp, "sistema.wav"), os.path.join(tmp, "mic.wav")) if os.path.exists(f) and os.path.getsize(f) > 2000]
+            saved.append(mux(video, wavs, os.path.join(DIR_VID, f"grabacion-{stamp()}.mp4")))
+        shutil.rmtree(tmp, ignore_errors=True)
+    return saved
+
 class Recorder:
     """Grabación de pantalla. start() lanza wf-recorder (vídeo) y, si se pide, pw-record por cada fuente de audio; stop() cierra con SIGINT (así los archivos quedan válidos),
     mezcla el audio con ffmpeg y deja un MP4 en ~/Videos/Screen Recordings. Un fallo en una fuente de audio no estropea el vídeo."""
@@ -149,15 +197,7 @@ class Recorder:
         self._term(self.procs[0], 60); video = os.path.join(self.tmp, "video.mkv")
         if not os.path.exists(video) or os.path.getsize(video) < 1000: err = open(os.path.join(self.tmp, "wf.log")).read().strip()[-200:]; self.cleanup(); raise RuntimeError(_("La grabación quedó vacía. ") + err)
         wavs = [f for _n, f, _p in self.audio if os.path.exists(f) and os.path.getsize(f) > 2000]
-        if wavs and have("ffmpeg"):
-            cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", video] + sum([["-i", w] for w in wavs], [])
-            cmd += (["-filter_complex", f"{''.join(f'[{i + 1}:a]' for i in range(len(wavs)))}amix=inputs={len(wavs)}:normalize=0[a]", "-map", "0:v", "-map", "[a]"] if len(wavs) > 1 else ["-map", "0:v", "-map", "1:a"])
-            cmd += ["-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", self.out]
-        elif have("ffmpeg"): cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-c:v", "copy", self.out]
-        else: shutil.copy(video, self.out.replace(".mp4", ".mkv")); self.out = self.out.replace(".mp4", ".mkv"); cmd = None
-        if cmd:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-            if r.returncode != 0 or not os.path.exists(self.out): shutil.copy(video, self.out.replace(".mp4", ".mkv")); self.out = self.out.replace(".mp4", ".mkv")   # al menos el vídeo no se pierde
+        self.out = mux(video, wavs, self.out)
         out = self.out; self.cleanup()
         if out.endswith(".mp4"): reduce_in_background(out, self.quality)
         return out

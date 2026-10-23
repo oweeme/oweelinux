@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""Protector de pantalla de OweeLinux: kois nadando a pantalla completa. Lo lanza owee-idle (swayidle) tras el tiempo elegido en Ajustes → Energía y lo cierra en cuanto el usuario mueve el ratón
+o pulsa una tecla (swayidle avisa de la actividad); el bloqueo de pantalla también lo cierra. Es una capa por encima de todo, sin foco de teclado: no roba nada y no se queda si algo falla (se cierra solo
+a los 60 min). Solo hay una a la vez."""
+import os, sys
+for d in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell")): sys.path.append(d)
+_LS = "/usr/lib/x86_64-linux-gnu/libgtk4-layer-shell.so.0"
+if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exists(_LS):
+    os.environ["LD_PRELOAD"] = (_LS + " " + os.environ.get("LD_PRELOAD", "")).strip(); os.execv(sys.executable, [sys.executable] + sys.argv)
+import gi
+gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
+from gi.repository import Gtk, Gio, GLib, Gtk4LayerShell as LS
+from owee_koi import KoiScreen
+
+class App(Gtk.Application):
+    def __init__(self): super().__init__(application_id="org.oweelinux.Screensaver")
+    def do_activate(self):
+        if self.get_windows(): return                              # ya hay uno
+        w = Gtk.Window(application=self, decorated=False); LS.init_for_window(w); LS.set_layer(w, LS.Layer.OVERLAY); LS.set_namespace(w, "owee-screensaver")
+        for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(w, e, True)
+        LS.set_exclusive_zone(w, -1); LS.set_keyboard_mode(w, LS.KeyboardMode.NONE)
+        w.set_cursor_from_name("none"); w.set_child(KoiScreen()); w.present()
+        GLib.timeout_add_seconds(3600, lambda: (self.quit(), False)[1])
+
+if __name__ == "__main__": sys.exit(App().run([]))

@@ -12,7 +12,7 @@ PROFILES = {"performance": _("Rendimiento"), "balanced": _("Equilibrado"), "powe
 def load():
     try: d = json.load(open(SAVE))
     except (OSError, ValueError): d = {}
-    return {"lock_min": str(d.get("lock_min", "10")), "suspend_min": str(d.get("suspend_min", "0"))}
+    return {"lock_min": str(d.get("lock_min", "10")), "suspend_min": str(d.get("suspend_min", "0")), "saver_min": str(d.get("saver_min", "5"))}
 
 class Energia(Page):
     title = _("Energía"); icon = "owee-set-power"; group = "Dispositivos"; order = 50; keywords = _("batería suspender bloqueo inactividad rendimiento ahorro")
@@ -22,6 +22,7 @@ class Energia(Page):
             self.holder.append(heading(_("Perfil de rendimiento"))); self.prof_row = Gtk.Box(); self.holder.append(self.prof_row)
             run(["powerprofilesctl", "list"], self.on_profiles)
         self.holder.append(heading(_("Inactividad")))
+        self.holder.append(row(_("Protector de pantalla (kois) tras"), dropdown(TIMES, self.cfg["saver_min"], lambda k: self.set(saver_min=k)), _("Se quita al mover el ratón o pulsar una tecla")))
         self.holder.append(row(_("Bloquear la pantalla tras"), dropdown(TIMES, self.cfg["lock_min"], lambda k: self.set(lock_min=k))))
         self.holder.append(row(_("Suspender el equipo tras"), dropdown(TIMES, self.cfg["suspend_min"], lambda k: self.set(suspend_min=k)), _("Suspender necesita un equipo que lo admita")))
         return scrolled(b)

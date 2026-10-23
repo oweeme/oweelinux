@@ -1,6 +1,6 @@
 [Plymouth Theme]
 Name=OweeLinux
-Description=Logo de OweeLinux: koi sobre fondo verde oscuro, con una barra fina de progreso
+Description=Logo de OweeLinux con tres kois nadando alrededor, sobre fondo verde oscuro, y una barra fina de progreso
 ModuleName=script
 
 [script]

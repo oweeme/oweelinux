@@ -229,13 +229,27 @@ class App(Gtk.Application):
         if not self.rec.running: return False
         s = self.rec.elapsed(); self.timer_l.set_text(f"●  {s // 60:02d}:{s % 60:02d}"); return True
 
+    def recover_orphans(self):
+        """«Detener» sin grabación propia: puede que una grabación quedara en marcha sin su Capturadora (la aplicación se cerró o falló). Se detiene y se guarda lo grabado, y se quita el aviso del panel."""
+        try: os.remove(self.STATE)
+        except OSError: pass
+        def done(paths, err):
+            if err: self.say(err); return
+            if paths: self.notify(_("Grabación guardada"), "\n".join(paths)); self.say(_("Grabación guardada: ") + paths[0])
+            GLib.idle_add(self.quit_if_idle)
+        core.run_async(core.recover_orphans, done)
+
     def stop_recording(self):
-        if not self.rec.running: return
+        if not self.rec.running:
+            if not getattr(self, "saving", False): self.recover_orphans()
+            return
+        self.saving = True
         if self.pill: self.timer_l.set_text(_("Guardando…"))
         self.close_cam()                  # la cámara se apaga al instante; guardar puede tardar unos segundos
         try: os.remove(self.STATE)
         except OSError: pass
         def done(path, err):
+            self.saving = False
             if self.pill: self.pill.close(); self.pill = None
             self.close_cam()
             if self.pres: self.pres.finish()

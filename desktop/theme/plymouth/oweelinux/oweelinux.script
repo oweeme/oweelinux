@@ -29,9 +29,48 @@ progress = 0;
 shown = 0;
 frame = 0;
 
+# Tres kois nadan en círculos alrededor del logo (imágenes ya dibujadas, giradas en cada cuadro; la cola se mueve con tres posiciones).
+kscale = screen_h / 760;
+if (kscale < 0.55) kscale = 0.55;
+if (kscale > 1.3) kscale = 1.3;
+for (i = 0; i < 3; i++)
+  for (j = 0; j < 3; j++)
+    {
+      raw = Image("koi" + (i + 1) + "_" + j + ".png");
+      koi_img[i * 3 + j] = raw.Scale(raw.GetWidth() * kscale, raw.GetHeight() * kscale);
+    }
+koi_phase[0] = 0.0;  koi_speed[0] = 0.021;  koi_rx[0] = 0.24; koi_ry[0] = 0.27;
+koi_phase[1] = 2.1;  koi_speed[1] = -0.017; koi_rx[1] = 0.30; koi_ry[1] = 0.33;
+koi_phase[2] = 4.2;  koi_speed[2] = 0.026;  koi_rx[2] = 0.18; koi_ry[2] = 0.21;
+center_x = screen_w / 2;
+center_y = logo_y + logo_size / 2;
+for (i = 0; i < 3; i++) koi_sprite[i] = Sprite();
+
+fun move_kois ()
+  {
+    fade = frame / 40;
+    if (fade > 1) fade = 1;
+    for (i = 0; i < 3; i++)
+      {
+        a = koi_phase[i] + frame * koi_speed[i];
+        x = center_x + screen_w * koi_rx[i] * Math.Cos(a);
+        y = center_y + screen_h * koi_ry[i] * Math.Sin(a);
+        dir = 1;
+        if (koi_speed[i] < 0) dir = -1;
+        heading = Math.ATan2(screen_h * koi_ry[i] * Math.Cos(a) * dir, -screen_w * koi_rx[i] * Math.Sin(a) * dir);
+        wag = Math.Int(frame / 5 + i) % 4;
+        if (wag == 3) wag = 1;
+        img = koi_img[i * 3 + wag].Rotate(heading);
+        koi_sprite[i].SetImage(img);
+        koi_sprite[i].SetPosition(x - img.GetWidth() / 2, y - img.GetHeight() / 2, 5);
+        koi_sprite[i].SetOpacity(fade);
+      }
+  }
+
 fun refresh_callback ()
   {
     frame++;
+    move_kois();
     logo_sprite.SetOpacity(0.84 + 0.16 * Math.Sin(frame / 20));
     if (progress > shown) shown = shown + (progress - shown) * 0.08;     # la barra avanza suave y nunca retrocede
     w = Math.Int(bar_w * shown);

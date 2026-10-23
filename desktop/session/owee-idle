@@ -1,12 +1,13 @@
 #!/bin/sh
-# Inactividad: lee ~/.config/owee/power.json y (re)inicia swayidle: bloquear la pantalla y suspender tras N minutos (0 = nunca). Lo usa la sesión y la página Energía de Ajustes.
+# Inactividad (protector de pantalla de kois, bloqueo y suspensión): lee ~/.config/owee/power.json y (re)inicia swayidle: bloquear la pantalla y suspender tras N minutos (0 = nunca). Lo usa la sesión y la página Energía de Ajustes.
 S="${XDG_CONFIG_HOME:-$HOME/.config}/owee/power.json"
-LOCK=10; SUSP=0
+LOCK=10; SUSP=0; SAVER=5
 if [ -f "$S" ]; then
-  LOCK=$(jq -r '.lock_min // 10' "$S" 2>/dev/null || echo 10); SUSP=$(jq -r '.suspend_min // 0' "$S" 2>/dev/null || echo 0)
+  LOCK=$(jq -r '.lock_min // 10' "$S" 2>/dev/null || echo 10); SUSP=$(jq -r '.suspend_min // 0' "$S" 2>/dev/null || echo 0); SAVER=$(jq -r '.saver_min // 5' "$S" 2>/dev/null || echo 5)
 fi
 pkill -x swayidle 2>/dev/null
 set --
+[ "$SAVER" -gt 0 ] 2>/dev/null && set -- "$@" timeout $((SAVER * 60)) '/usr/libexec/owee/owee-screensaver &' resume "pkill -f '^[^ ]*python3 [^ ]*owee-screensaver$'"
 [ "$LOCK" -gt 0 ] 2>/dev/null && set -- "$@" timeout $((LOCK * 60)) /usr/libexec/owee/owee-lock
 [ "$SUSP" -gt 0 ] 2>/dev/null && set -- "$@" timeout $((SUSP * 60)) 'systemctl suspend'
 [ $# -gt 0 ] && exec swayidle -w "$@" before-sleep /usr/libexec/owee/owee-lock
