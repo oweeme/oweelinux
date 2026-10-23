@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "Screensaver (koi) after",
 "Se quita al mover el ratón o pulsar una tecla": "It goes away when you move the mouse or press a key",
 "Bloqueo animado (kois nadando)": "Animated lock screen (swimming koi)",
-"Si tu equipo va lento al bloquear, apágalo": "If your computer is slow when locking, turn it off"
+"Si tu equipo va lento al bloquear, apágalo": "If your computer is slow when locking, turn it off",
+"Vista previa: se cierra sola en {0} s": "Preview: closes by itself in {0} s"
 }

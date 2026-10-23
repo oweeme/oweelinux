@@ -1,6 +1,6 @@
 """Acceso: la pantalla de bloqueo (colores del tema y, si quieres, el fondo) y el inicio de sesión (SDDM): entrar solo al encender y sesión predeterminada.
 El tiempo de bloqueo por inactividad se cambia en Energía. Los cambios del inicio de sesión son del sistema: pasan por `owee-account-helper` con `pkexec`."""
-import configparser, glob, os
+import shutil, configparser, glob, os
 import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib, Gio
@@ -94,10 +94,25 @@ class Acceso(Page):
         if not self.std_loading: self.apply(["logintheme", "tema=" + ("owee" if on else "estandar")])
 
     def preview_login(self):
-        """Abre el inicio de sesión en una ventana de prueba (modo de prueba de SDDM: no entra ni cierra nada). Se cierra con la ventana."""
+        """Abre el inicio de sesión en una ventana de prueba (modo de prueba de SDDM: no entra a ninguna sesión, ni al escribir la clave ni con los botones de energía). Para que NO quede atrapada se usa
+        una copia temporal del tema con `preview=1` (aviso rojo con cuenta atrás) y Ajustes la cierra sola a los 16 s: el saludador de SDDM no tiene forma de salir por sí mismo."""
         if not have("sddm-greeter-qt6"): self.status.set_text(_("No se encontró el programa de inicio de sesión.")); return
-        try: Gio.Subprocess.new(["sddm-greeter-qt6", "--test-mode", "--theme", "/usr/share/sddm/themes/owee"], Gio.SubprocessFlags.NONE)
-        except GLib.Error as e: self.status.set_text(str(e))
+        src = "/usr/share/sddm/themes/owee"; tmp = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-login-preview")
+        try:
+            shutil.rmtree(tmp, ignore_errors=True); os.makedirs(tmp)
+            for f in os.listdir(src):
+                if not f.startswith("theme.conf"): os.symlink(os.path.join(src, f), os.path.join(tmp, f))
+            cfg = {}
+            for f in ("theme.conf", "theme.conf.user"):
+                try:
+                    for line in open(os.path.join(src, f), encoding="utf-8"):
+                        if "=" in line and not line.lstrip().startswith(("#", ";", "[")): k, v = line.split("=", 1); cfg[k.strip()] = v.strip().strip('"')
+                except OSError: pass
+            cfg["preview"] = "1"; cfg["previewtext"] = _("Vista previa: se cierra sola en {0} s")
+            with open(os.path.join(tmp, "theme.conf"), "w", encoding="utf-8") as fh: fh.write("[General]\n" + "".join(f'{k}="{v}"\n' if " " in v or "#" in v else f"{k}={v}\n" for k, v in cfg.items()))
+            proc = Gio.Subprocess.new(["sddm-greeter-qt6", "--test-mode", "--theme", tmp], Gio.SubprocessFlags.NONE)
+            GLib.timeout_add_seconds(16, lambda: (proc.force_exit() if proc.get_identifier() else None, False)[1])
+        except (OSError, GLib.Error) as e: self.status.set_text(str(e))
 
     def lock_now(self):
         for p in ("/usr/libexec/owee/owee-lock", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "session", "owee-lock")):

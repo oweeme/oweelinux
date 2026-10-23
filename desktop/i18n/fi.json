@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "Näytönsäästäjä (koi-kalat) kun on kulunut",
 "Se quita al mover el ratón o pulsar una tecla": "Poistuu, kun liikutat hiirtä tai painat näppäintä",
 "Bloqueo animado (kois nadando)": "Animoitu lukitusnäyttö (uivat koi-kalat)",
-"Si tu equipo va lento al bloquear, apágalo": "Jos tietokone hidastelee lukittaessa, poista käytöstä"
+"Si tu equipo va lento al bloquear, apágalo": "Jos tietokone hidastelee lukittaessa, poista käytöstä",
+"Vista previa: se cierra sola en {0} s": "Esikatselu: sulkeutuu itsestään {0} s kuluttua"
 }

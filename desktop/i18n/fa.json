@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "محافظ صفحه (کوی) بعد از",
 "Se quita al mover el ratón o pulsar una tecla": "با حرکت ماوس یا فشردن یک کلید از بین می‌رود",
 "Bloqueo animado (kois nadando)": "قفل متحرک (کوی‌های شناور)",
-"Si tu equipo va lento al bloquear, apágalo": "اگر رایانه هنگام قفل کند است، آن را خاموش کنید"
+"Si tu equipo va lento al bloquear, apágalo": "اگر رایانه هنگام قفل کند است، آن را خاموش کنید",
+"Vista previa: se cierra sola en {0} s": "پیش‌نمایش: پس از {0} ثانیه خودکار بسته می‌شود"
 }

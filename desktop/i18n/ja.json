@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "スクリーンセーバー(鯉)まで",
 "Se quita al mover el ratón o pulsar una tecla": "マウスを動かすかキーを押すと消えます",
 "Bloqueo animado (kois nadando)": "アニメーションのロック画面(泳ぐ鯉)",
-"Si tu equipo va lento al bloquear, apágalo": "ロック時に動作が遅い場合はオフにしてください"
+"Si tu equipo va lento al bloquear, apágalo": "ロック時に動作が遅い場合はオフにしてください",
+"Vista previa: se cierra sola en {0} s": "プレビュー: {0} 秒後に自動で閉じます"
 }

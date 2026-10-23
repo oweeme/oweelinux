@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "Заставка (карпы кои) через",
 "Se quita al mover el ratón o pulsar una tecla": "Исчезает при движении мыши или нажатии клавиши",
 "Bloqueo animado (kois nadando)": "Анимированная блокировка (плавающие карпы кои)",
-"Si tu equipo va lento al bloquear, apágalo": "Если компьютер тормозит при блокировке, отключите"
+"Si tu equipo va lento al bloquear, apágalo": "Если компьютер тормозит при блокировке, отключите",
+"Vista previa: se cierra sola en {0} s": "Предпросмотр: закроется сам через {0} с"
 }

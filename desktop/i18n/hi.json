@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "स्क्रीनसेवर (कोई) कब शुरू हो",
 "Se quita al mover el ratón o pulsar una tecla": "माउस हिलाने या कोई कुंजी दबाने पर हट जाता है",
 "Bloqueo animado (kois nadando)": "एनिमेटेड लॉक स्क्रीन (तैरती कोई)",
-"Si tu equipo va lento al bloquear, apágalo": "यदि लॉक करते समय कंप्यूटर धीमा हो, तो इसे बंद करें"
+"Si tu equipo va lento al bloquear, apágalo": "यदि लॉक करते समय कंप्यूटर धीमा हो, तो इसे बंद करें",
+"Vista previa: se cierra sola en {0} s": "पूर्वावलोकन: {0} सेकंड में अपने आप बंद हो जाएगा"
 }

@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "화면 보호기(잉어) 시작까지",
 "Se quita al mover el ratón o pulsar una tecla": "마우스를 움직이거나 키를 누르면 사라집니다",
 "Bloqueo animado (kois nadando)": "움직이는 잠금 화면(헤엄치는 잉어)",
-"Si tu equipo va lento al bloquear, apágalo": "잠글 때 컴퓨터가 느리면 끄세요"
+"Si tu equipo va lento al bloquear, apágalo": "잠글 때 컴퓨터가 느리면 끄세요",
+"Vista previa: se cierra sola en {0} s": "미리보기: {0}초 후 자동으로 닫힙니다"
 }

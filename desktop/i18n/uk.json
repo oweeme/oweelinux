@@ -718,5 +718,6 @@
 "Protector de pantalla (kois) tras": "Заставка (коі) через",
 "Se quita al mover el ratón o pulsar una tecla": "Зникає, коли ви рухаєте мишею або натискаєте клавішу",
 "Bloqueo animado (kois nadando)": "Анімоване блокування (коі пливуть)",
-"Si tu equipo va lento al bloquear, apágalo": "Якщо комп'ютер гальмує під час блокування, вимкніть"
+"Si tu equipo va lento al bloquear, apágalo": "Якщо комп'ютер гальмує під час блокування, вимкніть",
+"Vista previa: se cierra sola en {0} s": "Попередній перегляд: закриється сам через {0} с"
 }

@@ -728,5 +728,7 @@
 "Protector de pantalla (kois) tras",
 "Se quita al mover el ratón o pulsar una tecla",
 "Bloqueo animado (kois nadando)",
-"Si tu equipo va lento al bloquear, apágalo"
+"Si tu equipo va lento al bloquear, apágalo",
+"Vista previa: pulsa Esc o haz clic aquí para cerrar",
+"Vista previa: se cierra sola en {0} s"
 ]

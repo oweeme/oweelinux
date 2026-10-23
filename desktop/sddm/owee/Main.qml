@@ -19,6 +19,8 @@ Rectangle {
     readonly property real panelW: side ? Math.max(formW + 80, width * 0.40) : 0
     property int userIndex: Math.max(0, userModel.lastIndex)
     property int sessionIndex: Math.max(0, sessionModel.lastIndex)
+    readonly property bool preview: config.preview === "1"           // vista previa desde Ajustes: no entra a ninguna sesión; Ajustes la cierra a los 16 s (Qt.quit() no cierra el saludador de SDDM) y aquí corre la cuenta atrás
+    property int previewLeft: 15
     property string failure: ""
     property string sessLabel: ""
     property string faceSrc: ""
@@ -200,4 +202,12 @@ Rectangle {
         function onLoginFailed() { root.failure = config.wrong || "Contraseña incorrecta"; pw.text = ""; shake.start(); pw.forceActiveFocus() }
     }
     Component.onCompleted: pw.forceActiveFocus()
+
+    Rectangle {                                         // aviso de la vista previa (solo desde Ajustes → Acceso)
+        visible: root.preview; z: 100
+        anchors.top: parent.top; anchors.horizontalCenter: parent.horizontalCenter; anchors.topMargin: 14
+        width: pvText.implicitWidth + 40; height: 42; radius: 21; color: "#E63946"
+        Text { id: pvText; anchors.centerIn: parent; color: "#ffffff"; font.pixelSize: 16; font.bold: true; text: (config.previewtext || "Vista previa: se cierra sola en {0} s").replace("{0}", root.previewLeft) }
+    }
+    Timer { running: root.preview; repeat: true; interval: 1000; onTriggered: if (root.previewLeft > 0) root.previewLeft-- }
 }
