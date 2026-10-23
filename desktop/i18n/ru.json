@@ -696,5 +696,20 @@
 "Imagen en un lado": "Картинка сбоку",
 "La del escritorio": "Как на рабочем столе",
 "Otra imagen…": "Другое изображение…",
-"Solo color": "Только цвет"
+"Solo color": "Только цвет",
+"Creando tu cuenta": "Создание учётной записи",
+"Configurando el idioma y el teclado": "Настройка языка и клавиатуры",
+"Ajustando la hora": "Настройка времени",
+"Preparando tu escritorio": "Подготовка рабочего стола",
+"Casi listo…": "Почти готово…",
+"Esto tarda unos segundos.": "Это займёт несколько секунд.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "Через несколько секунд появится экран входа; экран может ненадолго стать чёрным.",
+"Elige tu foto": "Выберите фото",
+"Subir una imagen…": "Загрузить изображение…",
+"Quitar la foto": "Удалить фото",
+"Elige un koi o sube tu propia imagen": "Выберите карпа кои или загрузите своё изображение",
+"Foto…": "Фото…",
+"Foto cambiada": "Фото изменено",
+"No se pudo cambiar la foto: {0}": "Не удалось изменить фото: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Не удалось прочитать изображение (оно корректно?)"
 }

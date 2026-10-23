@@ -696,5 +696,20 @@
 "Imagen en un lado": "ایک طرف تصویر",
 "La del escritorio": "ڈیسک ٹاپ والی",
 "Otra imagen…": "کوئی اور تصویر…",
-"Solo color": "صرف رنگ"
+"Solo color": "صرف رنگ",
+"Creando tu cuenta": "آپ کا اکاؤنٹ بنایا جا رہا ہے",
+"Configurando el idioma y el teclado": "زبان اور کی بورڈ ترتیب دیا جا رہا ہے",
+"Ajustando la hora": "وقت ترتیب دیا جا رہا ہے",
+"Preparando tu escritorio": "آپ کا ڈیسک ٹاپ تیار کیا جا رہا ہے",
+"Casi listo…": "تقریباً تیار…",
+"Esto tarda unos segundos.": "اس میں چند سیکنڈ لگتے ہیں۔",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "چند سیکنڈ میں لاگ اِن اسکرین نظر آئے گی؛ اسکرین لمحے بھر کے لیے کالی ہو سکتی ہے۔",
+"Elige tu foto": "اپنی تصویر منتخب کریں",
+"Subir una imagen…": "تصویر اپ لوڈ کریں…",
+"Quitar la foto": "تصویر ہٹائیں",
+"Elige un koi o sube tu propia imagen": "کوئی چنیں یا اپنی تصویر اپ لوڈ کریں",
+"Foto…": "تصویر…",
+"Foto cambiada": "تصویر تبدیل ہو گئی",
+"No se pudo cambiar la foto: {0}": "تصویر تبدیل نہیں ہو سکی: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "تصویر پڑھی نہیں جا سکی (کیا یہ درست تصویر ہے؟)"
 }

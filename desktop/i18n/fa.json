@@ -696,5 +696,20 @@
 "Imagen en un lado": "تصویر در یک سو",
 "La del escritorio": "همان تصویر دسکتاپ",
 "Otra imagen…": "تصویر دیگر…",
-"Solo color": "فقط رنگ"
+"Solo color": "فقط رنگ",
+"Creando tu cuenta": "در حال ساخت حساب شما",
+"Configurando el idioma y el teclado": "در حال تنظیم زبان و صفحه‌کلید",
+"Ajustando la hora": "در حال تنظیم ساعت",
+"Preparando tu escritorio": "در حال آماده‌سازی میزکار",
+"Casi listo…": "تقریباً آماده است…",
+"Esto tarda unos segundos.": "این چند ثانیه طول می‌کشد.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "چند ثانیه دیگر صفحهٔ ورود را می‌بینید؛ ممکن است صفحه لحظه‌ای سیاه شود.",
+"Elige tu foto": "عکس خود را انتخاب کنید",
+"Subir una imagen…": "بارگذاری تصویر…",
+"Quitar la foto": "حذف عکس",
+"Elige un koi o sube tu propia imagen": "یک کوی انتخاب کنید یا تصویر خودتان را بارگذاری کنید",
+"Foto…": "عکس…",
+"Foto cambiada": "عکس تغییر کرد",
+"No se pudo cambiar la foto: {0}": "تغییر عکس ممکن نشد: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "خواندن تصویر ممکن نشد (آیا تصویر معتبری است؟)"
 }

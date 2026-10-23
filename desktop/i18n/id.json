@@ -696,5 +696,20 @@
 "Imagen en un lado": "Gambar di satu sisi",
 "La del escritorio": "Sama dengan desktop",
 "Otra imagen…": "Gambar lain…",
-"Solo color": "Hanya warna"
+"Solo color": "Hanya warna",
+"Creando tu cuenta": "Membuat akun Anda",
+"Configurando el idioma y el teclado": "Mengatur bahasa dan keyboard",
+"Ajustando la hora": "Mengatur waktu",
+"Preparando tu escritorio": "Menyiapkan desktop Anda",
+"Casi listo…": "Hampir siap…",
+"Esto tarda unos segundos.": "Ini memakan waktu beberapa detik.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "Dalam beberapa detik Anda akan melihat layar masuk; layar mungkin hitam sejenak.",
+"Elige tu foto": "Pilih foto Anda",
+"Subir una imagen…": "Unggah gambar…",
+"Quitar la foto": "Hapus foto",
+"Elige un koi o sube tu propia imagen": "Pilih koi atau unggah gambar Anda sendiri",
+"Foto…": "Foto…",
+"Foto cambiada": "Foto diubah",
+"No se pudo cambiar la foto: {0}": "Tidak dapat mengubah foto: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Tidak dapat membaca gambar (apakah gambar yang valid?)"
 }

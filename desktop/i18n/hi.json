@@ -696,5 +696,20 @@
 "Imagen en un lado": "एक ओर चित्र",
 "La del escritorio": "डेस्कटॉप वाला",
 "Otra imagen…": "कोई और चित्र…",
-"Solo color": "केवल रंग"
+"Solo color": "केवल रंग",
+"Creando tu cuenta": "आपका खाता बनाया जा रहा है",
+"Configurando el idioma y el teclado": "भाषा और कीबोर्ड सेट किया जा रहा है",
+"Ajustando la hora": "समय समायोजित किया जा रहा है",
+"Preparando tu escritorio": "आपका डेस्कटॉप तैयार किया जा रहा है",
+"Casi listo…": "लगभग तैयार…",
+"Esto tarda unos segundos.": "इसमें कुछ सेकंड लगते हैं।",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "कुछ सेकंड में लॉगिन स्क्रीन दिखेगी; स्क्रीन थोड़ी देर काली रह सकती है।",
+"Elige tu foto": "अपनी फ़ोटो चुनें",
+"Subir una imagen…": "छवि अपलोड करें…",
+"Quitar la foto": "फ़ोटो हटाएँ",
+"Elige un koi o sube tu propia imagen": "कोई कोई चुनें या अपनी छवि अपलोड करें",
+"Foto…": "फ़ोटो…",
+"Foto cambiada": "फ़ोटो बदल दी गई",
+"No se pudo cambiar la foto: {0}": "फ़ोटो नहीं बदली जा सकी: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "छवि पढ़ी नहीं जा सकी (क्या यह मान्य छवि है?)"
 }

@@ -2,12 +2,12 @@
 """Primer arranque de OweeLinux: asistente corto (idioma → teclado → zona horaria → tu cuenta → terminar) que corre en una sesión propia de SDDM (`owee-setup-session`), solo mientras
 el equipo no tenga ningún usuario. Crea tu usuario (administrador) con `owee-account-helper firstboot` vía pkexec (la contraseña va por la entrada estándar), deja listo el idioma y el
 teclado del equipo y de tu sesión, y vuelve a la pantalla de inicio de sesión. Variables de prueba: OWEE_SETUP_WINDOWED=1 (ventana normal), OWEE_SETUP_DRYRUN=1 (no crea nada)."""
-import os, re, sys
+import math, os, re, sys, time
 for d in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell")): sys.path.insert(0, d)
 import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gio, GLib, Gdk
-from owee_i18n import _
+from owee_i18n import _, N_
 import owee_i18n, owee_config, owee_keys
 owee_i18n.apply_direction()
 from ajustes.teclado import LAYOUTS
@@ -41,6 +41,34 @@ def current_tz():
     try: return open("/etc/timezone").read().strip() or "UTC"
     except OSError: return "UTC"
 
+class KoiPond(Gtk.DrawingArea):
+    """Tres kois nadando en círculos sobre ondas suaves, dibujados con cairo (sin imágenes): se ven mientras el equipo se prepara. Se anima solo mientras la ventana está visible."""
+    KOIS = [((0.99, 0.92, 0.68), (0.95, 0.34, 0.23), 0.0, 170, 62, 0.55), ((0.96, 0.95, 0.92), (0.25, 0.22, 0.20), 2.1, 150, 50, -0.45), ((0.97, 0.62, 0.30), (0.99, 0.92, 0.68), 4.2, 100, 40, 0.70)]
+    def __init__(self):
+        super().__init__(content_width=520, content_height=190); self.set_draw_func(self.draw); self.t0 = time.time(); self.add_tick_callback(lambda *_a: (self.queue_draw(), True)[1])
+
+    @staticmethod
+    def koi(cr, x, y, ang, wag, body, spot):
+        cr.save(); cr.translate(x, y); cr.rotate(ang)
+        cr.set_source_rgb(*body); cr.move_to(-24, 0); cr.curve_to(-38, -8 + wag * 5, -50, -16 + wag * 11, -60, -13 + wag * 15); cr.curve_to(-52, -2 + wag * 8, -52, 2 + wag * 8, -60, 13 + wag * 15)   # cola
+        cr.curve_to(-50, 16 + wag * 11, -38, 8 + wag * 5, -24, 0); cr.fill()
+        for sgn in (-1, 1):                                                                                                                              # aletas
+            cr.save(); cr.translate(8, sgn * 11); cr.rotate(sgn * (0.5 + wag * 0.25)); cr.scale(1, 0.45); cr.arc(0, 0, 10, 0, 2 * math.pi); cr.restore(); cr.set_source_rgb(*body); cr.fill()
+        cr.save(); cr.scale(1, 0.42); cr.arc(0, 0, 32, 0, 2 * math.pi); cr.restore(); cr.set_source_rgb(*body); cr.fill()                                  # cuerpo
+        cr.set_source_rgb(*spot)
+        for dx, dy, r in ((-6, -3, 6), (8, 4, 5), (-16, 3, 4)): cr.arc(dx, dy, r, 0, 2 * math.pi); cr.fill()                                           # manchas
+        cr.set_source_rgb(0.12, 0.10, 0.09); cr.arc(22, -4, 1.8, 0, 2 * math.pi); cr.arc(22, 4, 1.8, 0, 2 * math.pi); cr.fill()                          # ojos
+        cr.restore()
+
+    def draw(self, area, cr, w, h):
+        t = time.time() - self.t0
+        for k in range(3):                                                                                                                               # ondas
+            cr.set_source_rgba(0.16, 0.62, 0.56, 0.12 * (1 - ((t * 20 + k * 50) % 150) / 150)); cr.set_line_width(2); cr.arc(w / 2, h / 2, 20 + (t * 20 + k * 50) % 150, 0, 2 * math.pi); cr.stroke()
+        for i, (body, spot, phase, rx, ry, speed) in enumerate(self.KOIS):
+            a = t * speed + phase; x = w / 2 + rx * math.cos(a); y = h / 2 + ry * math.sin(a)
+            ang = math.atan2(ry * math.cos(a) * (1 if speed > 0 else -1), -rx * math.sin(a) * (1 if speed > 0 else -1))
+            self.koi(cr, x, y, ang, math.sin(t * 6 + i * 2), body, spot)
+
 class Setup(Gtk.Application):
     def __init__(self): super().__init__(application_id="org.oweelinux.Setup"); self.page = 0
 
@@ -57,7 +85,8 @@ class Setup(Gtk.Application):
         self.win.set_child(outer)
         self.pages = [self.p_lang(), self.p_kbd(), self.p_tz(), self.p_user()]
         for i, p in enumerate(self.pages): self.stack.add_named(p, str(i))
-        self.show(0); self.win.present()
+        self.stack.add_named(self.p_progress(), "progress")
+        self.ptimer = 0; self.show(0); self.win.present()
 
     def box(self, title, sub=""):
         b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
@@ -108,6 +137,34 @@ class Setup(Gtk.Application):
             if self.user.get_text() in ("", last[0]): last[0] = suggest_username(self.full.get_text()); self.user.set_text(last[0])
         self.full.connect("changed", follow); self.p2.connect("activate", lambda *_a: self.go(1)); return b
 
+    STEPS = [N_("Creando tu cuenta"), N_("Configurando el idioma y el teclado"), N_("Ajustando la hora"), N_("Preparando tu escritorio"), N_("Casi listo…")]
+
+    def p_progress(self):
+        b = self.box(_("Preparando tu equipo…"), _("Esto tarda unos segundos."))
+        b.append(KoiPond()); self.step_labels = []
+        for t in self.STEPS:
+            l = Gtk.Label(label="○  " + _(t), xalign=0, css_classes=["step"]); self.step_labels.append(l); b.append(l)
+        self.final_msg = Gtk.Label(label="", wrap=True, xalign=0, css_classes=["sub"]); b.append(self.final_msg)
+        return b
+
+    def begin_progress(self):
+        self.stack.set_visible_child_name("progress"); self.back.set_visible(False); self.next.set_visible(False); self.err.set_text(""); self.pstep = 0; self.mark(0)
+        def tick():
+            if self.pstep < len(self.STEPS) - 2: self.pstep += 1; self.mark(self.pstep)       # los pasos avanzan solos; el último espera a que el ayudante termine de verdad
+            return self.pstep < len(self.STEPS) - 2
+        self.ptimer = GLib.timeout_add(1300, tick)
+
+    def mark(self, upto):
+        for i, l in enumerate(self.step_labels): l.set_text(("✓  " if i < upto else "●  " if i == upto else "○  ") + _(self.STEPS[i]))
+
+    def end_progress(self, ok):
+        if self.ptimer: GLib.source_remove(self.ptimer); self.ptimer = 0
+        if ok:
+            for i, l in enumerate(self.step_labels): l.set_text("✓  " + _(self.STEPS[i]))
+            self.final_msg.set_text(_("Listo. Cargando la pantalla de inicio de sesión…") + "\n" + _("En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento."))
+        else:
+            self.stack.set_visible_child_name(str(len(self.pages) - 1)); self.back.set_visible(True); self.next.set_visible(True)
+
     def show(self, i):
         self.page = i; self.stack.set_visible_child_name(str(i)); self.err.set_text(""); self.back.set_sensitive(i > 0)
         self.next.set_label(_("Terminar") if i == len(self.pages) - 1 else _("Siguiente"))
@@ -125,7 +182,7 @@ class Setup(Gtk.Application):
         if p1 != p2: self.err.set_text(_("Las contraseñas no coinciden")); return
         lst, idx = owee_keys.state(); tz = self.zs[self.tz.get_selected()]
         argv = ["firstboot", user, full, owee_i18n.LANG, ",".join(lst), str(idx), tz]
-        self.next.set_sensitive(False); self.back.set_sensitive(False); self.err.set_text(""); self.sub_msg(_("Preparando tu equipo…"))
+        self.next.set_sensitive(False); self.back.set_sensitive(False); self.begin_progress()
         if os.environ.get("OWEE_SETUP_DRYRUN"): print("DRYRUN", argv, flush=True); GLib.timeout_add(800, lambda: (self.done(0, "ok"), False)[1]); return
         h = next((x for x in HELPERS if os.path.exists(x)), HELPERS[0])
         try: p = Gio.Subprocess.new(["pkexec", h] + argv, Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_MERGE)
@@ -135,8 +192,8 @@ class Setup(Gtk.Application):
     def sub_msg(self, t): self.err.remove_css_class("bad"); self.err.set_text(t)
 
     def done(self, code, out):
-        if code == 0 and out.strip().endswith("ok"): self.sub_msg(_("Listo. Cargando la pantalla de inicio de sesión…")); return
-        self.err.add_css_class("bad"); self.err.set_text(_("No se pudo terminar: {0}", out.strip().removeprefix("ERR: ") or _("cancelado o sin permiso")))
+        if code == 0 and out.strip().endswith("ok"): self.end_progress(True); return
+        self.end_progress(False); self.err.add_css_class("bad"); self.err.set_text(_("No se pudo terminar: {0}", out.strip().removeprefix("ERR: ") or _("cancelado o sin permiso")))
         self.next.set_sensitive(True); self.back.set_sensitive(True)
 
 if __name__ == "__main__": sys.exit(Setup().run(sys.argv))

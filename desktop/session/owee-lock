@@ -1,39 +1,49 @@
 #!/usr/bin/env python3
 """Bloquea la pantalla. Usa gtklock (verifica la contraseña con PAM, como cualquier bloqueo serio) con el diseño de OweeLinux: reloj, fecha, tu nombre y foto, el campo de contraseña SIEMPRE visible y una
 indicación de qué hacer. El aspecto se elige en Ajustes → Acceso: posición (izquierda, centro, derecha), imagen (fondo de escritorio, otra imagen o solo color) y desenfoque.
-Si gtklock no está instalado, se usa swaylock como antes. Lo usan el atajo Super + L, el menú de apagado, la inactividad (owee-idle) y la suspensión. Si ya hay un bloqueo, no hace nada."""
-import hashlib, html, os, shutil, subprocess, sys
+A PRUEBA DE FALLOS: un supervisor vigila a gtklock; si este se cae en cualquier momento (con el compositor bloqueado eso dejaría la pantalla NEGRA y sin salida), entrega el bloqueo a swaylock, que siempre
+permite desbloquear con la contraseña. Si gtklock no está instalado, se usa swaylock directamente. El registro queda en ~/.cache/owee/lock.log.
+Lo usan el atajo Super + L, el menú de apagado, la inactividad (owee-idle) y la suspensión: el proceso que se lanza vuelve en cuanto el bloqueo está puesto (swayidle espera a eso antes de suspender).
+Si ya hay un bloqueo, no hace nada."""
+import hashlib, html, os, shutil, subprocess, sys, time
 for d in ("/usr/libexec/owee", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shell")): sys.path.append(d)
 import owee_config
 from owee_i18n import _
-if any(subprocess.run(["pgrep", "-x", n], stdout=subprocess.DEVNULL).returncode == 0 for n in ("swaylock", "gtklock")): sys.exit(0)
 c = owee_config.load(); p = owee_config.palette(c); h = lambda x: x.lstrip("#")[:6]
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.abspath(__file__)); CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache")), "owee")
+CLEAN = {k: v for k, v in os.environ.items() if k != "LD_PRELOAD"}          # gtklock es GTK3: la capa de paneles de GTK4 que el escritorio precarga no debe entrar en su proceso
+running = lambda *names: any(subprocess.run(["pgrep", "-x", n], stdout=subprocess.DEVNULL).returncode == 0 for n in names)
+
+def log(msg):
+    try:
+        os.makedirs(CACHE, exist_ok=True); f = os.path.join(CACHE, "lock.log")
+        if os.path.exists(f) and os.path.getsize(f) > 50000: os.replace(f, f + ".1")
+        open(f, "a").write(time.strftime("%F %T ") + msg + "\n")
+    except OSError: pass
 
 def background():
-    """Ruta de la imagen del bloqueo (ya desenfocada si se pidió) o None para solo color."""
-    src = c.get("access_image") or ""
-    if c.get("access_bg", "desktop") == "color": return None
+    """Ruta de una imagen segura para el bloqueo (JPEG de hasta 1920 px, desenfocado si se pidió) o None para solo color. Toda imagen pasa por ffmpeg: así gtklock nunca recibe un formato raro o enorme."""
+    if c.get("access_bg", "desktop") == "color" or not c.get("lock_wallpaper", True): return None
+    src = (c.get("access_image") or "") if c.get("access_bg") == "image" else ""
     if not (src and os.path.isfile(src)): src = c.get("wallpaper") or owee_config.DEFAULT_WALLPAPER
-    if not (c.get("lock_wallpaper", True) and os.path.isfile(src)): return None
-    if not c.get("access_blur", False): return src
-    cache = os.path.join(os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache")), "owee"); os.makedirs(cache, exist_ok=True)
-    key = hashlib.sha1(f"{src}{os.path.getmtime(src)}".encode()).hexdigest()[:12]; out = os.path.join(cache, f"lock-bg-{key}.jpg")
+    if not os.path.isfile(src): return None
+    blur = bool(c.get("access_blur", False)); os.makedirs(CACHE, exist_ok=True)
+    key = hashlib.sha1(f"{src}{os.path.getmtime(src)}{blur}".encode()).hexdigest()[:12]; out = os.path.join(CACHE, f"lock-bg-{key}.jpg")
     if not os.path.exists(out) and shutil.which("ffmpeg"):
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-vf", "scale='min(1920,iw)':-2,gblur=sigma=16", "-frames:v", "1", "-q:v", "3", out], timeout=30, stdout=subprocess.DEVNULL)
-    return out if os.path.exists(out) else src
+        r = subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-vf", "scale='min(1920,iw)':-2" + (",gblur=sigma=16" if blur else ""), "-frames:v", "1", "-q:v", "3", out], timeout=40, capture_output=True, text=True)
+        if r.returncode != 0: log("ffmpeg no pudo preparar la imagen: " + r.stderr[:200])
+    return out if os.path.exists(out) else (src if src.lower().endswith((".jpg", ".jpeg", ".png")) else None)
 
-def gtklock():
+def gtklock_args():
     run = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "owee-lock"); os.makedirs(run, exist_ok=True)
     pos = c.get("access_pos", "center"); pos = pos if pos in ("left", "center", "right") else "center"
     tpl = next((f for f in ("/usr/share/owee/gtklock/layout.ui.in", os.path.join(HERE, "gtklock-layout.ui.in")) if os.path.exists(f)), None)
-    if not tpl: return False
+    if not tpl: return None
     e = lambda t: html.escape(t, quote=False)
     lay = open(tpl, encoding="utf-8").read()
     for k, v in (("{MARGIN}", "120" if pos != "center" else "100"), ("{HALIGN}", {"left": "start", "center": "center", "right": "end"}[pos]), ("{PASSWORD}", e(_("Contraseña"))),
                  ("{UNLOCK}", e(_("Entrar"))), ("{HINT}", e(_("Escribe tu contraseña y pulsa Intro")))): lay = lay.replace(k, v)
     open(os.path.join(run, "layout.ui"), "w", encoding="utf-8").write(lay)
-    bg = background()
     css = f"""window {{ background-color: #{h(p['win'])}; }}
 #window-box {{ background-color: rgba(0, 0, 0, 0.38); border-radius: 22px; padding: 34px 44px; }}
 #clock-label {{ font-size: 68pt; font-weight: 300; color: #{h(p['fg'])}; }}
@@ -47,20 +57,40 @@ def gtklock():
 #user-name, #user-label {{ color: #{h(p['fg'])}; font-size: 14pt; }}
 """
     open(os.path.join(run, "style.css"), "w", encoding="utf-8").write(css)
-    args = ["gtklock", "--daemonize", "--style", os.path.join(run, "style.css"), "--layout", os.path.join(run, "layout.ui"), "--time-format", "%H:%M", "--date-format", "%A, %d %B %Y"]
+    args = ["gtklock", "--style", os.path.join(run, "style.css"), "--layout", os.path.join(run, "layout.ui"), "--time-format", "%H:%M", "--date-format", "%A, %d %B %Y"]
+    bg = background()
     if bg: args += ["--background", bg]
     for m in ("/usr/lib/x86_64-linux-gnu/gtklock/userinfo-module.so", "/usr/lib/gtklock/userinfo-module.so"):
         if os.path.exists(m): args += ["--modules", m]; break
-    os.execvp("gtklock", args)
+    return args
 
-def swaylock():
-    args = ["swaylock", "-f", "-c", h(p["win"]), "--indicator-radius", "90", "--indicator-thickness", "8", "--indicator-idle-visible", "--inside-color", h(p["pop"]) + "d9", "--inside-clear-color", h(p["pop"]) + "d9",
+def swaylock_args():
+    args = ["swaylock", "--indicator-radius", "90", "--indicator-thickness", "8", "--indicator-idle-visible", "-c", h(p["win"]), "--inside-color", h(p["pop"]) + "d9", "--inside-clear-color", h(p["pop"]) + "d9",
             "--inside-ver-color", h(p["pop"]) + "d9", "--inside-wrong-color", "F06548d9", "--ring-color", h(p["accent"]), "--ring-ver-color", h(p["accent"]), "--ring-clear-color", h(p["dim"]),
             "--ring-wrong-color", "F06548", "--key-hl-color", h(p["fg"]), "--bs-hl-color", "F06548", "--line-color", "00000000", "--separator-color", "00000000", "--text-color", h(p["fg"]),
             "--text-clear-color", h(p["fg"]), "--text-ver-color", h(p["fg"]), "--text-wrong-color", h(p["fg"])]
     bg = background()
     if bg: args += ["-i", bg, "-s", "fill"]
-    os.execvp("swaylock", args)
+    return args
 
-if shutil.which("gtklock") and os.environ.get("OWEE_LOCK") != "swaylock": gtklock()
-swaylock()
+def supervise():
+    """Corre en segundo plano (proceso aparte): ejecuta gtklock y, si termina con error, retoma el bloqueo con swaylock (bloqueante) hasta que se desbloquee."""
+    args = gtklock_args() if shutil.which("gtklock") and os.environ.get("OWEE_LOCK") != "swaylock" else None
+    if args:
+        log("gtklock: " + " ".join(args[:1] + args[-4:]))
+        os.makedirs(CACHE, exist_ok=True)
+        r = subprocess.run(args, env=CLEAN, stderr=open(os.path.join(CACHE, "lock.err"), "w"))
+        log(f"gtklock terminó con código {r.returncode}")
+        if r.returncode == 0: return                                  # desbloqueo normal
+        log("gtklock falló: se retoma el bloqueo con swaylock")
+    subprocess.run(swaylock_args(), env=CLEAN)                        # sin -f: bloquea hasta desbloquear
+    log("swaylock terminó (desbloqueado)")
+
+if __name__ == "__main__":
+    if "--supervise" in sys.argv: supervise(); sys.exit(0)
+    if running("swaylock", "gtklock"): sys.exit(0)
+    subprocess.Popen([os.path.abspath(__file__), "--supervise"], start_new_session=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=CLEAN)
+    for _i in range(40):                                              # vuelve en cuanto hay un bloqueo (swayidle espera a esto antes de suspender)
+        time.sleep(0.1)
+        if running("swaylock", "gtklock"): time.sleep(0.4); break
+    sys.exit(0)

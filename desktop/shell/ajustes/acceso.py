@@ -17,7 +17,8 @@ def sessions():
             try: cp.read(f, encoding="utf-8"); name = cp["Desktop Entry"].get("Name", "") ; hidden = cp["Desktop Entry"].get("Hidden", "") == "true" or cp["Desktop Entry"].get("NoDisplay", "") == "true"
             except (configparser.Error, KeyError, OSError): continue
             if name and not hidden and not any(o[0] == os.path.basename(f) for o in out): out.append((os.path.basename(f), name))
-    return out
+    allowed = ("owee-lite.desktop", "plasma.desktop", "plasmax11.desktop")             # el asistente, el instalador y «labwc» a pelo no son escritorios para usar: confundían y dejaban la pantalla negra
+    return sorted([o for o in out if o[0] in allowed], key=lambda o: allowed.index(o[0]))
 
 def autologin_state():
     """(usuario, sesión) con que SDDM entra solo, mirando /etc/sddm.conf y /etc/sddm.conf.d/*.conf (el último que lo define manda); ('', '') si no entra solo."""

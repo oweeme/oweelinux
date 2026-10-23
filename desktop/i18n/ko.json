@@ -696,5 +696,20 @@
 "Imagen en un lado": "이미지를 한쪽에",
 "La del escritorio": "바탕 화면과 같게",
 "Otra imagen…": "다른 이미지…",
-"Solo color": "단색만"
+"Solo color": "단색만",
+"Creando tu cuenta": "계정을 만드는 중",
+"Configurando el idioma y el teclado": "언어와 키보드를 설정하는 중",
+"Ajustando la hora": "시간을 조정하는 중",
+"Preparando tu escritorio": "데스크톱을 준비하는 중",
+"Casi listo…": "거의 다 됐어요…",
+"Esto tarda unos segundos.": "몇 초 걸립니다.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "몇 초 후 로그인 화면이 나타납니다. 화면이 잠시 검게 변할 수 있습니다.",
+"Elige tu foto": "사진 선택",
+"Subir una imagen…": "이미지 올리기…",
+"Quitar la foto": "사진 삭제",
+"Elige un koi o sube tu propia imagen": "잉어를 고르거나 직접 이미지를 올리세요",
+"Foto…": "사진…",
+"Foto cambiada": "사진이 변경되었습니다",
+"No se pudo cambiar la foto: {0}": "사진을 변경할 수 없습니다: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "이미지를 읽을 수 없습니다(올바른 이미지인가요?)"
 }

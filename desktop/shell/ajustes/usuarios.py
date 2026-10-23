@@ -10,6 +10,16 @@ from owee_i18n import _
 HELPERS = ["/usr/libexec/owee/owee-account-helper", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "session", "owee-account-helper")]
 def helper(): return next((h for h in HELPERS if os.path.exists(h)), HELPERS[0])
 
+AVATAR_HELPERS = ["/usr/libexec/owee/owee-avatar-helper", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "session", "owee-avatar-helper")]
+AVATAR_DIRS = ["/usr/share/owee/avatars", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "theme", "avatars")]
+FACE_VF = "scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte(hypot(X-W/2,Y-H/2),W/2),255,0)'"
+
+def avatar_path(user, home):
+    """Foto de perfil de la cuenta: ~/.face (la lee el bloqueo) o la que lee el inicio de sesión; None si no hay."""
+    for f in (os.path.join(home, ".face"), f"/var/lib/owee/faces/{user}.face.icon"):
+        if os.path.isfile(f) and os.access(f, os.R_OK): return f
+    return None
+
 def list_users():
     """[(usuario, nombre completo, es_admin, directorio)] de las cuentas de personas (UID 1000–59999)."""
     try: admins = set(grp.getgrnam("sudo").gr_mem)
@@ -53,14 +63,59 @@ class Usuarios(Page):
         while (c := self.holder.get_first_child()): self.holder.remove(c)
         me = os.environ.get("USER") or pwd.getpwuid(os.getuid()).pw_name
         for user, full, isadmin, home in list_users():
-            r = Gtk.Box(spacing=12, css_classes=["setrow"]); ini = Gtk.Label(label=(full[:1] or "?").upper(), css_classes=["tick"], width_chars=2); ini.set_size_request(34, 34); r.append(ini)
+            r = Gtk.Box(spacing=12, css_classes=["setrow"]); pic = avatar_path(user, home)
+            if pic: ini = Gtk.Image.new_from_file(pic); ini.set_pixel_size(44)
+            else: ini = Gtk.Label(label=(full[:1] or "?").upper(), css_classes=["tick"], width_chars=2); ini.set_size_request(34, 34)
+            r.append(ini)
             who = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True); who.append(Gtk.Label(label=full + ("  ·  " + _("tú") if user == me else ""), xalign=0, css_classes=["heading"]))
             who.append(Gtk.Label(label=f"{user} · " + (_("Administrador") if isadmin else _("Usuario estándar")), xalign=0, css_classes=["dim-label"])); r.append(who)
             sw = switch(isadmin, lambda on, u=user: self.set_admin(u, on)); sw.set_tooltip_text(_("Administrador")); r.append(sw)
+            if user == me:
+                ph = Gtk.Button(label=_("Foto…")); ph.connect("clicked", lambda _b: self.photo_dialog()); r.append(ph)
             pw = Gtk.Button(label=_("Contraseña…")); pw.connect("clicked", lambda _b, u=user: self.passwd_dialog(u)); r.append(pw)
             if user != me:
                 d = Gtk.Button(label=_("Eliminar")); d.connect("clicked", lambda _b, u=user: self.delete_dialog(u)); r.append(d)
             self.holder.append(r)
+
+    # ── foto de perfil ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    def photo_dialog(self):
+        """Galería de kois (basados en el logo) y la opción de subir tu propia imagen. Se aplica al instante en el bloqueo y en el inicio de sesión, sin contraseña (solo cambia TU foto)."""
+        dlg = Gtk.Window(title=_("Elige tu foto"), transient_for=self.win(), modal=True, default_width=470)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin_top=16, margin_bottom=16, margin_start=16, margin_end=16); dlg.set_child(box)
+        box.append(Gtk.Label(label=_("Elige un koi o sube tu propia imagen"), xalign=0, css_classes=["heading"]))
+        fl = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=4, min_children_per_line=4, column_spacing=8, row_spacing=8, homogeneous=True); box.append(fl)
+        d = next((x for x in AVATAR_DIRS if os.path.isdir(x)), None)
+        for f in (sorted(os.listdir(d)) if d else []):
+            if not f.endswith(".png"): continue
+            path = os.path.join(d, f); b = Gtk.Button(child=Gtk.Image.new_from_file(path), has_frame=False); b.get_child().set_pixel_size(84)
+            b.connect("clicked", lambda _b, p=path: (self.set_photo(p), dlg.close())); fl.append(b)
+        bar = Gtk.Box(spacing=8)
+        up = Gtk.Button(label=_("Subir una imagen…")); up.connect("clicked", lambda _b: self.upload_photo(dlg)); bar.append(up)
+        rm = Gtk.Button(label=_("Quitar la foto")); rm.connect("clicked", lambda _b: (self.set_photo(None), dlg.close())); bar.append(rm)
+        cl = Gtk.Button(label=_("Cerrar"), hexpand=True, halign=Gtk.Align.END); cl.connect("clicked", lambda _b: dlg.close()); bar.append(cl); box.append(bar)
+        dlg.present()
+
+    def upload_photo(self, dlg):
+        fd = Gtk.FileDialog(); fd.set_title(_("Elige una imagen")); flt = Gtk.FileFilter(); flt.set_name(_("Imágenes")); flt.add_mime_type("image/*"); fd.set_default_filter(flt)
+        def done(d, res):
+            try: f = d.open_finish(res)
+            except GLib.Error: return
+            if f and f.get_path(): self.set_photo(f.get_path()); dlg.close()
+        fd.open(dlg, None, done)
+
+    def set_photo(self, src):
+        me = os.environ.get("USER") or pwd.getpwuid(os.getuid()).pw_name; home = os.path.expanduser("~"); face = os.path.join(home, ".face")
+        h = next((x for x in AVATAR_HELPERS if os.path.exists(x)), AVATAR_HELPERS[0])
+        def apply_login():
+            if not have("pkexec"): self.say(_("Falta `pkexec` (polkit).")); return
+            def fin(out, code):
+                ok = code == 0 and out.strip().endswith("ok"); self.say(_("Foto cambiada") if ok else _("No se pudo cambiar la foto: {0}", out.strip().removeprefix("ERR: ") or _("cancelado o sin permiso"))); self.refresh()
+            run(["pkexec", h] + (["set", src] if src else ["remove"]), fin, timeout=60)
+        if src is None:
+            try: os.remove(face)
+            except OSError: pass
+            apply_login(); return
+        run(["ffmpeg", "-v", "error", "-y", "-i", src, "-vf", FACE_VF, "-frames:v", "1", "-f", "image2", "-c:v", "png", face], lambda out, code: apply_login() if code == 0 else self.say(_("No se pudo leer la imagen (¿es una imagen válida?)")), timeout=40)
 
     def call(self, argv, ok_text, stdin=None):
         """Ejecuta el ayudante con pkexec; muestra el resultado y vuelve a listar."""

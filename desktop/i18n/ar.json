@@ -696,5 +696,20 @@
 "Imagen en un lado": "صورة على جانب",
 "La del escritorio": "نفس صورة سطح المكتب",
 "Otra imagen…": "صورة أخرى…",
-"Solo color": "لون فقط"
+"Solo color": "لون فقط",
+"Creando tu cuenta": "جارٍ إنشاء حسابك",
+"Configurando el idioma y el teclado": "جارٍ إعداد اللغة ولوحة المفاتيح",
+"Ajustando la hora": "جارٍ ضبط الوقت",
+"Preparando tu escritorio": "جارٍ تجهيز سطح المكتب",
+"Casi listo…": "أوشكنا على الانتهاء…",
+"Esto tarda unos segundos.": "يستغرق هذا بضع ثوانٍ.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "بعد ثوانٍ ستظهر شاشة تسجيل الدخول؛ قد تظلّ الشاشة سوداء لحظة.",
+"Elige tu foto": "اختر صورتك",
+"Subir una imagen…": "رفع صورة…",
+"Quitar la foto": "إزالة الصورة",
+"Elige un koi o sube tu propia imagen": "اختر سمكة كوي أو ارفع صورتك",
+"Foto…": "صورة…",
+"Foto cambiada": "تم تغيير الصورة",
+"No se pudo cambiar la foto: {0}": "تعذّر تغيير الصورة: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "تعذّرت قراءة الصورة (هل هي صورة صالحة؟)"
 }

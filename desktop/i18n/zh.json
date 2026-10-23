@@ -696,5 +696,20 @@
 "Imagen en un lado": "图片在一侧",
 "La del escritorio": "与桌面相同",
 "Otra imagen…": "其他图片…",
-"Solo color": "仅纯色"
+"Solo color": "仅纯色",
+"Creando tu cuenta": "正在创建你的账户",
+"Configurando el idioma y el teclado": "正在设置语言和键盘",
+"Ajustando la hora": "正在调整时间",
+"Preparando tu escritorio": "正在准备你的桌面",
+"Casi listo…": "马上就好…",
+"Esto tarda unos segundos.": "这需要几秒钟。",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "几秒钟后你将看到登录界面；屏幕可能会短暂变黑。",
+"Elige tu foto": "选择你的头像",
+"Subir una imagen…": "上传图片…",
+"Quitar la foto": "移除头像",
+"Elige un koi o sube tu propia imagen": "选择一条锦鲤或上传你自己的图片",
+"Foto…": "头像…",
+"Foto cambiada": "头像已更改",
+"No se pudo cambiar la foto: {0}": "无法更改头像：{0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "无法读取该图片（它是有效的图片吗？）"
 }

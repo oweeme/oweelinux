@@ -696,5 +696,20 @@
 "Imagen en un lado": "画像を片側に",
 "La del escritorio": "デスクトップと同じ",
 "Otra imagen…": "別の画像…",
-"Solo color": "単色のみ"
+"Solo color": "単色のみ",
+"Creando tu cuenta": "アカウントを作成しています",
+"Configurando el idioma y el teclado": "言語とキーボードを設定しています",
+"Ajustando la hora": "時刻を調整しています",
+"Preparando tu escritorio": "デスクトップを準備しています",
+"Casi listo…": "もうすぐです…",
+"Esto tarda unos segundos.": "数秒かかります。",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "数秒後にログイン画面が表示されます。画面が一瞬黒くなることがあります。",
+"Elige tu foto": "写真を選択",
+"Subir una imagen…": "画像をアップロード…",
+"Quitar la foto": "写真を削除",
+"Elige un koi o sube tu propia imagen": "鯉を選ぶか、自分の画像をアップロード",
+"Foto…": "写真…",
+"Foto cambiada": "写真を変更しました",
+"No se pudo cambiar la foto: {0}": "写真を変更できませんでした: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "画像を読み込めませんでした(有効な画像ですか?)"
 }

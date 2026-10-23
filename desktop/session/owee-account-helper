@@ -36,6 +36,19 @@ def caller():
     try: return pwd.getpwuid(int(os.environ.get("PKEXEC_UID", "-1"))).pw_name
     except (KeyError, ValueError): return ""
 
+
+def default_face(u):
+    """Foto de perfil por defecto (el koi del logo) para una cuenta nueva: en /var/lib/owee/faces (la lee el inicio de sesión) y en ~/.face (la lee el bloqueo). Si algo falla no impide crear la cuenta."""
+    try:
+        src = "/usr/share/owee/avatars/koi-1.png"
+        if not os.path.exists(src): return
+        vf = "scale=256:256,format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte(hypot(X-W/2,Y-H/2),W/2),255,0)'"
+        png = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", vf, "-frames:v", "1", "-f", "image2pipe", "-c:v", "png", "-"], capture_output=True, timeout=30).stdout
+        if len(png) < 500: return
+        os.makedirs("/var/lib/owee/faces", exist_ok=True); os.chmod("/var/lib/owee/faces", 0o755)
+        f = f"/var/lib/owee/faces/{u.pw_name}.face.icon"; open(f, "wb").write(png); os.chmod(f, 0o644)
+        h = os.path.join(u.pw_dir, ".face"); open(h, "wb").write(png); os.chown(h, u.pw_uid, u.pw_gid)
+    except Exception: pass
 a = sys.argv[1:]
 if os.geteuid() != 0: die("hay que ejecutarlo como administrador (pkexec)")
 if not a: die(__doc__)
@@ -48,7 +61,7 @@ if op == "add" and len(a) in (3, 4):
     fn = full(a[2]); pw = password(); isadmin = len(a) == 4 and a[3] == "admin"
     if isadmin: sh("groupadd", "-f", ADMIN)
     groups = [g for g in GROUPS if any(x.gr_name == g for x in grp.getgrall())]
-    sh("useradd", "-m", "-s", "/bin/bash", "-c", fn, "-G", ",".join(groups + ([ADMIN] if isadmin else [])), name); sh("chpasswd", stdin=f"{name}:{pw}\n")
+    sh("useradd", "-m", "-s", "/bin/bash", "-c", fn, "-G", ",".join(groups + ([ADMIN] if isadmin else [])), name); sh("chpasswd", stdin=f"{name}:{pw}\n"); default_face(pwd.getpwnam(name))
 elif op == "passwd" and len(a) == 2: human(a[1]); sh("chpasswd", stdin=f"{a[1]}:{password()}\n")
 elif op == "delete" and len(a) in (2, 3):
     u = human(a[1])
@@ -88,7 +101,7 @@ elif op == "firstboot" and len(a) == 7:
             ids = ["-u", str(st.st_uid), "-M", "-d", "/home/" + name]
             if not any(g.gr_gid == st.st_gid for g in grp.getgrall()) and 1000 <= st.st_gid < 60000: sh("groupadd", "-g", str(st.st_gid), name); ids += ["-g", str(st.st_gid)]
     sh("useradd", *(ids or ["-m"]), "-s", "/bin/bash", "-c", fn, "-G", ",".join(groups + [ADMIN]), name); sh("chpasswd", stdin=f"{name}:{pw}\n")
-    u = pwd.getpwnam(name); cfg = os.path.join(u.pw_dir, ".config"); os.makedirs(os.path.join(cfg, "owee"), exist_ok=True); os.makedirs(os.path.join(cfg, "labwc"), exist_ok=True)
+    u = pwd.getpwnam(name); default_face(u); cfg = os.path.join(u.pw_dir, ".config"); os.makedirs(os.path.join(cfg, "owee"), exist_ok=True); os.makedirs(os.path.join(cfg, "labwc"), exist_ok=True)
     key = lay[int(idx)]; base, _s, var = key.partition("(")
     json.dump({"lang": lang, "layouts": lay, "layout_idx": int(idx)}, open(os.path.join(cfg, "owee", "settings.json"), "w"), indent=1)
     open(os.path.join(cfg, "labwc", "environment"), "w").write(f"XKB_DEFAULT_LAYOUT={base}\n" + (f"XKB_DEFAULT_VARIANT={var.rstrip(')')}\n" if var else ""))

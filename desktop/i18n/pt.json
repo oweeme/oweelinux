@@ -696,5 +696,20 @@
 "Imagen en un lado": "Imagem em um lado",
 "La del escritorio": "A da área de trabalho",
 "Otra imagen…": "Outra imagem…",
-"Solo color": "Somente cor"
+"Solo color": "Somente cor",
+"Creando tu cuenta": "Criando sua conta",
+"Configurando el idioma y el teclado": "Configurando o idioma e o teclado",
+"Ajustando la hora": "Ajustando a hora",
+"Preparando tu escritorio": "Preparando sua área de trabalho",
+"Casi listo…": "Quase pronto…",
+"Esto tarda unos segundos.": "Isso leva alguns segundos.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "Em alguns segundos você verá a tela de login; a tela pode ficar preta por um instante.",
+"Elige tu foto": "Escolha sua foto",
+"Subir una imagen…": "Enviar uma imagem…",
+"Quitar la foto": "Remover a foto",
+"Elige un koi o sube tu propia imagen": "Escolha uma carpa ou envie sua própria imagem",
+"Foto…": "Foto…",
+"Foto cambiada": "Foto alterada",
+"No se pudo cambiar la foto: {0}": "Não foi possível alterar a foto: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Não foi possível ler a imagem (é uma imagem válida?)"
 }

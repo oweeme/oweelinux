@@ -7,13 +7,15 @@ set -euo pipefail
 R=${1:?uso: $0 ROOTFS [REPO_ROOT]}; REPO=${2:-/work}; D=$REPO/desktop
 ETC=$R/usr/etc; [ -d "$ETC" ] || { echo "rootfs sin preparar" >&2; exit 1; }
 install -Dm0644 "$D/session/owee-lite.desktop" "$R/usr/share/wayland-sessions/owee-lite.desktop"
-for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run owee-firewall owee-centinela owee-centinela-ctl owee-dev; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
+for f in owee-session owee-lite-start owee-wallpaper owee-apply-display owee-idle owee-desktop owee-store-setup owee-apply-theme owee-layout owee-lock owee-account-helper owee-avatar-helper owee-firstboot owee-setup-session owee-setup-run owee-locale owee-installer-session owee-installer-run owee-installer-calamares owee-run-labwc owee-apt-shim owee-panel-run owee-firewall owee-centinela owee-centinela-ctl owee-dev; do install -Dm0755 "$D/session/$f" "$R/usr/libexec/owee/$f"; done
 for f in owee_panel.py wl_toplevels.py owee_tray.py owee_theme.py owee_config.py owee_i18n.py owee_windows.py owee_overview.py owee_switcher.py owee_desktops.py owee_keys.py owee_settings.py $(cd "$D/shell" && ls ajustes/*.py); do install -Dm0755 "$D/shell/$f" "$R/usr/libexec/owee/$f"; done
 install -Dm0644 "$D/session/mako/config" "$ETC/xdg/mako/config"; install -Dm0644 "$D/session/labwc/menu.xml" "$ETC/xdg/labwc/menu.xml"; install -Dm0644 "$D/session/labwc/rc.xml" "$ETC/xdg/labwc/rc.xml"; install -Dm0755 "$D/session/labwc/autostart" "$ETC/xdg/labwc/autostart"
 # widgets del panel: los del sistema van en /usr/share/owee/widgets (el usuario los sustituye con un archivo del mismo nombre
 # en ~/.config/owee/widgets); los ejemplos se dejan aparte para copiarlos y cambiarlos.
 for f in "$D"/widgets/sistema/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets/$(basename "$f")"; done
 install -Dm0644 "$D/session/org.oweelinux.accounts.policy" "$R/usr/share/polkit-1/actions/org.oweelinux.accounts.policy"      # Ajustes → Usuarios/Acceso: pkexec pide la clave de administrador
+install -Dm0644 "$D/session/org.oweelinux.avatar.policy" "$R/usr/share/polkit-1/actions/org.oweelinux.avatar.policy"      # cambiar la propia foto no pide clave de administrador
+mkdir -p "$R/usr/share/owee/avatars"; cp "$D"/theme/avatars/*.png "$R/usr/share/owee/avatars/"
 # Primer arranque (docs/EXTENSIONES.md → Primer arranque): sesión propia de SDDM con el asistente, usuario de sistema `owee-setup`, regla polkit y servicio que decide cada arranque
 install -Dm0644 "$D/session/labwc-setup/rc.xml" "$R/usr/share/owee/labwc-setup/rc.xml"; install -Dm0644 "$D/session/labwc-setup/autostart" "$R/usr/share/owee/labwc-setup/autostart"
 # Fcitx5 por defecto (también para usuarios nuevos): sin icono propio en la bandeja (lo reemplaza el indicador del panel) y sin avisos (el de «Wayland Diagnose» no aplica con labwc)
@@ -235,8 +237,8 @@ T="$R/usr/share/sddm/themes/owee"; mkdir -p "$T"
 for f in Main.qml metadata.desktop theme.conf logo.png; do install -m0644 "$D/sddm/owee/$f" "$T/$f"; done
 ln -sf /usr/share/wallpapers/OweeLinux/contents/images/1920x1080.jpg "$T/background-default.jpg"          # imagen por defecto: el fondo de OweeLinux
 ln -sf /var/lib/owee/login/theme.conf.user "$T/theme.conf.user"                                         # lo que elige el usuario vive en /var (el tema, en /usr, es de solo lectura)
-printf '[Theme]\nCurrent=owee\n' | install -Dm0644 /dev/stdin "$ETC/sddm.conf.d/25-owee-login-theme.conf"
-printf 'd /var/lib/owee/login 0755 root root -\n' | install -Dm0644 /dev/stdin "$R/usr/lib/tmpfiles.d/owee-login.conf"
+printf '[Theme]\nCurrent=owee\nFacesDir=/var/lib/owee/faces\n' | install -Dm0644 /dev/stdin "$ETC/sddm.conf.d/25-owee-login-theme.conf"
+printf 'd /var/lib/owee/login 0755 root root -\nd /var/lib/owee/faces 0755 root root -\n' | install -Dm0644 /dev/stdin "$R/usr/lib/tmpfiles.d/owee-login.conf"
 install -Dm0644 "$D/session/gtklock-layout.ui.in" "$R/usr/share/owee/gtklock/layout.ui.in"
 # owee-dev: cajas de desarrollo y programas .deb (Podman + distrobox, sin root); un .deb abre el asistente en una terminal
 ln -sf /usr/libexec/owee/owee-dev "$R/usr/bin/owee-dev"

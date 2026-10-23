@@ -696,5 +696,20 @@
 "Imagen en un lado": "Bild an einer Seite",
 "La del escritorio": "Das Hintergrundbild des Desktops",
 "Otra imagen…": "Anderes Bild …",
-"Solo color": "Nur Farbe"
+"Solo color": "Nur Farbe",
+"Creando tu cuenta": "Dein Konto wird erstellt",
+"Configurando el idioma y el teclado": "Sprache und Tastatur werden eingerichtet",
+"Ajustando la hora": "Uhrzeit wird eingestellt",
+"Preparando tu escritorio": "Dein Desktop wird vorbereitet",
+"Casi listo…": "Fast fertig …",
+"Esto tarda unos segundos.": "Das dauert ein paar Sekunden.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "In wenigen Sekunden siehst du die Anmeldung; der Bildschirm kann kurz schwarz bleiben.",
+"Elige tu foto": "Wähle dein Bild",
+"Subir una imagen…": "Bild hochladen …",
+"Quitar la foto": "Bild entfernen",
+"Elige un koi o sube tu propia imagen": "Wähle einen Koi oder lade ein eigenes Bild hoch",
+"Foto…": "Bild …",
+"Foto cambiada": "Bild geändert",
+"No se pudo cambiar la foto: {0}": "Das Bild konnte nicht geändert werden: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Das Bild konnte nicht gelesen werden (ist es ein gültiges Bild?)"
 }

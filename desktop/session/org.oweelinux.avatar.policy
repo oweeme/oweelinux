@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN" "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>OweeLinux</vendor>
+  <action id="org.oweelinux.avatar">
+    <description>Change your own profile picture</description>
+    <description xml:lang="es">Cambiar tu propia foto de perfil</description>
+    <message>Authentication is required to change the profile picture</message>
+    <message xml:lang="es">Se necesita autenticación para cambiar la foto de perfil</message>
+    <defaults><allow_any>auth_self</allow_any><allow_inactive>auth_self</allow_inactive><allow_active>yes</allow_active></defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/owee/owee-avatar-helper</annotate>
+  </action>
+</policyconfig>

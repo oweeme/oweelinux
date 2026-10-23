@@ -696,5 +696,20 @@
 "Imagen en un lado": "Immagine su un lato",
 "La del escritorio": "Quella della scrivania",
 "Otra imagen…": "Un'altra immagine…",
-"Solo color": "Solo colore"
+"Solo color": "Solo colore",
+"Creando tu cuenta": "Creazione del tuo account",
+"Configurando el idioma y el teclado": "Impostazione di lingua e tastiera",
+"Ajustando la hora": "Regolazione dell'ora",
+"Preparando tu escritorio": "Preparazione del desktop",
+"Casi listo…": "Quasi pronto…",
+"Esto tarda unos segundos.": "Ci vogliono pochi secondi.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "Tra pochi secondi vedrai l'accesso; lo schermo può restare nero per un momento.",
+"Elige tu foto": "Scegli la tua foto",
+"Subir una imagen…": "Carica un'immagine…",
+"Quitar la foto": "Rimuovi la foto",
+"Elige un koi o sube tu propia imagen": "Scegli un koi o carica una tua immagine",
+"Foto…": "Foto…",
+"Foto cambiada": "Foto cambiata",
+"No se pudo cambiar la foto: {0}": "Impossibile cambiare la foto: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Impossibile leggere l'immagine (è un'immagine valida?)"
 }

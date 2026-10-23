@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+"""Foto de perfil del inicio de sesión. Lo ejecuta Ajustes → Usuarios con `pkexec` SIN pedir contraseña porque solo toca la foto del PROPIO usuario que lo invoca (se deduce de PKEXEC_UID, nunca de un argumento).
+La imagen se lee y se convierte con los permisos del usuario (no de root), se recorta a un cuadrado de 256 px con las esquinas redondeadas y se guarda en /var/lib/owee/faces/USUARIO.face.icon (SDDM la lee de ahí).
+Uso:  set /ruta/imagen   |   remove"""
+import os, pwd, re, subprocess, sys
+D = "/var/lib/owee/faces"
+def die(msg, code=2): print("ERR: " + msg); sys.exit(code)
+if os.geteuid() != 0: die("hay que ejecutarlo con pkexec")
+try: uid = int(os.environ.get("PKEXEC_UID", "-1")); u = pwd.getpwuid(uid)
+except (ValueError, KeyError): die("no se pudo saber quién llama")
+if not 1000 <= uid < 60000 or not re.match(r"^[a-z_][a-z0-9_-]{0,30}$", u.pw_name): die("solo las cuentas de personas pueden tener foto")
+a = sys.argv[1:]; dest = os.path.join(D, u.pw_name + ".face.icon")
+if a[:1] == ["set"] and len(a) == 2:
+    src = a[1]
+    if not src.startswith("/") or ".." in src.split("/") or not os.path.isfile(src): die("imagen no válida")
+    vf = "scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte(hypot(X-W/2,Y-H/2),W/2),255,0)'"
+    r = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", vf, "-frames:v", "1", "-f", "image2pipe", "-c:v", "png", "-"], capture_output=True, timeout=40, user=uid, group=u.pw_gid, env={"PATH": "/usr/bin:/bin", "HOME": "/tmp"})
+    if r.returncode != 0 or len(r.stdout) < 500: die("no se pudo leer la imagen (¿es una imagen válida?)")
+    os.makedirs(D, exist_ok=True); os.chmod(D, 0o755); tmp = dest + ".tmp"; open(tmp, "wb").write(r.stdout); os.chmod(tmp, 0o644); os.replace(tmp, dest)
+elif a == ["remove"]:
+    try: os.remove(dest)
+    except OSError: pass
+else: die(__doc__)
+print("ok")

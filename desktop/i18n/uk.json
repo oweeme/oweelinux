@@ -696,5 +696,20 @@
 "Imagen en un lado": "Картинка збоку",
 "La del escritorio": "Як на робочому столі",
 "Otra imagen…": "Інше зображення…",
-"Solo color": "Лише колір"
+"Solo color": "Лише колір",
+"Creando tu cuenta": "Створення облікового запису",
+"Configurando el idioma y el teclado": "Налаштування мови та клавіатури",
+"Ajustando la hora": "Налаштування часу",
+"Preparando tu escritorio": "Підготовка робочого столу",
+"Casi listo…": "Майже готово…",
+"Esto tarda unos segundos.": "Це займе кілька секунд.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "За кілька секунд ви побачите екран входу; екран може на мить почорніти.",
+"Elige tu foto": "Оберіть своє фото",
+"Subir una imagen…": "Завантажити зображення…",
+"Quitar la foto": "Видалити фото",
+"Elige un koi o sube tu propia imagen": "Оберіть коі або завантажте своє зображення",
+"Foto…": "Фото…",
+"Foto cambiada": "Фото змінено",
+"No se pudo cambiar la foto: {0}": "Не вдалося змінити фото: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Не вдалося прочитати зображення (воно коректне?)"
 }

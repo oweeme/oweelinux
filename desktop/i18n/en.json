@@ -696,5 +696,20 @@
 "Imagen en un lado": "Image on one side",
 "La del escritorio": "The desktop one",
 "Otra imagen…": "Another image…",
-"Solo color": "Color only"
+"Solo color": "Color only",
+"Creando tu cuenta": "Creating your account",
+"Configurando el idioma y el teclado": "Setting up language and keyboard",
+"Ajustando la hora": "Adjusting the time",
+"Preparando tu escritorio": "Preparing your desktop",
+"Casi listo…": "Almost ready…",
+"Esto tarda unos segundos.": "This takes a few seconds.",
+"En unos segundos verás el inicio de sesión; la pantalla puede quedar en negro un momento.": "In a few seconds you will see the sign-in screen; the display may go black for a moment.",
+"Elige tu foto": "Choose your picture",
+"Subir una imagen…": "Upload an image…",
+"Quitar la foto": "Remove the picture",
+"Elige un koi o sube tu propia imagen": "Pick a koi or upload your own image",
+"Foto…": "Photo…",
+"Foto cambiada": "Picture changed",
+"No se pudo cambiar la foto: {0}": "Could not change the picture: {0}",
+"No se pudo leer la imagen (¿es una imagen válida?)": "Could not read the image (is it a valid image?)"
 }

@@ -21,6 +21,9 @@ Rectangle {
     property int sessionIndex: Math.max(0, sessionModel.lastIndex)
     property string failure: ""
     property string sessLabel: ""
+    property string faceSrc: ""
+    onUserIndexChanged: updateFace()
+    property var okSessions: []                      // posiciones de las sesiones que se ofrecen (OweeLinux y Plasma); el asistente, el instalador y «labwc» a pelo NUNCA: llevan a una pantalla negra o al asistente otra vez
     onSessionIndexChanged: sessLabel = sessionName()
 
     // ── fondo ────────────────────────────────────────────────────────────────
@@ -63,7 +66,13 @@ Rectangle {
             return (root.width - width) / 2
         }
 
-        Image { source: Qt.resolvedUrl("logo.png"); width: 84; height: 84; smooth: true; anchors.horizontalCenter: parent.horizontalCenter }
+        Image {                                     // foto de perfil del usuario elegido (si no tiene o no carga, el koi del logo)
+            id: face
+            width: 96; height: 96; smooth: true; anchors.horizontalCenter: parent.horizontalCenter
+            fillMode: Image.PreserveAspectFit; asynchronous: true
+            source: root.faceSrc !== "" ? root.faceSrc : Qt.resolvedUrl("logo.png")
+            onStatusChanged: if (status === Image.Error) source = Qt.resolvedUrl("logo.png")
+        }
         Text {
             id: clock
             anchors.horizontalCenter: parent.horizontalCenter
@@ -87,8 +96,10 @@ Rectangle {
             Repeater {
                 id: userRepeater
                 model: userModel
+                onItemAdded: root.updateFace()
                 delegate: Rectangle {
                     property string uname: model.name
+                    property string uicon: String(model.icon)
                     visible: userModel.count === 1 ? index === root.userIndex : true
                     width: nameText.implicitWidth + 28; height: 34; radius: 17
                     color: index === root.userIndex ? root.accent : "#33ffffff"
@@ -136,11 +147,11 @@ Rectangle {
             text: root.failure !== "" ? root.failure : (config.hint || "Escribe tu contraseña y pulsa Intro")
         }
         Text {                                      // sesión (si hay más de una, tocar para cambiar)
-            visible: sessionModel.count > 1 && root.sessLabel !== ""
+            visible: root.okSessions.length > 1 && root.sessLabel !== ""
             anchors.horizontalCenter: parent.horizontalCenter
             color: "#aab0b2"; font.pixelSize: 13
             text: "▾ " + root.sessLabel
-            MouseArea { anchors.fill: parent; onClicked: root.sessionIndex = (root.sessionIndex + 1) % sessionModel.count }
+            MouseArea { anchors.fill: parent; onClicked: root.sessionIndex = root.okSessions[(root.okSessions.indexOf(root.sessionIndex) + 1) % root.okSessions.length] }
         }
 
         Item { width: 1; height: 8 }
@@ -163,8 +174,22 @@ Rectangle {
     Repeater {
         id: sessionRepeater
         model: sessionModel
-        delegate: Item { property string sname: model.name }
-        onItemAdded: root.sessLabel = root.sessionName()
+        delegate: Item { property string sname: model.name; property string sfile: String(model.file) }
+        onItemAdded: root.pickSessions()
+    }
+    function pickSessions() {
+        var ok = [], lite = -1;
+        for (var i = 0; i < sessionRepeater.count; i++) {
+            var it = sessionRepeater.itemAt(i);
+            if (it && /(owee-lite|plasma|plasmax11)\.desktop$/.test(it.sfile)) { ok.push(i); if (/owee-lite\.desktop$/.test(it.sfile)) lite = i }
+        }
+        okSessions = ok
+        if (ok.length > 0 && ok.indexOf(root.sessionIndex) < 0) root.sessionIndex = lite >= 0 ? lite : ok[0]     // la última sesión no era de las que se ofrecen: se usa OweeLinux
+        sessLabel = sessionName()
+    }
+    function updateFace() {
+        var it = userRepeater.itemAt(root.userIndex); var p = it ? it.uicon : "";
+        faceSrc = (p === "" || p === "undefined") ? "" : (p.charAt(0) === "/" ? "file://" + p : p)
     }
     function userName() { var it = userRepeater.itemAt(root.userIndex); return it ? it.uname : "" }
     function sessionName() { var it = sessionRepeater.itemAt(root.sessionIndex); return it ? it.sname : "" }
