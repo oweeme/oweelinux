@@ -9,6 +9,7 @@ owee_locale() {
     zh) LOC=zh_CN.UTF-8; LNG=zh:en ;;   ja) LOC=ja_JP.UTF-8; LNG=ja:en ;;   ko) LOC=ko_KR.UTF-8; LNG=ko:en ;;   ar) LOC=ar_SA.UTF-8; LNG=ar:en ;;
     fa) LOC=fa_IR.UTF-8; LNG=fa:en ;;   hi) LOC=hi_IN.UTF-8; LNG=hi:en ;;   ur) LOC=ur_PK.UTF-8; LNG=ur:en ;;   id) LOC=id_ID.UTF-8; LNG=id:en ;;
     ms) LOC=ms_MY.UTF-8; LNG=ms:en ;;
+    pl) LOC=pl_PL.UTF-8; LNG=pl:en ;;   fi) LOC=fi_FI.UTF-8; LNG=fi:en ;;   sv) LOC=sv_SE.UTF-8; LNG=sv:en ;;
     qow) LOC=qow_BO.UTF-8; LNG=qow:es ;; qow@owee) LOC=qow_BO.UTF-8; LNG=qow@owee:qow:es ;;
     *) X=""; SJ="${XDG_CONFIG_HOME:-$HOME/.config}/owee/settings.json"
        [ -n "$1" ] && [ -f "$SJ" ] && command -v jq >/dev/null && X=$(jq -r --arg c "$1" '.extra_langs[$c].loc // empty' "$SJ" 2>/dev/null)

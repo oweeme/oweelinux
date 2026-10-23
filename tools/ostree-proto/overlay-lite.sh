@@ -137,7 +137,7 @@ EOD
 for f in org.kde.systemsettings.desktop kdesystemsettings.desktop systemsettings.desktop org.kde.kinfocenter.desktop org.kde.kcalc.desktop org.kde.spectacle.desktop org.kde.discover.desktop org.kde.discover.urlhandler.desktop org.kde.discover.notifier.desktop org.kde.discover.flatpak.desktop foot-server.desktop footclient.desktop fcitx5-configtool.desktop fcitx5-wayland-launcher.desktop org.fcitx.Fcitx5.desktop org.fcitx.fcitx5-qt6-gui-wrapper.desktop; do [ -f "$R/usr/share/applications/$f" ] && sed -i '/^NoDisplay=/d; /^\[Desktop Entry\]/a NoDisplay=true' "$R/usr/share/applications/$f"; done
 # ---- Idiomas: catálogos de la interfaz, locales del sistema, fuentes y teclados (docs/EXTENSIONES.md → Idiomas)
 install -d "$R/usr/share/owee/i18n"; cp "$D"/i18n/*.json "$R/usr/share/owee/i18n/"
-for l in es_ES en_US pt_BR fr_FR de_DE it_IT ru_RU uk_UA zh_CN ja_JP ko_KR ar_SA fa_IR hi_IN ur_PK id_ID ms_MY; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
+for l in es_ES en_US pt_BR fr_FR de_DE it_IT ru_RU uk_UA zh_CN ja_JP ko_KR ar_SA fa_IR hi_IN ur_PK id_ID ms_MY pl_PL fi_FI sv_SE; do chroot "$R" localedef -i "$l" -f UTF-8 "$l.UTF-8" 2>/dev/null || echo "(aviso: sin locale $l)"; done
 # Nombres de nuestras apps en cada idioma dentro del lanzador (Name[xx]= en los .desktop), a partir de los mismos catálogos
 python3 - "$R" "$D/i18n" <<'PYEOF'
 import json, os, sys

@@ -11,7 +11,7 @@ LAYOUTS = [("us", "", _("Inglés (EE. UU.)")), ("latam", "", _("Español (Latino
            ("gb", "", _("Inglés (Reino Unido)")), ("br", "", _("Portugués (Brasil)")), ("pt", "", _("Portugués (Portugal)")), ("fr", "", _("Francés")), ("de", "", _("Alemán")),
            ("it", "", _("Italiano")), ("ru", "", _("Ruso")), ("ua", "", _("Ucraniano")), ("jp", "", _("Japonés")), ("kr", "", _("Coreano")), ("ara", "", _("Árabe")),
            ("ir", "", _("Persa (farsi)")), ("in", "", _("Hindi (InScript)")), ("in", "bolnagri", _("Hindi (Bolnagri, fonético)")), ("pk", "", _("Urdu")),
-           ("id", "", _("Indonesio")), ("my", "", _("Malayo (jawi)"))]            # el malayo en letras latinas se escribe con «Inglés (EE. UU.)»; chino, japonés (Mozc) y coreano (Hangul) usan además un método de escritura (Métodos)
+           ("pl", "", _("Polaco")), ("fi", "", _("Finés")), ("se", "", _("Sueco")), ("id", "", _("Indonesio")), ("my", "", _("Malayo (jawi)"))]            # el malayo en letras latinas se escribe con «Inglés (EE. UU.)»; chino, japonés (Mozc) y coreano (Hangul) usan además un método de escritura (Métodos)
 BASES = {l for l, _v, _n in LAYOUTS}
 import owee_keys
 KEYS = [f"{l}({v})" if v else l for l, v, _n in LAYOUTS]

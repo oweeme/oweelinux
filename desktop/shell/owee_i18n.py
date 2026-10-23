@@ -10,6 +10,7 @@ LANGS = [  # (código, nombre en su propio idioma, locale del sistema): la ÚNIC
     ("it", "Italiano", "it_IT.UTF-8"), ("ru", "Русский", "ru_RU.UTF-8"), ("uk", "Українська", "uk_UA.UTF-8"), ("zh", "中文（简体）", "zh_CN.UTF-8"), ("ja", "日本語", "ja_JP.UTF-8"),
     ("ko", "한국어", "ko_KR.UTF-8"), ("ar", "العربية", "ar_SA.UTF-8"), ("fa", "فارسی", "fa_IR.UTF-8"), ("hi", "हिन्दी", "hi_IN.UTF-8"), ("ur", "اردو", "ur_PK.UTF-8"),
     ("id", "Bahasa Indonesia", "id_ID.UTF-8"), ("ms", "Bahasa Melayu", "ms_MY.UTF-8"),
+    ("pl", "Polski", "pl_PL.UTF-8"), ("fi", "Suomi", "fi_FI.UTF-8"), ("sv", "Svenska", "sv_SE.UTF-8"),
     ("qow", "Owee (romano)", "qow_BO.UTF-8"), ("qow@owee", "Owee (Owee Script)", "qow_BO.UTF-8"),
 ]
 # Para cada idioma: distribución(es) de teclado XKB que se ponen al elegirlo (la primera es la principal; con dos, Alt + Mayús alterna), método de escritura de Fcitx5 que se
@@ -18,6 +19,7 @@ LANG_INFO = {
     "es": ("latam", None, False), "en": ("us", None, False), "pt": ("br", None, False), "fr": ("fr", None, False), "de": ("de", None, False), "it": ("it", None, False),
     "ru": ("us,ru", None, False), "uk": ("us,ua", None, False), "zh": ("us", "pinyin", False), "ja": ("jp", "mozc", False), "ko": ("us", "hangul", False),
     "ar": ("us,ara", None, True), "fa": ("us,ir", None, True), "hi": ("us,in", None, False), "ur": ("us,pk", None, True), "id": ("us", None, False), "ms": ("us,my", None, False),
+    "pl": ("pl", None, False), "fi": ("fi", None, False), "sv": ("se", None, False),
     "qow": ("us", "owee", False), "qow@owee": ("us", "owee", False),
 }
 def all_layouts(): return sorted({k for v in LANG_INFO.values() for k in v[0].split(",")} | {"us(intl)"})
