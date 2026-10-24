@@ -12,7 +12,8 @@ def write_gtk_prefs(mode):
     for v in ("3.0", "4.0"):
         d = os.path.expanduser(f"~/.config/gtk-{v}"); os.makedirs(d, exist_ok=True); p = os.path.join(d, "settings.ini")
         lines = [l for l in (open(p).read().splitlines() if os.path.exists(p) else []) if not l.startswith("gtk-application-prefer-dark-theme") and l != "[Settings]"]
-        open(p, "w").write("\n".join(["[Settings]", f"gtk-application-prefer-dark-theme={1 if mode == 'dark' else 0}"] + lines) + "\n")
+        extra = [] if any(l.startswith("gtk-decoration-layout") for l in lines) else ["gtk-decoration-layout=appmenu:minimize,maximize,close"]      # apps GTK con barra propia (Flutter, GNOME…): minimizar y maximizar además de cerrar
+        open(p, "w").write("\n".join(["[Settings]", f"gtk-application-prefer-dark-theme={1 if mode == 'dark' else 0}"] + extra + lines) + "\n")
 
 def write_qt_scheme(cfg):
     """Apps Qt/KDE: se parte del esquema Breeze (BreezeDark o BreezeLight, según el tema) y se pintan por encima los colores del tema de OweeLinux en kdeglobals

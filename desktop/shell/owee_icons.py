@@ -12,6 +12,7 @@ if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exi
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gtk, Gdk, Gio, GLib, Gtk4LayerShell as LS
+os.environ.pop("LD_PRELOAD", None)          # la capa de paneles ya está cargada en ESTE proceso; los programas que lance (terminales, cajas de desarrollo…) no deben heredarla: en otros entornos no existe y escribía un error en cada comando
 from owee_i18n import _
 import owee_i18n; owee_i18n.apply_direction()
 
@@ -47,12 +48,16 @@ def unique(d, name, ext=""):
     return os.path.join(d, n)
 
 def open_path(path):
+    """Abre con la aplicación predeterminada de ese tipo (carpetas: Dolphin; texto: Kate; ver /etc/xdg/mimeapps.list). Los lanzadores .desktop se ejecutan."""
     try:
         if path.endswith(".desktop"):
             ai = Gio.DesktopAppInfo.new_from_filename(path)
             if ai: ai.launch([], None); return
-        subprocess.Popen(["xdg-open", path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-    except Exception as e: print("[icons] no se pudo abrir:", e, flush=True)
+        f = Gio.File.new_for_path(path); info = f.query_info("standard::content-type", 0, None); ai = Gio.AppInfo.get_default_for_type(info.get_content_type(), False)
+        if ai: ai.launch([f], None); return
+    except GLib.Error as e: print("[icons] sin aplicación predeterminada:", e, flush=True)
+    try: subprocess.Popen(["dolphin", path] if os.path.isdir(path) else ["xdg-open", path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    except OSError as e: print("[icons] no se pudo abrir:", e, flush=True)
 
 def settings(page=""):
     env = dict(os.environ); env["OWEE_PAGE"] = page
@@ -68,7 +73,7 @@ class Desk(Gtk.Application):
         w = self.win = Gtk.ApplicationWindow(application=self, decorated=False); w.add_css_class("desk")
         LS.init_for_window(w); LS.set_layer(w, LS.Layer.BOTTOM); LS.set_namespace(w, "owee-desktop-icons")
         for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(w, e, True)
-        LS.set_keyboard_mode(w, LS.KeyboardMode.NONE)
+        LS.set_keyboard_mode(w, LS.KeyboardMode.ON_DEMAND)          # con teclado: flechas para moverse entre iconos, Intro abre, F2 renombra, Supr a la papelera
         self.flow = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL, selection_mode=Gtk.SelectionMode.MULTIPLE, homogeneous=True, halign=Gtk.Align.START, valign=Gtk.Align.START,
                                  activate_on_single_click=False, column_spacing=4, row_spacing=4, margin_top=10, margin_start=10, max_children_per_line=6, min_children_per_line=1)
         self.flow.connect("child-activated", lambda f, c: open_path(c.path))
@@ -76,6 +81,7 @@ class Desk(Gtk.Application):
         bg = Gtk.GestureClick(button=3); bg.connect("pressed", self.on_bg_menu); self.root.add_controller(bg)
         bl = Gtk.GestureClick(button=1); bl.connect("pressed", lambda g, n, x, y: self.on_bg_left(x, y)); self.root.add_controller(bl)
         self.build_actions(); self.reload()
+        kc = Gtk.EventControllerKey(); kc.connect("key-pressed", self.on_key); w.add_controller(kc)
         try: self.mon = Gio.File.new_for_path(self.dir).monitor_directory(Gio.FileMonitorFlags.NONE, None); self.mon.connect("changed", lambda *a: GLib.idle_add(self.reload))
         except GLib.Error: pass
         w.present(); w.realize()
@@ -121,6 +127,17 @@ class Desk(Gtk.Application):
             self.flow.append(child)
         return False
 
+    def on_key(self, ctl, keyval, keycode, state):
+        ctrl = bool(state & Gdk.ModifierType.CONTROL_MASK)
+        if keyval == Gdk.KEY_F2: self.rename()
+        elif keyval == Gdk.KEY_Delete: self.trash()
+        elif ctrl and keyval in (Gdk.KEY_c, Gdk.KEY_C): self.copy(False)
+        elif ctrl and keyval in (Gdk.KEY_x, Gdk.KEY_X): self.copy(True)
+        elif ctrl and keyval in (Gdk.KEY_v, Gdk.KEY_V): self.paste()
+        elif ctrl and keyval in (Gdk.KEY_a, Gdk.KEY_A): self.flow.select_all()
+        else: return False
+        return True
+
     # --- acciones y menús
     def act(self, name, fn, state=None):
         a = Gio.SimpleAction.new(name, None) if state is None else Gio.SimpleAction.new_stateful(name, GLib.VariantType.new("s"), GLib.Variant.new_string(state))
@@ -155,7 +172,7 @@ class Desk(Gtk.Application):
         LS.set_keyboard_mode(self.win, LS.KeyboardMode.ON_DEMAND)
         pop = Gtk.PopoverMenu.new_from_model(model); pop.set_parent(parent); pop.set_has_arrow(False); pop.set_halign(Gtk.Align.START)
         r = Gdk.Rectangle(); r.x, r.y, r.width, r.height = int(x), int(y), 1, 1; pop.set_pointing_to(r)
-        pop.connect("closed", lambda p: (LS.set_keyboard_mode(self.win, LS.KeyboardMode.NONE), GLib.idle_add(p.unparent)))
+        pop.connect("closed", lambda p: (LS.set_keyboard_mode(self.win, LS.KeyboardMode.ON_DEMAND), GLib.idle_add(p.unparent)))
         pop.popup()
 
     def on_bg_menu(self, g, n, x, y): self.flow.unselect_all(); self.popup(self.bg_model(), self.root, x, y)
@@ -177,7 +194,7 @@ class Desk(Gtk.Application):
     def selected(self): return [c.path for c in self.flow.get_selected_children()]
 
     def ask_name(self, path):
-        d = Gtk.Window(title=_("Cambiar nombre"), default_width=380, resizable=False); b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin_top=14, margin_bottom=14, margin_start=14, margin_end=14)
+        d = Gtk.Window(title=_("Cambiar nombre"), default_width=380, resizable=False, icon_name="folder"); b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin_top=14, margin_bottom=14, margin_start=14, margin_end=14)
         e = Gtk.Entry(text=os.path.basename(path)); b.append(e); ok = Gtk.Button(label=_("Aceptar"), css_classes=["suggested-action"], halign=Gtk.Align.END); b.append(ok); d.set_child(b)
         def done(*_a):
             new = e.get_text().strip().replace("/", "")

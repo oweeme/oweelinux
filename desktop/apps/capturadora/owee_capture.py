@@ -13,6 +13,7 @@ if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exi
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gtk, Gdk, Gio, GLib, Gtk4LayerShell as LS
+os.environ.pop("LD_PRELOAD", None)          # la capa de paneles ya está cargada en ESTE proceso; los programas que lance (terminales, cajas de desarrollo…) no deben heredarla: en otros entornos no existe y escribía un error en cada comando
 import core
 try: import owee_config
 except Exception: owee_config = None

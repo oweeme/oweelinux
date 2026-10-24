@@ -180,3 +180,7 @@ Arranque en la VM: `python3 -c pass` 37 ms; **`import` de GTK4 en Python 869 ms*
 - Aún no hay arrastrar y soltar dentro del escritorio ni mover los iconos de sitio (se ordenan solos en columnas).
 - Ajustes se puede abrir en una página con `OWEE_PAGE=fondo owee_settings.py`.
 - Pruebas en la VM: `boot-shot.py` entiende ahora `rclick:x,y` (clic derecho) además de `click`.
+- Teclado en el escritorio: flechas para moverse entre iconos, Intro abre, F2 renombra, Supr manda a la papelera, Ctrl+C/X/V/A. Se abre con la aplicación predeterminada de cada tipo (`/etc/xdg/mimeapps.list`: carpetas con Dolphin y texto/código con Kate).
+- Barra de tareas: las ventanas de la misma aplicación se agrupan en un solo icono con el número de ventanas; al pulsarlo se abre la lista (clic central en una fila cierra esa ventana). Así el panel no se llena y el reloj no se desplaza.
+- `LD_PRELOAD` (capa de paneles) se quita del entorno en cuanto el panel, la Capturadora, el protector y los iconos la han cargado: los programas que lanzan (terminales, cajas de desarrollo…) ya no escriben «cannot be preloaded» en cada comando.
+- Las apps GTK con barra de título propia (p. ej. Flutter) reciben minimizar y maximizar: `gtk-decoration-layout` en `/etc/xdg/gtk-{3,4}.0/settings.ini` y en `~/.config/gtk-*/settings.ini`.

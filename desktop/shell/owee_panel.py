@@ -16,6 +16,7 @@ gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
 import json, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import owee_config, owee_i18n
 from gi.repository import Gtk, Gtk4LayerShell as LS, GLib, Gdk, Gio
+os.environ.pop("LD_PRELOAD", None)          # la capa de paneles ya está cargada en ESTE proceso; los programas que lance (terminales, cajas de desarrollo…) no deben heredarla: en otros entornos no existe y escribía un error en cada comando
 from owee_i18n import _
 import owee_i18n as _i18n; _i18n.apply_direction()
 import owee_keys
@@ -28,6 +29,7 @@ window.owee-overview { background: alpha(@win@, 0.94); color: @fg@; } .ov-head {
 .ov-card { padding: 10px 6px; border-radius: 14px; } .ov-btn:hover .ov-card { background: @hover@; } .ov-card.act { background: alpha(@fg@, 0.10); } .ov-card.min image { opacity: .4; } .ov-name { color: @fg@; font-size: 10pt; }
 .ov-card.sel { background: alpha(@fg@, 0.22); } .dv-col { padding: 10px; border-radius: 14px; background: alpha(@fg@, 0.05); } .dv-col.dv-cur { background: alpha(@fg@, 0.10); } .dv-head { font-weight: bold; } button.dv-move { padding: 0 6px; min-height: 0; min-width: 0; border-radius: 6px; background: alpha(@fg@, 0.10); background-image: none; box-shadow: none; border: none; color: @fg@; } button.dv-move:hover { background: @hover@; }
 window.owee-overview button.ov-btn { background: transparent; background-image: none; border: none; box-shadow: none; }
+label.task-count { font-size: 7pt; font-weight: bold; background: @accent@; color: @on@; border-radius: 999px; padding: 0 4px; min-width: 8px; }
 window.owee-panel.vertical label { padding: 0; font-size: 8pt; }
 window.owee-panel.vertical menubutton.launcher > button { padding: 2px 0; margin: 3px 2px; }
 window.owee-panel.vertical button.owee-desk { padding: 1px 0; min-width: 22px; }
@@ -217,16 +219,43 @@ class TaskBar:
             if theme.has_icon(cand): return Gio.ThemedIcon.new(cand)
         return Gio.ThemedIcon.new("application-x-executable")
 
+    pos = "top"                                                                            # lo fija el panel (apply_layout): hacia dónde se abre la lista de un grupo
+
     def update(self, wins):
-        while (c := self.box.get_first_child()): self.box.remove(c)
-        for w in wins[:self.MAX]:
-            img = Gtk.Image(gicon=self.icon_for(w["app"]), pixel_size=18); b = Gtk.Button(child=img, has_frame=False, tooltip_text=w["title"] or w["app"])
-            b.add_css_class("owee-task")
-            if w["minimized"]: b.add_css_class("min")
-            if w["active"] and not w["minimized"]: b.add_css_class("act")
-            b.connect("clicked", lambda _b, h=w["handle"]: self.get().toggle(h))
-            mid = Gtk.GestureClick(button=2); mid.connect("released", lambda *a, h=w["handle"]: self.get().close(h)); b.add_controller(mid)
-            self.box.append(b)
+        while (c := self.box.get_first_child()):
+            if getattr(c, "pop", None): c.pop.unparent()
+            self.box.remove(c)
+        groups = {}
+        for w in wins: groups.setdefault(w["app"], []).append(w)                         # una sola entrada por aplicación (con varias ventanas: contador y lista)
+        for app, ws in list(groups.items())[:self.MAX]:
+            if len(ws) == 1: self.single(ws[0])
+            else: self.group(app, ws)
+
+    def single(self, w):
+        img = Gtk.Image(gicon=self.icon_for(w["app"]), pixel_size=18); b = Gtk.Button(child=img, has_frame=False, tooltip_text=w["title"] or w["app"])
+        b.add_css_class("owee-task")
+        if w["minimized"]: b.add_css_class("min")
+        if w["active"] and not w["minimized"]: b.add_css_class("act")
+        b.connect("clicked", lambda _b, h=w["handle"]: self.get().toggle(h))
+        mid = Gtk.GestureClick(button=2); mid.connect("released", lambda *a, h=w["handle"]: self.get().close(h)); b.add_controller(mid)
+        self.box.append(b)
+
+    def group(self, app, ws):
+        """Varias ventanas de la misma aplicación: un solo icono con el número de ventanas; al pulsarlo se abre la lista para elegir una (así el panel no se llena ni el reloj se desplaza)."""
+        ov = Gtk.Overlay(child=Gtk.Image(gicon=self.icon_for(app), pixel_size=18))
+        ov.add_overlay(Gtk.Label(label=str(len(ws)), css_classes=["task-count"], halign=Gtk.Align.END, valign=Gtk.Align.END))
+        b = Gtk.Button(child=ov, has_frame=False, tooltip_text=f"{ws[0]['title'] or app} ({len(ws)})"); b.add_css_class("owee-task")
+        if all(w["minimized"] for w in ws): b.add_css_class("min")
+        if any(w["active"] and not w["minimized"] for w in ws): b.add_css_class("act")
+        pop = Gtk.Popover(); pop.set_parent(b); b.pop = pop
+        pop.set_position({"top": Gtk.PositionType.BOTTOM, "bottom": Gtk.PositionType.TOP, "left": Gtk.PositionType.RIGHT, "right": Gtk.PositionType.LEFT}.get(self.pos, Gtk.PositionType.BOTTOM))
+        col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
+        for w in ws:
+            lab = Gtk.Label(label=(w["title"] or app) + ("  ⌄" if w["minimized"] else ""), xalign=0, ellipsize=3, max_width_chars=34)
+            r = Gtk.Button(child=lab, has_frame=False, css_classes=["owee-row"]); r.connect("clicked", lambda _b, h=w["handle"], p=pop: (p.popdown(), self.get().toggle(h)))
+            mid = Gtk.GestureClick(button=2); mid.connect("released", lambda *a, h=w["handle"]: self.get().close(h)); r.add_controller(mid); col.append(r)
+        pop.set_child(col); b.connect("clicked", lambda _b, p=pop: p.popup())
+        self.box.append(b)
 
 class RecIndicator:
     """Controles de la grabación de pantalla DENTRO del panel (tiempo, dibujar, cámara, detener): así no flotan sobre la pantalla ni salen en el vídeo. La Capturadora escribe la hora de inicio en
@@ -672,6 +701,7 @@ class Panel(Gtk.Application):
         if (pos, size) == getattr(self, "layout", None): return
         self.layout = (pos, size); self.pos = pos; vertical = pos in ("left", "right"); win = self.win
         global VERT; VERT = vertical
+        if hasattr(self, "tasks"): self.tasks.pos = pos
         for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(win, e, False)
         for e in self.EDGES[pos]: LS.set_anchor(win, e, True)
         o = Gtk.Orientation.VERTICAL if vertical else Gtk.Orientation.HORIZONTAL; thick = self.THICK[size]
