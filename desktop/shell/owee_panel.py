@@ -28,7 +28,12 @@ window.owee-overview { background: alpha(@win@, 0.94); color: @fg@; } .ov-head {
 .ov-card { padding: 10px 6px; border-radius: 14px; } .ov-btn:hover .ov-card { background: @hover@; } .ov-card.act { background: alpha(@fg@, 0.10); } .ov-card.min image { opacity: .4; } .ov-name { color: @fg@; font-size: 10pt; }
 .ov-card.sel { background: alpha(@fg@, 0.22); } .dv-col { padding: 10px; border-radius: 14px; background: alpha(@fg@, 0.05); } .dv-col.dv-cur { background: alpha(@fg@, 0.10); } .dv-head { font-weight: bold; } button.dv-move { padding: 0 6px; min-height: 0; min-width: 0; border-radius: 6px; background: alpha(@fg@, 0.10); background-image: none; box-shadow: none; border: none; color: @fg@; } button.dv-move:hover { background: @hover@; }
 window.owee-overview button.ov-btn { background: transparent; background-image: none; border: none; box-shadow: none; }
-window.owee-panel.vertical label { padding: 2px 2px; font-size: 9pt; }
+window.owee-panel.vertical label { padding: 0; font-size: 8pt; }
+window.owee-panel.vertical menubutton.launcher > button { padding: 2px 0; margin: 3px 2px; }
+window.owee-panel.vertical button.owee-desk { padding: 1px 0; min-width: 22px; }
+window.owee-panel.vertical button.owee-task { padding: 2px 2px; }
+window.owee-panel.vertical button.owee-tray { padding: 2px 1px; }
+window.owee-panel.vertical menubutton.owee-widget > button { padding: 0; }
 window.owee-panel.compact { border-radius: 0; background: @win@; border-bottom: 1px solid @line@; }
 .owee-panel label { padding: 0 10px; }
 .owee-panel label.warn { color: #F06548; }
@@ -75,6 +80,8 @@ def mem(tag):
 
 WIDGET_DIRS = ["/usr/share/owee/widgets", os.path.expanduser("~/.config/owee/widgets")]
 
+VERT = False                                                           # panel lateral: los textos de los widgets pasan a varias líneas (así el panel es delgado)
+
 class ScriptWidget:
     """Widget hecho con un script en CUALQUIER lenguaje (Python, JavaScript/GJS, shell...): ejecutable que imprime una línea
     JSON. Campos (todos opcionales salvo "text"):
@@ -109,12 +116,17 @@ class ScriptWidget:
 
     def run(self): self.spawn([self.path], self.done); return True
 
+    def retext(self):
+        """Vuelve a poner el texto con el formato del panel actual (en columna si es lateral) sin esperar al siguiente ciclo del widget."""
+        t = str(self.data.get("text", ""))
+        if t: self.label.set_text(t.replace(" ", "\n") if VERT else t)
+
     def done(self, p, res):
         try:
             ok, out, _x = p.communicate_utf8_finish(res); d = json.loads(out.strip().splitlines()[-1]); self.data = d
             self.btn.set_visible(not d.get("hidden")); 
             if d.get("hidden"): return
-            self.label.set_text(str(d.get("text", ""))); self.label.set_visible(bool(d.get("text"))); self.btn.set_tooltip_text(d.get("tooltip"))
+            self.label.set_text(str(d.get("text", "")).replace(" ", "\n") if VERT else str(d.get("text", ""))); self.label.set_visible(bool(d.get("text"))); self.btn.set_tooltip_text(d.get("tooltip"))
             if d.get("icon"): self.icon.set_from_icon_name(d["icon"]); self.icon.set_visible(True)
             else: self.icon.set_visible(False)
             self.label.remove_css_class("warn")
@@ -659,22 +671,25 @@ class Panel(Gtk.Application):
         cfg = owee_config.load(); pos = cfg.get("panel_pos", "top"); size = cfg.get("panel_size", "normal")
         if (pos, size) == getattr(self, "layout", None): return
         self.layout = (pos, size); self.pos = pos; vertical = pos in ("left", "right"); win = self.win
+        global VERT; VERT = vertical
         for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(win, e, False)
         for e in self.EDGES[pos]: LS.set_anchor(win, e, True)
         o = Gtk.Orientation.VERTICAL if vertical else Gtk.Orientation.HORIZONTAL; thick = self.THICK[size]
         for box in (self.bar, self.left_box, self.right_box, getattr(getattr(self, "desks", None), "box", None), getattr(getattr(self, "tasks", None), "box", None), getattr(getattr(self, "rec", None), "box", None), getattr(getattr(self, "tray", None), "box", None)):
             if box is not None: box.set_orientation(o)
-        self.bar.set_size_request(thick + 20 if vertical else -1, -1 if vertical else thick); win.set_default_size(thick + 20 if vertical else -1, -1 if vertical else thick)
+        self.bar.set_size_request(thick + 8 if vertical else -1, -1 if vertical else thick); win.set_default_size(thick + 8 if vertical else -1, -1 if vertical else thick)
         (win.add_css_class if vertical else win.remove_css_class)("vertical")
         for box in (self.left_box, self.right_box):
             c = box.get_first_child()
             while c: c.set_halign(Gtk.Align.CENTER if vertical else Gtk.Align.FILL); c = c.get_next_sibling()
         self.set_margins(self.compact)
+        for sw in getattr(self, "widgets", []): sw.retext()
         if hasattr(self, "launcher"): self.launcher.name.set_visible(not vertical)           # lateral: solo el logo, para que el panel sea tan delgado como el de arriba o abajo
         if hasattr(self, "clock"): self.clock.vertical = vertical; self.clock.tick()
         def narrow(w):                                                                      # etiquetas de los widgets en columna: se parten en varias líneas en vez de ensanchar el panel
             while w:
                 if isinstance(w, Gtk.Popover): w = w.get_next_sibling(); continue
+                if isinstance(w, Gtk.Box) and isinstance(w.get_first_child(), Gtk.Image) and isinstance(w.get_last_child(), Gtk.Label): w.set_orientation(Gtk.Orientation.VERTICAL if vertical else Gtk.Orientation.HORIZONTAL)     # icono encima del texto
                 if isinstance(w, Gtk.Label) and not w.has_css_class("clock-big") and w is not getattr(getattr(self, "clock", None), "label", None) and w is not getattr(getattr(self, "launcher", None), "name", None):
                     w.set_wrap(vertical); w.set_max_width_chars(4 if vertical else -1); w.set_justify(Gtk.Justification.CENTER if vertical else Gtk.Justification.LEFT)
                 narrow(w.get_first_child()); w = w.get_next_sibling()

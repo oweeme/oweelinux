@@ -19,6 +19,7 @@ HOME = os.path.expanduser("~"); STATE = os.path.join(os.environ.get("XDG_CONFIG_
 SETTINGS = "/usr/libexec/owee/owee_settings.py"
 CSS = b"""
 window.desk { background: transparent; }
+box.desk-root { background-color: rgba(0, 0, 0, 0.012); }          /* casi invisible: GTK siempre pinta y recibe el raton en todo el fondo */
 flowboxchild.desk-item { padding: 6px 4px; margin: 2px; border-radius: 10px; background: transparent; }
 flowboxchild.desk-item:selected { background: alpha(#2A9D8F, 0.50); }
 flowboxchild.desk-item:hover { background: alpha(#ffffff, 0.14); }
@@ -71,7 +72,7 @@ class Desk(Gtk.Application):
         self.flow = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL, selection_mode=Gtk.SelectionMode.MULTIPLE, homogeneous=True, halign=Gtk.Align.START, valign=Gtk.Align.START,
                                  activate_on_single_click=False, column_spacing=4, row_spacing=4, margin_top=10, margin_start=10, max_children_per_line=6, min_children_per_line=1)
         self.flow.connect("child-activated", lambda f, c: open_path(c.path))
-        self.root = Gtk.Box(hexpand=True, vexpand=True); self.root.append(self.flow); w.set_child(self.root)
+        self.root = Gtk.Box(hexpand=True, vexpand=True, css_classes=["desk-root"]); self.root.append(self.flow); w.set_child(self.root)
         bg = Gtk.GestureClick(button=3); bg.connect("pressed", self.on_bg_menu); self.root.add_controller(bg)
         bl = Gtk.GestureClick(button=1); bl.connect("pressed", lambda g, n, x, y: self.on_bg_left(x, y)); self.root.add_controller(bl)
         self.build_actions(); self.reload()

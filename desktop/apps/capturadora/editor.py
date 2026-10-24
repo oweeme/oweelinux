@@ -1,6 +1,6 @@
 """Editor de capturas de OweeLinux: dibuja sobre la imagen (lápiz, resaltador, flecha, rectángulo, elipse, texto, números de pasos, pixelar), deshacer/rehacer,
 copiar, guardar y «guardar como». Python + GTK4 + cairo; no modifica el archivo original hasta que se pulsa Guardar."""
-import math, os, sys
+import math, os, subprocess, sys
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gdk", "4.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Gio
@@ -44,6 +44,10 @@ class Editor(Gtk.ApplicationWindow):
         self.set_tool("pen"); self.set_color(COLORS[0]); self.set_default_size(min(self.w + 40, 1180), min(self.h + 120, 820)); self.msg(f"{self.w}×{self.h}")
 
     def msg(self, t): self.status.set_text(t)
+    def toast(self, title, body, icon="owee-capture"):
+        """Aviso en pantalla (mako): así se sabe al instante que la captura se guardó o se copió, sin mirar la barra de abajo ni la carpeta."""
+        try: subprocess.Popen(["notify-send", "-i", icon, title, body], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except OSError: pass
     def set_tool(self, k):
         self.tool = k
         for kk, b in self.tool_btns.items(): (b.add_css_class if kk == k else b.remove_css_class)("on")
@@ -141,15 +145,15 @@ class Editor(Gtk.ApplicationWindow):
         surf.write_to_png(path)
     def save(self):
         if self.items: self.render(self.path)
-        self.msg(_("Guardado: ") + self.path); return self.path
+        self.msg("✓ " + _("Guardado: ") + self.path); self.toast(_("Captura guardada"), self.path, self.path); return self.path
     def save_as(self):
         dlg = Gtk.FileDialog(title=_("Guardar como"), initial_name=os.path.basename(self.path))
         def done(d, res):
             try: f = d.save_finish(res).get_path()
             except GLib.Error: return
-            self.render(f); self.path = f; self.msg(_("Guardado: ") + f)
+            self.render(f); self.path = f; self.msg("✓ " + _("Guardado: ") + f); self.toast(_("Captura guardada"), f, f)
         dlg.save(self, None, done)
     def copy(self):
-        tmp = os.path.join("/tmp", f"owee-copy-{os.getpid()}.png"); self.render(tmp); ok = core.copy_image(tmp); os.remove(tmp); self.msg(_("Copiada al portapapeles") if ok else _("Falta wl-copy"))
+        tmp = os.path.join("/tmp", f"owee-copy-{os.getpid()}.png"); self.render(tmp); ok = core.copy_image(tmp); os.remove(tmp); self.msg(_("Copiada al portapapeles") if ok else _("Falta wl-copy")); self.toast(_("Copiada al portapapeles"), "", "edit-copy") if ok else None
 
 def open_editor(app, path): w = Editor(app, path); w.present(); return w
