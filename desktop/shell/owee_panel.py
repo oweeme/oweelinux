@@ -340,7 +340,7 @@ class Launcher:
     La lista se construye al ABRIR por primera vez (no al arrancar): no cuesta memoria ni tiempo de sesión si no se usa.
     Escribir filtra; Intro lanza la primera coincidencia; Esc cierra."""
     def __init__(self):
-        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); inner.append(Gtk.Label(label=_("OweeLinux")))
+        inner = Gtk.Box(spacing=6); inner.append(Gtk.Image(icon_name="owee-logo", pixel_size=22)); self.name = Gtk.Label(label=_("OweeLinux")); inner.append(self.name)
         self.btn = Gtk.MenuButton(child=inner, has_frame=False); self.btn.add_css_class("launcher")
         self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", self.toggled); self.built = False; self.stale = False
         self.sig = None
@@ -471,6 +471,7 @@ class Clock:
     Los nombres de día y mes están en español en el propio código (no dependen de que la imagen traiga el idioma instalado)."""
     def __init__(self):
         self.label = Gtk.Label(); self.btn = Gtk.MenuButton(child=self.label, has_frame=False); self.btn.add_css_class("owee-widget")
+        self.vertical = False; self.label.set_justify(Gtk.Justification.CENTER)
         self.src = 0; self.pop = Gtk.Popover(); self.btn.set_popover(self.pop); self.pop.connect("notify::visible", lambda p, _: (self.pop.get_visible() and self.today(), self.refresh()))
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=12, margin_bottom=12, margin_start=14, margin_end=14)
         self.big = Gtk.Label(xalign=0, css_classes=["clock-big"]); self.date = Gtk.Label(xalign=0, css_classes=["heading"])
@@ -488,7 +489,10 @@ class Clock:
     def tick(self):
         n = GLib.DateTime.new_now_local(); c = owee_config.load()                       # (lectura pequeña y rápida; así el cambio de formato se ve al instante)
         hm = n.format("%I:%M" + (":%S" if c.get("clock_seconds") else "") + " %p") if str(c.get("clock_hours", "24")) == "12" else n.format("%H:%M" + (":%S" if c.get("clock_seconds") else ""))
-        self.label.set_text(hm + (f"   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}" if c.get("clock_date", True) else ""))
+        if self.vertical:                                                                   # panel lateral (delgado): hora y fecha en columna
+            hh, mm = hm.split(" ")[0].split(":")[:2]; ap = hm.split(" ")[1] if " " in hm else ""
+            self.label.set_text(hh + "\n" + mm + (("\n" + ap) if ap else "") + (f"\n\n{n.get_day_of_month()}\n{MESES[n.get_month() - 1][:3]}" if c.get("clock_date", True) else ""))
+        else: self.label.set_text(hm + (f"   {n.get_day_of_month()} {MESES[n.get_month() - 1][:3]}" if c.get("clock_date", True) else ""))
         if self.pop.get_visible():
             self.big.set_text(n.format("%H:%M:%S")); self.date.set_text(_('{0}, {1} de {2} de {3}', DIAS[n.get_day_of_week() - 1].capitalize(), n.get_day_of_month(), MESES[n.get_month() - 1], n.get_year()))
         self.src = 0                                                                       # un despertar por minuto; por segundo solo con segundos activados o el calendario abierto
@@ -660,12 +664,21 @@ class Panel(Gtk.Application):
         o = Gtk.Orientation.VERTICAL if vertical else Gtk.Orientation.HORIZONTAL; thick = self.THICK[size]
         for box in (self.bar, self.left_box, self.right_box, getattr(getattr(self, "desks", None), "box", None), getattr(getattr(self, "tasks", None), "box", None), getattr(getattr(self, "rec", None), "box", None), getattr(getattr(self, "tray", None), "box", None)):
             if box is not None: box.set_orientation(o)
-        self.bar.set_size_request(thick + 30 if vertical else -1, -1 if vertical else thick); win.set_default_size(thick + 30 if vertical else -1, -1 if vertical else thick)
+        self.bar.set_size_request(thick + 20 if vertical else -1, -1 if vertical else thick); win.set_default_size(thick + 20 if vertical else -1, -1 if vertical else thick)
         (win.add_css_class if vertical else win.remove_css_class)("vertical")
         for box in (self.left_box, self.right_box):
             c = box.get_first_child()
             while c: c.set_halign(Gtk.Align.CENTER if vertical else Gtk.Align.FILL); c = c.get_next_sibling()
         self.set_margins(self.compact)
+        if hasattr(self, "launcher"): self.launcher.name.set_visible(not vertical)           # lateral: solo el logo, para que el panel sea tan delgado como el de arriba o abajo
+        if hasattr(self, "clock"): self.clock.vertical = vertical; self.clock.tick()
+        def narrow(w):                                                                      # etiquetas de los widgets en columna: se parten en varias líneas en vez de ensanchar el panel
+            while w:
+                if isinstance(w, Gtk.Popover): w = w.get_next_sibling(); continue
+                if isinstance(w, Gtk.Label) and not w.has_css_class("clock-big") and w is not getattr(getattr(self, "clock", None), "label", None) and w is not getattr(getattr(self, "launcher", None), "name", None):
+                    w.set_wrap(vertical); w.set_max_width_chars(4 if vertical else -1); w.set_justify(Gtk.Justification.CENTER if vertical else Gtk.Justification.LEFT)
+                narrow(w.get_first_child()); w = w.get_next_sibling()
+        narrow(self.bar)
         def arrows(w):
             while w:
                 if isinstance(w, Gtk.MenuButton): w.set_direction(self.ARROW[pos])
