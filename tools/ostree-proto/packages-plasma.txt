@@ -159,3 +159,20 @@ plymouth
 desktop-file-utils
 gtklock
 gtklock-userinfo-module
+# Ofimática: LibreOffice (Writer, Calc, Impress, Draw y Math; sin Base, que necesita Java), integrado con Qt/KDE; idiomas es, pt-br, pl, fi y sv (el inglés va incluido); tipografías compatibles con Office
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-draw
+libreoffice-math
+libreoffice-qt6
+libreoffice-kf6
+libreoffice-style-breeze
+libreoffice-l10n-es
+libreoffice-l10n-pt-br
+libreoffice-l10n-pl
+libreoffice-l10n-fi
+libreoffice-l10n-sv
+fonts-crosextra-carlito
+fonts-crosextra-caladea
+fonts-liberation2
