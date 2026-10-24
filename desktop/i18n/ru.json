@@ -740,5 +740,8 @@
 "Tamaño": "Размер",
 "Tipo": "Тип",
 "Aceptar": "ОК",
-"Captura guardada": "Снимок сохранён"
+"Captura guardada": "Снимок сохранён",
+"Abrir con…": "Открыть с помощью…",
+"No hay una aplicación para este tipo de archivo": "Для этого типа файлов нет приложения",
+"Instala una desde la Tienda de aplicaciones": "Установите её из магазина приложений"
 }

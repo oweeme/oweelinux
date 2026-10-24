@@ -740,5 +740,8 @@
 "Tamaño": "Storlek",
 "Tipo": "Typ",
 "Aceptar": "OK",
-"Captura guardada": "Skärmdumpen har sparats"
+"Captura guardada": "Skärmdumpen har sparats",
+"Abrir con…": "Öppna med…",
+"No hay una aplicación para este tipo de archivo": "Det finns inget program för den här filtypen",
+"Instala una desde la Tienda de aplicaciones": "Installera ett från appbutiken"
 }

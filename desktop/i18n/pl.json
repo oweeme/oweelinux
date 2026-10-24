@@ -740,5 +740,8 @@
 "Tamaño": "Rozmiar",
 "Tipo": "Typ",
 "Aceptar": "OK",
-"Captura guardada": "Zrzut ekranu zapisany"
+"Captura guardada": "Zrzut ekranu zapisany",
+"Abrir con…": "Otwórz za pomocą…",
+"No hay una aplicación para este tipo de archivo": "Brak aplikacji dla tego typu pliku",
+"Instala una desde la Tienda de aplicaciones": "Zainstaluj jedną ze sklepu z aplikacjami"
 }

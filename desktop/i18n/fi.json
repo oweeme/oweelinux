@@ -740,5 +740,8 @@
 "Tamaño": "Koko",
 "Tipo": "Tyyppi",
 "Aceptar": "OK",
-"Captura guardada": "Kuvakaappaus tallennettu"
+"Captura guardada": "Kuvakaappaus tallennettu",
+"Abrir con…": "Avaa ohjelmalla…",
+"No hay una aplicación para este tipo de archivo": "Tälle tiedostotyypille ei ole sovellusta",
+"Instala una desde la Tienda de aplicaciones": "Asenna sellainen sovelluskaupasta"
 }

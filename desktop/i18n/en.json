@@ -740,5 +740,8 @@
 "Tamaño": "Size",
 "Tipo": "Type",
 "Aceptar": "OK",
-"Captura guardada": "Screenshot saved"
+"Captura guardada": "Screenshot saved",
+"Abrir con…": "Open with…",
+"No hay una aplicación para este tipo de archivo": "There is no application for this type of file",
+"Instala una desde la Tienda de aplicaciones": "Install one from the app store"
 }

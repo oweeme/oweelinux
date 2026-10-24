@@ -740,5 +740,8 @@
 "Tamaño": "Größe",
 "Tipo": "Typ",
 "Aceptar": "OK",
-"Captura guardada": "Bildschirmfoto gespeichert"
+"Captura guardada": "Bildschirmfoto gespeichert",
+"Abrir con…": "Öffnen mit …",
+"No hay una aplicación para este tipo de archivo": "Für diesen Dateityp gibt es keine Anwendung",
+"Instala una desde la Tienda de aplicaciones": "Installiere eine aus dem App-Store"
 }

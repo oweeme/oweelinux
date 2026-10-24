@@ -740,5 +740,8 @@
 "Tamaño": "الحجم",
 "Tipo": "النوع",
 "Aceptar": "موافق",
-"Captura guardada": "تم حفظ لقطة الشاشة"
+"Captura guardada": "تم حفظ لقطة الشاشة",
+"Abrir con…": "فتح باستخدام…",
+"No hay una aplicación para este tipo de archivo": "لا يوجد تطبيق لهذا النوع من الملفات",
+"Instala una desde la Tienda de aplicaciones": "ثبّت واحداً من متجر التطبيقات"
 }

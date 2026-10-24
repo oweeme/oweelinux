@@ -47,8 +47,25 @@ def unique(d, name, ext=""):
     while os.path.exists(os.path.join(d, n)): n = f"{name} {i}{ext}"; i += 1
     return os.path.join(d, n)
 
-def open_path(path):
-    """Abre con la aplicación predeterminada de ese tipo (carpetas: Dolphin; texto: Kate; ver /etc/xdg/mimeapps.list). Los lanzadores .desktop se ejecutan."""
+def choose_app(path):
+    """«Abrir con…»: lista las aplicaciones que entienden ese tipo de archivo y abre con la que se elija."""
+    f = Gio.File.new_for_path(path)
+    try: ctype = f.query_info("standard::content-type", 0, None).get_content_type()
+    except GLib.Error: ctype = "application/octet-stream"
+    if not Gio.AppInfo.get_all_for_type(ctype) and not Gio.AppInfo.get_recommended_for_type(ctype):
+        subprocess.Popen(["notify-send", "-i", "dialog-information", _("No hay una aplicación para este tipo de archivo"), _("Instala una desde la Tienda de aplicaciones")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); return
+    dlg = Gtk.AppChooserDialog.new_for_content_type(None, 0, ctype); dlg.set_title(_("Abrir con…")); dlg.set_modal(False)
+    def resp(d, r):
+        if r == Gtk.ResponseType.OK:
+            ai = d.get_app_info()
+            if ai: ai.launch([f], None)
+        d.destroy()
+    dlg.connect("response", resp); dlg.present()
+
+def open_path(path, ask=False):
+    """Abre con la aplicación predeterminada de ese tipo (carpetas: Dolphin; texto y código: Kate; vídeo y música: mpv; etc., ver /etc/xdg/mimeapps.list). Los lanzadores .desktop se ejecutan.
+    Si el tipo no tiene aplicación predeterminada (o se pide «Abrir con…») se muestra la lista de las que lo entienden."""
+    if ask: choose_app(path); return
     try:
         if path.endswith(".desktop"):
             ai = Gio.DesktopAppInfo.new_from_filename(path)
@@ -56,8 +73,10 @@ def open_path(path):
         f = Gio.File.new_for_path(path); info = f.query_info("standard::content-type", 0, None); ai = Gio.AppInfo.get_default_for_type(info.get_content_type(), False)
         if ai: ai.launch([f], None); return
     except GLib.Error as e: print("[icons] sin aplicación predeterminada:", e, flush=True)
-    try: subprocess.Popen(["dolphin", path] if os.path.isdir(path) else ["xdg-open", path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-    except OSError as e: print("[icons] no se pudo abrir:", e, flush=True)
+    if os.path.isdir(path):
+        try: subprocess.Popen(["dolphin", path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True); return
+        except OSError: pass
+    choose_app(path)
 
 def settings(page=""):
     env = dict(os.environ); env["OWEE_PAGE"] = page
@@ -149,7 +168,7 @@ class Desk(Gtk.Application):
         self.act("sort", self.on_sort, self.sort)
         self.act("desk-settings", lambda *a: settings("fondo")); self.act("display-settings", lambda *a: settings("pantalla")); self.act("wallpaper", lambda *a: settings("fondo"))
         self.act("terminal", lambda *a: subprocess.Popen(["foot", "-D", self.dir], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
-        self.act("open", lambda *a: [open_path(c.path) for c in self.flow.get_selected_children()]); self.act("copy", lambda *a: self.copy(False)); self.act("cut", lambda *a: self.copy(True))
+        self.act("open", lambda *a: [open_path(c.path) for c in self.flow.get_selected_children()]); self.act("open-with", lambda *a: [open_path(c.path, True) for c in self.flow.get_selected_children()[:1]]); self.act("copy", lambda *a: self.copy(False)); self.act("cut", lambda *a: self.copy(True))
         self.act("rename", lambda *a: self.rename()); self.act("trash", lambda *a: self.trash())
 
     def bg_model(self):
@@ -163,7 +182,7 @@ class Desk(Gtk.Application):
         return m
 
     def item_model(self):
-        m = Gio.Menu(); m.append(_("Abrir"), "win.open")
+        m = Gio.Menu(); m.append(_("Abrir"), "win.open"); m.append(_("Abrir con…"), "win.open-with")
         s = Gio.Menu(); s.append(_("Copiar"), "win.copy"); s.append(_("Cortar"), "win.cut"); m.append_section(None, s)
         s = Gio.Menu(); s.append(_("Cambiar nombre"), "win.rename"); s.append(_("Mover a la papelera"), "win.trash"); m.append_section(None, s)
         return m

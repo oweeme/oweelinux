@@ -740,5 +740,8 @@
 "Tamaño": "サイズ",
 "Tipo": "種類",
 "Aceptar": "OK",
-"Captura guardada": "スクリーンショットを保存しました"
+"Captura guardada": "スクリーンショットを保存しました",
+"Abrir con…": "別のアプリで開く…",
+"No hay una aplicación para este tipo de archivo": "この種類のファイルを開くアプリがありません",
+"Instala una desde la Tienda de aplicaciones": "アプリストアからインストールしてください"
 }

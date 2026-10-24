@@ -740,5 +740,8 @@
 "Tamaño": "Taille",
 "Tipo": "Type",
 "Aceptar": "OK",
-"Captura guardada": "Capture enregistrée"
+"Captura guardada": "Capture enregistrée",
+"Abrir con…": "Ouvrir avec…",
+"No hay una aplicación para este tipo de archivo": "Aucune application pour ce type de fichier",
+"Instala una desde la Tienda de aplicaciones": "Installez-en une depuis la boutique d'applications"
 }

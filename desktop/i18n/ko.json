@@ -740,5 +740,8 @@
 "Tamaño": "크기",
 "Tipo": "종류",
 "Aceptar": "확인",
-"Captura guardada": "스크린샷을 저장했습니다"
+"Captura guardada": "스크린샷을 저장했습니다",
+"Abrir con…": "다른 앱으로 열기…",
+"No hay una aplicación para este tipo de archivo": "이 파일 형식을 열 수 있는 앱이 없습니다",
+"Instala una desde la Tienda de aplicaciones": "앱 스토어에서 설치하세요"
 }

@@ -740,5 +740,8 @@
 "Tamaño": "大小",
 "Tipo": "类型",
 "Aceptar": "确定",
-"Captura guardada": "截图已保存"
+"Captura guardada": "截图已保存",
+"Abrir con…": "打开方式…",
+"No hay una aplicación para este tipo de archivo": "没有可打开此类文件的应用",
+"Instala una desde la Tienda de aplicaciones": "请从应用商店安装"
 }

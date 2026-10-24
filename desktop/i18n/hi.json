@@ -740,5 +740,8 @@
 "Tamaño": "आकार",
 "Tipo": "प्रकार",
 "Aceptar": "ठीक है",
-"Captura guardada": "स्क्रीनशॉट सहेजा गया"
+"Captura guardada": "स्क्रीनशॉट सहेजा गया",
+"Abrir con…": "इसके साथ खोलें…",
+"No hay una aplicación para este tipo de archivo": "इस प्रकार की फ़ाइल के लिए कोई ऐप नहीं है",
+"Instala una desde la Tienda de aplicaciones": "ऐप स्टोर से एक इंस्टॉल करें"
 }

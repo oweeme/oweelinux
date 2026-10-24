@@ -740,5 +740,8 @@
 "Tamaño": "Розмір",
 "Tipo": "Тип",
 "Aceptar": "ОК",
-"Captura guardada": "Знімок збережено"
+"Captura guardada": "Знімок збережено",
+"Abrir con…": "Відкрити за допомогою…",
+"No hay una aplicación para este tipo de archivo": "Немає програми для цього типу файлів",
+"Instala una desde la Tienda de aplicaciones": "Встановіть її з магазину застосунків"
 }
