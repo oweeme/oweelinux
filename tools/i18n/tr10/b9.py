@@ -1,0 +1,23 @@
+# pl, fi, sv
+T = {
+732: ("Pokaż ikony na pulpicie", "Näytä kuvakkeet työpöydällä", "Visa ikoner på skrivbordet"),
+733: ("Foldery i pliki z folderu Pulpit; kliknij prawym przyciskiem, aby utworzyć nowe", "Työpöytäkansion kansiot ja tiedostot; luo uusia napsauttamalla hiiren oikealla painikkeella", "Mappar och filer från din Skrivbord-mapp; högerklicka för att skapa fler"),
+734: ("Nowy folder", "Uusi kansio", "Ny mapp"),
+735: ("Dokument tekstowy", "Tekstiasiakirja", "Textdokument"),
+736: ("Nowy dokument", "Uusi asiakirja", "Nytt dokument"),
+737: ("Zaznacz wszystko", "Valitse kaikki", "Markera allt"),
+738: ("Wklej", "Liitä", "Klistra in"),
+739: ("Odśwież", "Päivitä", "Uppdatera"),
+740: ("Sortuj według", "Lajittele", "Sortera efter"),
+741: ("Ustawienia pulpitu", "Työpöydän asetukset", "Skrivbordsinställningar"),
+742: ("Otwórz w terminalu", "Avaa päätteessä", "Öppna i terminal"),
+743: ("Ustawienia ekranu", "Näytön asetukset", "Skärminställningar"),
+744: ("Ustaw tapetę", "Aseta taustakuva", "Ange bakgrundsbild"),
+745: ("Wytnij", "Leikkaa", "Klipp ut"),
+746: ("Zmień nazwę", "Nimeä uudelleen", "Byt namn"),
+747: ("Przenieś do kosza", "Siirrä roskakoriin", "Flytta till papperskorgen"),
+748: ("Data modyfikacji", "Muokkauspäivä", "Ändringsdatum"),
+749: ("Rozmiar", "Koko", "Storlek"),
+750: ("Typ", "Tyyppi", "Typ"),
+751: ("OK", "OK", "OK"),
+}

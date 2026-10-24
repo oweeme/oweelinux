@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Menú del escritorio de OweeLinux Lite (clic derecho sobre el fondo). Cópialo a ~/.config/labwc/menu.xml para cambiarlo. -->
+<!-- Respaldo del menú del escritorio. Con los iconos del escritorio encendidos (Ajustes → Fondo de pantalla) el clic derecho lo muestra owee_icons.py, no labwc;
+     este menú solo se ve si esos iconos están apagados (y entonces solo con clic derecho, ver rc.xml). Cópialo a ~/.config/labwc/menu.xml para cambiarlo. -->
 <openbox_menu>
   <menu id="root-menu" label="">
-    <item label="Terminal"><action name="Execute" command="foot"/></item>
+    <item label="Abrir en terminal"><action name="Execute" command="foot"/></item>
     <item label="Archivos"><action name="Execute" command="dolphin"/></item>
-    <item label="Ajustes"><action name="Execute" command="/usr/libexec/owee/owee_settings.py"/></item>
     <separator/>
-    <item label="Cerrar sesión"><action name="Exit"/></item>
-    <item label="Reiniciar"><action name="Execute" command="systemctl reboot"/></item>
-    <item label="Apagar"><action name="Execute" command="systemctl poweroff"/></item>
+    <item label="Configuración de pantalla"><action name="Execute" command="env OWEE_PAGE=pantalla /usr/libexec/owee/owee_settings.py"/></item>
+    <item label="Establecer fondo"><action name="Execute" command="env OWEE_PAGE=fondo /usr/libexec/owee/owee_settings.py"/></item>
   </menu>
 </openbox_menu>

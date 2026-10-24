@@ -16,6 +16,7 @@ class Fondo(Page):
         self.app = app; b = page_box(_("Fondo de pantalla")); c = app.cfg
         self.mode = dropdown([("single", _("Una imagen fija")), ("slideshow", _("Presentación (cambia sola)"))], c.get("wallpaper_mode", "single"), self.set_mode)
         b.append(row(_("Modo"), self.mode))
+        b.append(row(_("Mostrar iconos en el escritorio"), switch(bool(c.get("desktop_icons", True)), self.set_icons), _("Carpetas y archivos de tu carpeta Escritorio; clic derecho para crear más")))
         self.opts = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.opts.append(row(_("Cambiar de imagen cada"), dropdown(MINUTES, str(c.get("slideshow_minutes", 10)) if str(c.get("slideshow_minutes", 10)) in dict(MINUTES) else "10", lambda k: app.change(slideshow_minutes=int(k)))))
         self.opts.append(row(_("Orden aleatorio"), switch(bool(c.get("slideshow_shuffle", True)), lambda on: app.change(slideshow_shuffle=on))))
@@ -37,6 +38,13 @@ class Fondo(Page):
         tick = Gtk.Label(label="✓", halign=Gtk.Align.END, valign=Gtk.Align.END, css_classes=["tick"], visible=False); ov.add_overlay(tick)
         btn = Gtk.Button(child=ov, has_frame=False, css_classes=["thumb"], tooltip_text=os.path.basename(f), valign=Gtk.Align.START); btn.connect("clicked", lambda _b, x=f: self.clicked(x))
         btn.tick = tick; self.flow.append(btn); self.thumbs[f] = btn
+
+    def set_icons(self, on):
+        self.app.change(desktop_icons=on)
+        try:
+            if on: GLib.spawn_command_line_async("/usr/libexec/owee/owee_icons.py")
+            else: GLib.spawn_command_line_async("pkill -f 'owee_icons.py'")
+        except GLib.Error: pass
 
     def slideshow(self): return self.app.cfg.get("wallpaper_mode") == "slideshow"
     def chosen(self): return [f for f in self.app.cfg.get("slideshow", []) if f in self.thumbs]

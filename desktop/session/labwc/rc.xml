@@ -73,6 +73,7 @@
     <default />
     <!-- Rueda del ratón sobre el escritorio: cambia de escritorio (se activa o quita desde Ajustes → Escritorios) -->
     <context name="Root">
+      <mousebind button="Left" action="Press"/>          <!-- sin esto, el clic izquierdo sobre el fondo abría el menú; ahora solo el derecho -->
       <mousebind button="Up" direction="Up" action="Scroll"><action name="Execute" command="/usr/libexec/owee/owee-desktop left"/><action name="GoToDesktop" to="left"/></mousebind>
       <mousebind button="Down" direction="Down" action="Scroll"><action name="Execute" command="/usr/libexec/owee/owee-desktop right"/><action name="GoToDesktop" to="right"/></mousebind>
     </context>

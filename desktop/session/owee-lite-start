@@ -10,6 +10,8 @@ if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/mako/config" ]; then mako & else mako
 # Fcitx5 (métodos de escritura: chino, japonés, coreano, Owee…) solo se arranca si el usuario tiene alguno activado (~32 MB de RAM que casi nadie necesita); Ajustes → Teclado lo lanza al activar uno
 FP="${XDG_CONFIG_HOME:-$HOME/.config}/fcitx5/profile"
 if command -v fcitx5 >/dev/null && [ -f "$FP" ] && grep '^Name=' "$FP" | grep -qv 'keyboard-'; then FCITX_NO_WAYLAND_DIAGNOSE=1 fcitx5 -d --replace >/dev/null 2>&1 & fi
+# iconos del escritorio (carpeta Escritorio): se apagan en Ajustes → Fondo de pantalla; la clave se lee de settings.json
+[ "$(jq -r '.desktop_icons // true' "${XDG_CONFIG_HOME:-$HOME/.config}/owee/settings.json" 2>/dev/null)" = "false" ] || /usr/libexec/owee/owee_icons.py &
 /usr/libexec/owee/owee-apply-theme &             # tema de fábrica para apps GTK/Qt en el primer arranque de un usuario
 /usr/libexec/owee/owee-apply-display &           # resolución y escala guardadas en Ajustes
 /usr/libexec/owee/owee-idle &                    # bloqueo y suspensión por inactividad (Ajustes → Energía)

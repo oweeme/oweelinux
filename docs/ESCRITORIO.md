@@ -172,3 +172,11 @@ Arranque en la VM: `python3 -c pass` 37 ms; **`import` de GTK4 en Python 869 ms*
 2. **Después, solo donde dé resultado y se haya medido en hardware real:** reescribir en **Rust + `gtk4-rs`** lo que está **siempre activo** o se abre muy a menudo (panel, demonio de notificaciones, lanzador). Python/GJS quedan para herramientas a demanda, apps y extensiones de los usuarios.
 3. **JavaScript sin Node (GJS): permitido como opción para apps de usuarios** (plantilla), no como lenguaje del shell. **Node/Electron: no.**
 4. Si algún día los widgets de usuario deben convivir con un panel en Rust, hará falta un mecanismo de extensiones (p. ej. un lenguaje de *scripting* embebido); **no se ha evaluado**.
+
+## Iconos y menú del escritorio (clic derecho)
+- `desktop/shell/owee_icons.py` muestra la carpeta Escritorio (`xdg-user-dir DESKTOP`, o `~/Desktop`) sobre el fondo: una capa de layer-shell **por debajo de las ventanas**, que respeta el panel. Doble clic abre; clic derecho en un hueco da el menú (Nueva carpeta, Nuevo documento, Seleccionar todo, Pegar, Actualizar, Ordenar por, Configuración del escritorio, Abrir en terminal, Configuración de pantalla, Establecer fondo); clic derecho en un icono da Abrir, Copiar, Cortar, Cambiar nombre y Mover a la papelera. El orden elegido se guarda en `~/.config/owee/desktop.json`.
+- Se apaga en Ajustes → Fondo de pantalla («Mostrar iconos en el escritorio», clave `desktop_icons`). Sin él, el clic derecho muestra el menú de respaldo de labwc (`session/labwc/menu.xml`).
+- `rc.xml` anula el enlace por defecto de labwc que abría el menú con el clic **izquierdo** sobre el fondo.
+- Aún no hay arrastrar y soltar dentro del escritorio ni mover los iconos de sitio (se ordenan solos en columnas).
+- Ajustes se puede abrir en una página con `OWEE_PAGE=fondo owee_settings.py`.
+- Pruebas en la VM: `boot-shot.py` entiende ahora `rclick:x,y` (clic derecho) además de `click`.

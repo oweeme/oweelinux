@@ -1,0 +1,23 @@
+# en, pt, fr, de, ru, zh, ja   (iconos y menú del escritorio)
+T = {
+732: ("Show icons on the desktop", "Mostrar ícones na área de trabalho", "Afficher les icônes sur le bureau", "Symbole auf dem Desktop anzeigen", "Показывать значки на рабочем столе", "在桌面上显示图标", "デスクトップにアイコンを表示"),
+733: ("Folders and files from your Desktop folder; right-click to create more", "Pastas e arquivos da sua pasta Área de trabalho; clique com o botão direito para criar mais", "Dossiers et fichiers de votre dossier Bureau ; clic droit pour en créer d'autres", "Ordner und Dateien aus deinem Desktop-Ordner; Rechtsklick zum Erstellen", "Папки и файлы из вашей папки «Рабочий стол»; щёлкните правой кнопкой, чтобы создать новые", "来自“桌面”文件夹的文件夹和文件；右键单击可新建", "デスクトップフォルダーのフォルダーとファイル。右クリックで新規作成"),
+734: ("New folder", "Nova pasta", "Nouveau dossier", "Neuer Ordner", "Новая папка", "新建文件夹", "新しいフォルダー"),
+735: ("Text document", "Documento de texto", "Document texte", "Textdokument", "Текстовый документ", "文本文档", "テキスト文書"),
+736: ("New document", "Novo documento", "Nouveau document", "Neues Dokument", "Новый документ", "新建文档", "新しい文書"),
+737: ("Select all", "Selecionar tudo", "Tout sélectionner", "Alles auswählen", "Выделить всё", "全选", "すべて選択"),
+738: ("Paste", "Colar", "Coller", "Einfügen", "Вставить", "粘贴", "貼り付け"),
+739: ("Refresh", "Atualizar", "Actualiser", "Aktualisieren", "Обновить", "刷新", "更新"),
+740: ("Sort by", "Ordenar por", "Trier par", "Sortieren nach", "Сортировать по", "排序方式", "並べ替え"),
+741: ("Desktop settings", "Configurações da área de trabalho", "Paramètres du bureau", "Desktop-Einstellungen", "Настройки рабочего стола", "桌面设置", "デスクトップの設定"),
+742: ("Open in terminal", "Abrir no terminal", "Ouvrir dans un terminal", "Im Terminal öffnen", "Открыть в терминале", "在终端中打开", "ターミナルで開く"),
+743: ("Display settings", "Configurações de tela", "Paramètres d'affichage", "Bildschirmeinstellungen", "Настройки экрана", "显示设置", "ディスプレイの設定"),
+744: ("Set wallpaper", "Definir plano de fundo", "Définir le fond d'écran", "Hintergrund festlegen", "Установить обои", "设置壁纸", "壁紙を設定"),
+745: ("Cut", "Recortar", "Couper", "Ausschneiden", "Вырезать", "剪切", "切り取り"),
+746: ("Rename", "Renomear", "Renommer", "Umbenennen", "Переименовать", "重命名", "名前の変更"),
+747: ("Move to trash", "Mover para a lixeira", "Mettre à la corbeille", "In den Papierkorb verschieben", "Переместить в корзину", "移到回收站", "ゴミ箱に移動"),
+748: ("Date modified", "Data de modificação", "Date de modification", "Änderungsdatum", "Дата изменения", "修改日期", "更新日時"),
+749: ("Size", "Tamanho", "Taille", "Größe", "Размер", "大小", "サイズ"),
+750: ("Type", "Tipo", "Type", "Typ", "Тип", "类型", "種類"),
+751: ("OK", "OK", "OK", "OK", "ОК", "确定", "OK"),
+}

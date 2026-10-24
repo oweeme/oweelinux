@@ -27,10 +27,10 @@ try:
     def press(k): cmd("send-key", keys=[{"type": "qcode", "data": q} for q in k.split("+")]); time.sleep(0.12)
     def typ(text):
         for ch in text: press(KEYS.get(ch) or ("shift+" + ch.lower() if ch.isupper() else ch))
-    def click(x, y):
+    def click(x, y, button="left"):
         for ax, v, m in (("x", x, 1280), ("y", y, 800)): pass
         cmd("input-send-event", events=[{"type": "abs", "data": {"axis": "x", "value": int(x * 32767 / 1280)}}, {"type": "abs", "data": {"axis": "y", "value": int(y * 32767 / 800)}}]); time.sleep(0.2)
-        cmd("input-send-event", events=[{"type": "btn", "data": {"down": True, "button": "left"}}]); time.sleep(0.12); cmd("input-send-event", events=[{"type": "btn", "data": {"down": False, "button": "left"}}])
+        cmd("input-send-event", events=[{"type": "btn", "data": {"down": True, "button": button}}]); time.sleep(0.12); cmd("input-send-event", events=[{"type": "btn", "data": {"down": False, "button": button}}])
     todo = [(int(x.split(":", 1)[0]), "do", x.split(":", 1)[1]) for x in os.environ.get("BOOT_DO", "").split(";") if x]
     for t, act, arg in sorted(todo + [(t, "shot", "") for t in times], key=lambda e: (e[0], e[1] == "shot")):      # acciones y capturas en una sola línea de tiempo
         time.sleep(max(0, t - (time.time() - t0)))
@@ -40,6 +40,7 @@ try:
             continue
         kind, _s, a2 = arg.partition(":")
         if kind == "click": click(*[int(v) for v in a2.split(",")])
+        elif kind == "rclick": click(*[int(v) for v in a2.split(",")], button="right")
         elif kind == "type": typ(a2)
         elif kind == "key": press(a2)
         elif kind in ("keydown", "keyup"): cmd("input-send-event", events=[{"type": "key", "data": {"down": kind == "keydown", "key": {"type": "qcode", "data": a2}}}])
