@@ -54,6 +54,7 @@ mkdir -p "$R/usr/lib/systemd/system/sysinit.target.wants"; ln -sf ../owee-firstb
 for f in "$D"/widgets/ejemplos/*; do install -Dm0755 "$f" "$R/usr/share/owee/widgets-ejemplos/$(basename "$f")"; done
 mkdir -p "$R/usr/share/owee/koi"; cp "$D"/theme/koi/*.png "$R/usr/share/owee/koi/"      # kois del bloqueo animado
 for v in 3.0 4.0; do printf '[Settings]\ngtk-decoration-layout=appmenu:minimize,maximize,close\n' | install -Dm0644 /dev/stdin "$ETC/xdg/gtk-$v/settings.ini"; done      # botones de minimizar y maximizar en las apps GTK que dibujan su propia barra de título
+install -Dm0644 "$D/session/61-owee-script.conf" "$ETC/fonts/conf.d/61-owee-script.conf"      # Owee Sans primero para la zona privada de Owee Script (OpenSymbol de LibreOffice la usaba y la escritura salía como dibujos)
 install -Dm0644 "$D/../docs/CREAR_WIDGETS.md" "$R/usr/share/doc/oweelinux/CREAR_WIDGETS.md"; install -Dm0644 "$D/../docs/EXTENSIONES.md" "$R/usr/share/doc/oweelinux/EXTENSIONES.md"      # guía para crear widgets y apps
 python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" >/dev/null; python3 "$D/theme/icons/gen_icons.py" "$R/usr/share/icons" "#17231e" Owee-Light >/dev/null
 install -Dm0644 "$D/theme/themerc" "$R/usr/share/themes/Owee/openbox-3/themerc"; install -Dm0644 "$D/theme/themerc-light" "$R/usr/share/themes/Owee-Light/openbox-3/themerc"
