@@ -174,6 +174,7 @@ else echo "(aviso: sin paquetes de Owee: el idioma Owee no estará disponible)";
 # Fondos de pantalla propios (15 paisajes de tecnología, ilusiones y sueños, dibujados con desktop/wallpapers/generar.py): aparecen en Ajustes → Fondo de pantalla
 install -d "$R/usr/share/backgrounds/oweelinux"; cp "$D"/wallpapers/fondos/*.jpg "$R/usr/share/backgrounds/oweelinux/"
 # Tienda de apps: Bazaar (Flatpak). El servicio la instala en el primer arranque con red; Discover (de KDE) se oculta
+install -Dm0644 "$D/session/flathub.flatpakrepo" "$ETC/flatpak/remotes.d/flathub.flatpakrepo"      # Flathub ya viene configurado (sin red en el primer arranque); Discover solo necesita descargar el catálogo
 install -Dm0644 "$D/session/owee-store.service" "$R/usr/lib/systemd/system/owee-store.service"
 mkdir -p "$ETC/systemd/system/multi-user.target.wants"; ln -sf /usr/lib/systemd/system/owee-store.service "$ETC/systemd/system/multi-user.target.wants/owee-store.service"
 # Hora por red: sin NTP el reloj de equipos con la pila agotada se queda atrás y Discover/HTTPS fallan con «certificado aún no válido»

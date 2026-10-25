@@ -4,14 +4,14 @@
  · Clic derecho en un hueco: Nueva carpeta, Nuevo documento, Seleccionar todo, Pegar, Actualizar, Ordenar por, Configuración del escritorio, Abrir en terminal, Configuración de pantalla, Establecer fondo.
  · Clic derecho en un icono: Abrir, Copiar, Cortar, Cambiar nombre, Mover a la papelera.
 Es una capa de layer-shell POR DEBAJO de las ventanas y por encima del fondo, respeta el panel y no roba el teclado salvo para escribir un nombre. Se apaga en Ajustes → Fondo de pantalla («Mostrar iconos en el escritorio»)."""
-import json, os, subprocess, sys
+import json, os, shutil, subprocess, sys
 for d in ("/usr/libexec/owee", os.path.dirname(os.path.abspath(__file__))): sys.path.append(d)
 _LS = "/usr/lib/x86_64-linux-gnu/libgtk4-layer-shell.so.0"
 if "libgtk4-layer-shell" not in os.environ.get("LD_PRELOAD", "") and os.path.exists(_LS):
     os.environ["LD_PRELOAD"] = (_LS + " " + os.environ.get("LD_PRELOAD", "")).strip(); os.execv(sys.executable, [sys.executable] + sys.argv)
 import gi
 gi.require_version("Gtk", "4.0"); gi.require_version("Gtk4LayerShell", "1.0")
-from gi.repository import Gtk, Gdk, Gio, GLib, Gtk4LayerShell as LS
+from gi.repository import Gtk, Gdk, Gio, GLib, GObject, Gtk4LayerShell as LS
 os.environ.pop("LD_PRELOAD", None)          # la capa de paneles ya está cargada en ESTE proceso; los programas que lance (terminales, cajas de desarrollo…) no deben heredarla: en otros entornos no existe y escribía un error en cada comando
 from owee_i18n import _
 import owee_i18n; owee_i18n.apply_direction()
@@ -24,6 +24,7 @@ box.desk-root { background-color: rgba(0, 0, 0, 0.012); }          /* casi invis
 flowboxchild.desk-item { padding: 6px 4px; margin: 2px; border-radius: 10px; background: transparent; }
 flowboxchild.desk-item:selected { background: alpha(#2A9D8F, 0.50); }
 flowboxchild.desk-item:hover { background: alpha(#ffffff, 0.14); }
+flowboxchild.desk-item:drop(active) { background: alpha(#2A9D8F, 0.65); }
 label.desk-name { color: #ffffff; font-size: 10pt; text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9); }
 """
 
@@ -92,12 +93,13 @@ class Desk(Gtk.Application):
         w = self.win = Gtk.ApplicationWindow(application=self, decorated=False); w.add_css_class("desk")
         LS.init_for_window(w); LS.set_layer(w, LS.Layer.BOTTOM); LS.set_namespace(w, "owee-desktop-icons")
         for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT): LS.set_anchor(w, e, True)
-        LS.set_keyboard_mode(w, LS.KeyboardMode.ON_DEMAND)          # con teclado: flechas para moverse entre iconos, Intro abre, F2 renombra, Supr a la papelera
+        LS.set_keyboard_mode(w, LS.KeyboardMode.NONE if os.environ.get("OWEE_KBD") == "none" else LS.KeyboardMode.ON_DEMAND)          # con teclado: flechas para moverse entre iconos, Intro abre, F2 renombra, Supr a la papelera
         self.flow = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL, selection_mode=Gtk.SelectionMode.MULTIPLE, homogeneous=True, halign=Gtk.Align.START, valign=Gtk.Align.START,
                                  activate_on_single_click=False, column_spacing=4, row_spacing=4, margin_top=10, margin_start=10, max_children_per_line=6, min_children_per_line=1)
         self.flow.connect("child-activated", lambda f, c: open_path(c.path))
         self.root = Gtk.Box(hexpand=True, vexpand=True, css_classes=["desk-root"]); self.root.append(self.flow); w.set_child(self.root)
         bg = Gtk.GestureClick(button=3); bg.connect("pressed", self.on_bg_menu); self.root.add_controller(bg)
+        bgdt = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.MOVE | Gdk.DragAction.COPY); bgdt.connect("drop", lambda t, v, x, y: self.on_drop(t, v, self.dir)); self.root.add_controller(bgdt)     # soltar archivos de otras apps en el escritorio
         bl = Gtk.GestureClick(button=1); bl.connect("pressed", lambda g, n, x, y: self.on_bg_left(x, y)); self.root.add_controller(bl)
         self.build_actions(); self.reload()
         kc = Gtk.EventControllerKey(); kc.connect("key-pressed", self.on_key); w.add_controller(kc)
@@ -139,12 +141,39 @@ class Desk(Gtk.Application):
             icon, label = self.icon_for(p)
             if p.endswith(".desktop") and label: n = label
             box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, width_request=92)
-            box.append(Gtk.Image(gicon=icon, pixel_size=56))
+            img = Gtk.Image(gicon=icon, pixel_size=56); box.append(img)
             box.append(Gtk.Label(label=n, wrap=True, wrap_mode=2, lines=2, ellipsize=3, max_width_chars=11, justify=Gtk.Justification.CENTER, css_classes=["desk-name"]))
             child = Gtk.FlowBoxChild(child=box, css_classes=["desk-item"]); child.path = p
             rc = Gtk.GestureClick(button=3); rc.connect("pressed", lambda g, n_, x, y, c=child: self.on_item_menu(c, x, y)); child.add_controller(rc)
+            ds = Gtk.DragSource(actions=Gdk.DragAction.COPY | Gdk.DragAction.MOVE); ds.connect("prepare", lambda src, x, y, c=child: self.drag_prepare(c))
+            ds.connect("drag-begin", lambda src, drag, ic=img: (os.environ.get("OWEE_DEBUG") and print("[icons] drag-begin", flush=True), src.set_icon(Gtk.WidgetPaintable.new(ic), 28, 28)))
+            ds.connect("drag-end", lambda src, drag, ok: os.environ.get("OWEE_DEBUG") and print("[icons] drag-end", ok, flush=True)); child.add_controller(ds)      # arrastrar a una carpeta, a otra app (Kate, VS Code…) o a Dolphin
+            if isdir:
+                dt = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.MOVE | Gdk.DragAction.COPY); dt.set_preload(False)
+                dt.connect("drop", lambda t, v, x, y, d=p: self.on_drop(t, v, d)); child.add_controller(dt)                                     # soltar archivos o carpetas DENTRO de esta carpeta
             self.flow.append(child)
         return False
+
+    def drag_prepare(self, child):
+        if os.environ.get("OWEE_DEBUG"): print("[icons] prepare", child.path, flush=True)
+        if not child.is_selected(): self.flow.unselect_all(); self.flow.select_child(child)
+        files = [Gio.File.new_for_path(p) for p in self.selected()]
+        return Gdk.ContentProvider.new_for_value(GObject.Value(Gdk.FileList, Gdk.FileList.new_from_list(files))) if files else None
+
+    def on_drop(self, target, value, dstdir):
+        """Soltar archivos sobre una carpeta o sobre el fondo: se mueven (arrastre normal) o se copian (Ctrl); lo que ya está ahí o una carpeta dentro de sí misma se ignora."""
+        if os.environ.get("OWEE_DEBUG"): print("[icons] drop en", dstdir, [f.get_path() for f in value.get_files()], flush=True)
+        try: move = target.get_current_drop().get_selected_action() == Gdk.DragAction.MOVE
+        except Exception: move = True
+        for f in value.get_files():
+            src = f.get_path()
+            if not src or not os.path.exists(src) or os.path.dirname(os.path.abspath(src)) == os.path.abspath(dstdir): continue
+            if os.path.isdir(src) and (os.path.abspath(dstdir) + os.sep).startswith(os.path.abspath(src) + os.sep): continue
+            dst = os.path.join(dstdir, os.path.basename(src))
+            if os.path.exists(dst): base, ext = os.path.splitext(os.path.basename(src)); dst = unique(dstdir, base, ext) if os.path.isfile(src) else unique(dstdir, os.path.basename(src))
+            try: shutil.move(src, dst) if move else (subprocess.run(["cp", "-a", src, dst], check=True))
+            except (OSError, subprocess.CalledProcessError) as e: print("[icons] soltar:", e, flush=True)
+        GLib.idle_add(self.reload); return True
 
     def on_key(self, ctl, keyval, keycode, state):
         ctrl = bool(state & Gdk.ModifierType.CONTROL_MASK)
@@ -239,7 +268,7 @@ class Desk(Gtk.Application):
         files = [Gio.File.new_for_path(p) for p in self.selected()]
         if not files: return
         self.cut = self.selected() if cut else []
-        self.win.get_clipboard().set_content(Gdk.ContentProvider.new_typed(Gdk.FileList, Gdk.FileList.new_from_list(files)))
+        self.win.get_clipboard().set_content(Gdk.ContentProvider.new_for_value(GObject.Value(Gdk.FileList, Gdk.FileList.new_from_list(files))))
 
     def paste(self):
         cb = self.win.get_clipboard()

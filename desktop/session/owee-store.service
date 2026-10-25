@@ -8,7 +8,7 @@ ConditionPathExists=!/var/lib/owee/installer-image
 [Service]
 Type=simple
 ExecStart=/usr/libexec/owee/owee-store-setup
-TimeoutStartSec=1500
+TimeoutStartSec=2700
 Nice=10
 IOSchedulingClass=idle
 

@@ -4,8 +4,8 @@
 # Uso: build-owee-debs.sh      (si falla, la imagen se construye igual, solo sin el idioma Owee)
 set -uo pipefail
 SRC=${OWEE_SRC:-/var/tmp/owee-src}; OUT=${OWEE_DEBS:-/var/tmp/owee-debs}
-# Versión del proyecto del idioma que se usa: FIJA (los glifos finales, fuentes 3.4); OWEE_REF=main usa lo último, OWEE_REF=otra-etiqueta otra versión
-OWEE_REF=${OWEE_REF-e7fe5d8a42d866e45ef8c4487ea77112a47a7483}
+# Versión del proyecto del idioma que se usa: FIJA (Owee Script con la vocal a la derecha de la consonante; fuentes 3.4-2 y teclado fcitx5-owee 1.2-4, 2026-10-25); OWEE_REF=main usa lo último, OWEE_REF=otra-etiqueta otra versión
+OWEE_REF=${OWEE_REF-d24c67ac249e077ae41463c82b242cd46675956f}
 command -v git >/dev/null || { echo "build-owee-debs: falta git" >&2; exit 1; }
 dpkg -s libfcitx5core-dev >/dev/null 2>&1 || apt-get install -y -qq libfcitx5core-dev cmake g++ pkg-config >/dev/null 2>&1 || { echo "build-owee-debs: no se pudo instalar libfcitx5core-dev" >&2; exit 1; }
 # El clon es desechable: la construcción reescribe archivos versionados (paquetes/*.deb) y eso impediría el siguiente `git pull`; se descartan los cambios locales antes.

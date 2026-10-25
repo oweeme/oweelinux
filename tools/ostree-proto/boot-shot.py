@@ -41,6 +41,13 @@ try:
         kind, _s, a2 = arg.partition(":")
         if kind == "click": click(*[int(v) for v in a2.split(",")])
         elif kind == "rclick": click(*[int(v) for v in a2.split(",")], button="right")
+        elif kind == "drag":                                                       # drag:x1,y1,x2,y2 — arrastra con el botón izquierdo (en pasos, para que cuente como arrastre)
+            x1, y1, x2, y2 = [int(v) for v in a2.split(",")]
+            def mv(x, y): cmd("input-send-event", events=[{"type": "abs", "data": {"axis": "x", "value": int(x * 32767 / 1280)}}, {"type": "abs", "data": {"axis": "y", "value": int(y * 32767 / 800)}}])
+            mv(x1, y1); time.sleep(0.3); cmd("input-send-event", events=[{"type": "btn", "data": {"down": True, "button": "left"}}]); time.sleep(0.3)
+            for k in range(1, 3): mv(x1 + 14 * k * (1 if x2 >= x1 else -1), y1 + 4 * k * (1 if y2 >= y1 else -1)); time.sleep(0.35)       # primero un par de movimientos pequeños (así empieza el arrastre dentro de la ventana de origen, como con un ratón real)
+            for k in range(1, 21): mv(x1 + (x2 - x1) * k / 20, y1 + (y2 - y1) * k / 20); time.sleep(0.2)
+            time.sleep(0.4); cmd("input-send-event", events=[{"type": "btn", "data": {"down": False, "button": "left"}}])
         elif kind == "type": typ(a2)
         elif kind == "key": press(a2)
         elif kind in ("keydown", "keyup"): cmd("input-send-event", events=[{"type": "key", "data": {"down": kind == "keydown", "key": {"type": "qcode", "data": a2}}}])
