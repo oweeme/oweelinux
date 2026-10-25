@@ -2,6 +2,7 @@
 # Arranque de la sesión "OweeLinux Lite": prepara el entorno y entrega el control al compositor (labwc).
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=OweeLite XDG_SESSION_DESKTOP=owee-lite
 export QT_QPA_PLATFORM=wayland MOZ_ENABLE_WAYLAND=1
+[ -e /usr/lib/libreoffice/program/libvclplug_kf6lo.so ] && export SAL_USE_VCLPLUGIN=kf6      # LibreOffice con el estilo de KDE (si no, elige el genérico y se ve gris y ajeno al escritorio)
 # Apps de KDE (Dolphin → «Abrir con…», diálogos de aplicaciones): necesitan el menú de aplicaciones de Plasma para construir su caché de servicios (ksycoca)
 [ -f /etc/xdg/menus/plasma-applications.menu ] && export XDG_MENU_PREFIX=plasma-
 # Apps Qt/KDE: tomar colores, fuentes e iconos de ~/.config/kdeglobals (lo escribe Ajustes → Apariencia); sin este tema de plataforma el modo oscuro no les llega
