@@ -31,3 +31,11 @@ docs/*.deb
 # Archivos de sistema/editor
 .directory
 *.swp
+
+# ISO y discos de prueba de OweeLinux (pesan GB): se construyen, no se suben
+*.iso
+*.iso.sha256
+/disco.img
+*.img
+vars*.fd
+__pycache__/

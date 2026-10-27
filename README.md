@@ -1,196 +1,50 @@
 # OweeLinux
 
-Distro propia basada en **Debian 13 (Trixie) + KDE Plasma**, con la marca **oweeme**
-(logo koi, paleta teal/coral). Pensada para tres tipos de usuario a la vez:
-desarrolladores, oficina, y usuarios sin experiencia técnica (incluye chicos de
-~10 años) — todo en el mismo sistema, sin perfiles separados.
+Debian 13 **inmutable** (ostree: el sistema es de solo lectura y se actualiza por versiones completas, con vuelta automática a la anterior si algo falla) con un escritorio propio y ligero, **OweeLinux Lite** (labwc + Python y GTK4), pensado para equipos modestos y para quien no quiere tocar la terminal. Proyecto de Hector Martinez (<https://oweeme.com>), licencia GPL-3.0.
 
-Principios del proyecto:
+> **Estado (26 de octubre de 2026):** se instala y funciona en QEMU (también con Secure Boot). Pendiente de probar en equipos reales (HP con AMD A12 y Dell con NVIDIA). **No hay ISO publicada** (pesa ~1,5 GB): se construye con [`docs/CONSTRUIR.md`](docs/CONSTRUIR.md). Aún no hay servidor de actualizaciones ni clave de publicación ([`docs/ACTUALIZACIONES.md`](docs/ACTUALIZACIONES.md)). El controlador privativo de NVIDIA no se construye todavía (ver abajo).
 
-- **Cero telemetría**, en cualquier capa del sistema.
-- **Estable antes que bleeding-edge** — Debian stable congelado, sin sorpresas de
-  rolling release. Fue una decisión explícita después de abandonar un intento
-  previo con Arch + Hyprland/COSMIC (ver `docs/PLAN_OWEELINUX.md`).
-- **Liviano pero completo** — no se sacrifica funcionalidad real (WiFi, batería,
-  Bluetooth, HDMI, tabletas Wacom) solo por bajar el tamaño del ISO.
-- Instalable con clicks (instalador gráfico Calamares), sin necesitar terminal.
-- Las apps propias se instalan y actualizan vía `apt`, desde un repo APT propio —
-  nunca hace falta reinstalar el sistema para tener la última versión.
+## Qué trae
+- **Escritorio:** panel arriba, abajo o a los lados (delgado), escritorios virtuales, iconos y menú de clic derecho en el escritorio con arrastrar y soltar, lanzador, calendario, calculadora, monitor del sistema, capturadora, ajustes propios, bloqueo y protector de pantalla animados (kois), arranque con el logo animado, inicio de sesión con tema propio.
+- **Aplicaciones:** Dolphin, Kate, Okular, Gwenview, Ark, mpv, Falkon, **LibreOffice** (Writer, Calc, Impress, Draw y Math), tienda con Discover y Flathub ya configurado.
+- **Desarrollo sin permisos de administrador:** `owee-dev` crea cajas Debian (Podman + distrobox) donde `apt`, `pip`, `cargo`, `npm` y `gcc` funcionan como siempre (`owee-dev init --with python,rust,node,java`).
+- **Seguridad:** cortafuegos activo, Centinela (señuelo de red, apagado por defecto), Secure Boot con GRUB y núcleo firmados, AppArmor.
+- **Idiomas (22):** español, inglés, portugués, francés, alemán, italiano, ruso, ucraniano, chino, japonés, coreano, árabe, persa, hindi, urdu, indonesio, malayo, polaco, finlandés, sueco y **Owee** (romano y Owee Script, <https://github.com/oweeme/owee>).
+- **Pensado para poco consumo:** `earlyoom`, zram, grabadora con límites de memoria, temporales en disco.
 
-## Qué trae OweeLinux hoy
+## Construir la ISO y probarla (resumen)
+Necesitas Linux con Podman, git, QEMU/KVM y ~40 GB libres. Todo está en [`docs/CONSTRUIR.md`](docs/CONSTRUIR.md); en corto:
+```bash
+git clone https://github.com/oweeme/oweelinux.git && cd oweelinux
+tools/devpod/devpod.sh build && tools/devpod/devpod.sh up
+podman exec oweelinux-dev bash -c 'cd /work/tools/ostree-proto && ./gen-test-keys.sh'
+podman exec -e OWEE_INSTALLER=1 -e OWEE_TEST_USER=0 -e OWEE_DISK_MIB=12000 oweelinux-dev \
+  bash -c 'cd /work/tools/ostree-proto && ./build-image-full.sh /var/tmp/imagen && ./make-iso.sh /var/tmp/imagen /var/tmp/OweeLinux.iso'
+podman cp oweelinux-dev:/var/tmp/OweeLinux.iso .
+tools/usuario/probar-en-qemu.sh OweeLinux.iso --secureboot --nuevo     # instalar en una VM
+tools/usuario/probar-en-qemu.sh --disco --secureboot                    # arrancar lo instalado
+```
+`tools/usuario/` tiene también `write-usb.sh` (grabar la ISO a un USB), `owee-diag.sh` (diagnóstico de lentitud) y un `LEEME.txt` para quien reciba la ISO.
 
-### Escritorio
+## Estructura del repositorio
+| Carpeta | Contenido |
+|---|---|
+| `desktop/` | el escritorio: `shell/` (panel, Ajustes, iconos del escritorio), `session/` (inicio de sesión, bloqueo, protector, ayudantes), `apps/` (calculadora, calendario, capturadora, monitor), `setup/` (asistente de primer arranque), `sddm/` (tema de inicio de sesión), `theme/`, `wallpapers/`, `i18n/` (catálogos) |
+| `tools/ostree-proto/` | construcción de la imagen (ostree), ISO, pruebas en QEMU (`boot-shot.py`) |
+| `tools/i18n/` | traducciones y generadores de catálogos (incluido Owee) |
+| `tools/devpod/` | contenedor de desarrollo (Debian 13) |
+| `tools/usuario/` | guiones para quien prueba la ISO |
+| `docs/` | documentación técnica (ver abajo) |
+| `livebuild-profile/`, `packaging/` | la primera versión del proyecto (live-build con KDE Plasma): ver [`docs/README-v1-livebuild.md`](docs/README-v1-livebuild.md) |
 
-- KDE Plasma 6, instalado **mínimo y curado** (no el meta-paquete `kde-full`).
-- Look-and-feel propio (`org.oweelinux.desktop`): panel único arriba, sin barra
-  de tareas abajo, reloj centrado.
-- Esquema de color propio (teal + coral, basado en el logo del koi), aplicado
-  en toda la interfaz — ventanas, diálogos, panel — no solo el wallpaper.
-- **6 wallpapers de koi** a elegir desde Configuración del Sistema, todos
-  ilustración vectorial propia: Solo, Duo, Pond, Sunset, Night, Dawn — además
-  del wallpaper foto que viene por defecto.
-- Splash de arranque (Plymouth), splash de sesión (KSplash), login (SDDM) y
-  GRUB, todos con el mismo branding.
+## Documentación
+[`CONSTRUIR`](docs/CONSTRUIR.md) · [`ESCRITORIO`](docs/ESCRITORIO.md) · [`ARRANQUE`](docs/ARRANQUE.md) · [`ACTUALIZACIONES`](docs/ACTUALIZACIONES.md) · [`SEGURIDAD`](docs/SEGURIDAD.md) · [`IDIOMAS`](docs/IDIOMAS.md) · [`EXTENSIONES`](docs/EXTENSIONES.md) y [`CREAR_WIDGETS`](docs/CREAR_WIDGETS.md) (para crear widgets y apps) · [`RECURSOS`](docs/RECURSOS.md) · [`DESARROLLO`](docs/DESARROLLO.md).
 
-### Instalación
-
-- Instalador gráfico Calamares, sin terminal.
-- Particionado automático pensado para que los archivos del usuario sobrevivan
-  a una reinstalación: `/` (40GB) y `/home` separados, más un swap chico en
-  disco como colchón sobre zram.
-- Filesystem del instalador limitado a lo que el ISO puede formatear de
-  verdad (ext4, btrfs) — no se ofrecen opciones que fallarían a mitad de
-  instalación.
-- Driver Nvidia opcional post-instalación (ícono "Instalar driver Nvidia"),
-  con chequeo de Secure Boot antes de instalar.
-
-### Stack de desarrollo preinstalado
-
-Python 3, Rust (`rustup`), Go, Ada (`gnat`), Podman, `git`, `curl`, `adb` +
-`fastboot`.
-
-### Herramientas de terminal moderna
-
-Instaladas, pero **no todas están activas por defecto** en una cuenta nueva
-— hay que activarlas a mano una vez:
-
-- **[`rg`](https://github.com/BurntSushi/ripgrep)** (paquete `ripgrep`):
-  buscador de texto tipo `grep`, mucho más rápido, recursivo por defecto y
-  que ignora automáticamente lo que está en `.gitignore`.
-  ```bash
-  rg "texto a buscar"          # busca en la carpeta actual y subcarpetas
-  rg -i "sin mayúsculas"
-  rg --type py "def "          # solo en archivos .py
-  ```
-- **`batcat`** (paquete `bat` — Debian le cambia el nombre al comando porque
-  `bat` ya estaba tomado por otro paquete): como `cat`, pero con resaltado de
-  sintaxis, números de línea, y marcas de git en el margen.
-  ```bash
-  batcat archivo.py
-  batcat --paging=never archivo.txt   # sin paginador, como un cat normal
-  ```
-  Si querés poder escribir `bat` a secas: `echo "alias bat=batcat" >> ~/.zshrc`
-  (o `~/.bashrc` si usás bash).
-- **`fzf`**: buscador difuso interactivo — filtra cualquier lista mientras
-  escribís. Los atajos (`Ctrl+R` para buscar en el historial de comandos,
-  `Ctrl+T` para buscar un archivo e insertarlo en la línea de comandos) **no
-  vienen cargados solos**, hay que sumarlos al shell:
-  ```bash
-  # para zsh
-  echo 'source /usr/share/doc/fzf/examples/key-bindings.zsh' >> ~/.zshrc
-  echo 'source /usr/share/doc/fzf/examples/completion.zsh' >> ~/.zshrc
-  # para bash
-  echo 'source /usr/share/doc/fzf/examples/key-bindings.bash' >> ~/.bashrc
-  echo 'source /usr/share/doc/fzf/examples/completion.bash' >> ~/.bashrc
-  ```
-  También sirve suelto, sin nada de esto: `cat lista.txt | fzf` filtra
-  cualquier lista a mano.
-- **`starship`**: prompt de terminal personalizable — muestra la rama de git,
-  si hay cambios sin commitear, versión del lenguaje del proyecto (Python,
-  Rust, Node, etc.), todo automático según la carpeta en la que estés. **No
-  se activa solo**: hay que agregar una línea al shell.
-  ```bash
-  # para zsh
-  echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-  # para bash
-  echo 'eval "$(starship init bash)"' >> ~/.bashrc
-  ```
-- **`zsh`**: shell alternativa a `bash`, con mejor autocompletado y soporte
-  de plugins. Está instalada pero **no es la shell por defecto** de una
-  cuenta nueva (sigue siendo `bash`, como en Debian). Para cambiar:
-  ```bash
-  chsh -s $(which zsh)   # pide la contraseña, aplica en el próximo login
-  ```
-
-### Apps para todo el mundo (sin terminal)
-
-Dolphin, Konsole, Kate, Gwenview, Ark, Okular, KCalc, Falkon, Spectacle — más
-KDE Discover (con Flatpak) para instalar lo que falte.
-
-**Apps recomendadas**: un ícono en el escritorio abre un checklist gráfico de
-apps opcionales (Krita, WPS Office, Inkscape, VLC, Blender, Hedgewars, Kooha,
-Obsidian) — se instalan con un click, cada una desde la fuente que le
-corresponde (apt propio, Debian, Flatpak, o terceros). La lista se actualiza
-sin necesidad de una ISO nueva, editando un manifiesto JSON en este repo.
-
-### Bajo consumo de recursos
-
-- `zram` (50% de la RAM, compresión lz4) en vez de depender solo de swap en
-  disco.
-- Baloo (indexador de archivos) instalado pero con indexado desactivado por
-  defecto.
-- Sin Akonadi, Kontact, ni juegos/apps de relleno.
-
-### Apps propias
-
-Las apps propias **no vienen incluidas en el ISO** — se instalan aparte, para
-no inflar el tamaño de la descarga.
-
-- **[oweecode](https://github.com/oweeme/oweecode)**: IDE propio (Tauri/Rust).
-  Se instala desde [GitHub Releases](https://github.com/oweeme/oweecode/releases),
-  no viene preinstalado ni en "Apps recomendadas".
-- Repo APT propio (`reprepro`), embebido offline en el ISO — hoy distribuye
-  WPS Office; funciona sin conexión desde el primer arranque.
-
-## Estado actual
-
-**v1 validada de punta a punta en hardware real**, incluyendo instalación
-gráfica completa con el particionado root+home+swap:
-
-- ✅ Hardware sin Nvidia (HP): WiFi, batería, Bluetooth, HDMI, audio.
-- ✅ Hardware con Nvidia (Dell G3 3579, GTX 1050 Pascal): driver instalado y
-  funcionando sobre Wayland, con chequeo de Secure Boot.
-- ✅ Instalación gráfica completa probada en hardware real (no solo VM),
-  incluyendo el nuevo esquema de particiones.
-
-Ver el detalle completo — incluyendo los bugs reales que se encontraron y
-resolvieron en el camino — en
-[`docs/MANUAL_MODIFICACIONES.md`](docs/MANUAL_MODIFICACIONES.md#estado-y-fases).
-
-## Descargar
-
-**[live-image-amd64.hybrid.iso](http://oweeme.com/iso/live-image-amd64.hybrid.iso)**
-
-Canal de YouTube: [@oweeme](https://www.youtube.com/@oweeme) — todavía sin
-videos, pero ahí van a subirse a medida que el autor trabaje con OweeLinux.
-
-## Instalación rápida
-
-1. Grabar la ISO a un pendrive (recomendado: [KDE ISO Image Writer](https://apps.kde.org/isoimagewriter/)).
-2. Arrancar la máquina desde el pendrive.
-3. Abrir "Instalar OweeLinux" desde el escritorio y seguir el instalador. En
-   el paso de particiones, elegir **"Erase disk"** con **"Format"** (no
-   "Keep") para que se cree el esquema root+home+swap.
-4. Si la máquina tiene GPU Nvidia: después de instalar, correr el ícono
-   "Instalar driver Nvidia" del escritorio (detecta el hardware
-   automáticamente).
-
-## Para desarrollar / modificar esta distro
-
-Toda la documentación técnica — estructura del proyecto, cómo reconstruir el
-ISO, dónde tocar cada cosa, y los bugs reales que nos encontramos en el camino
-(y por qué existen sus fixes) — está en
-[`docs/MANUAL_MODIFICACIONES.md`](docs/MANUAL_MODIFICACIONES.md).
+## Lo que falta (honesto)
+- Probar en el HP y el Dell reales; medir consumo y batería.
+- **NVIDIA privativo:** `OWEE_NVIDIA=1` no construye todavía (dkms de nvidia 550 contra el núcleo 6.12 falla). Mientras tanto la imagen usa el controlador libre nouveau.
+- Servidor de actualizaciones, clave de publicación y CI.
+- Cifrado de disco (LUKS), arrastrar iconos del escritorio a mano, y más pruebas con aplicaciones de terceros.
 
 ## Autoría y licencia
-
-OweeLinux es un proyecto de código abierto creado y mantenido por
-**Héctor Martínez**, desarrollador boliviano — [oweeme.com](https://oweeme.com).
-
-Se distribuye bajo los términos de la **GNU General Public License v3.0
-(GPLv3)**. Esto significa que cualquiera puede usar, estudiar, modificar y
-redistribuir este proyecto libremente, siempre que las obras derivadas se
-mantengan bajo la misma licencia y se conserve el aviso de copyright
-original — el espíritu del copyleft: el software libre que nace de este
-proyecto debe seguir siendo libre. El texto legal completo, sin modificar,
-está en [`LICENSE`](LICENSE).
-
-```
-OweeLinux — un proyecto de Héctor Martínez (oweeme.com)
-Copyright (C) 2026 Héctor Martínez
-
-Este programa es software libre: podés redistribuirlo y/o modificarlo
-bajo los términos de la Licencia Pública General de GNU publicada por
-la Free Software Foundation, ya sea la versión 3 de la licencia, o
-(a tu elección) cualquier versión posterior.
-```
+Hector Martinez — GPL-3.0 (ver [`LICENSE`](LICENSE)). La capturadora se desarrolla además como proyecto aparte: <https://github.com/oweeme/screencapture>.

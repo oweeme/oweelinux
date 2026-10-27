@@ -1,0 +1,16 @@
+OweeLinux — ISO en vivo (1,4 GB) · UEFI · Secure Boot activado o desactivado
+
+1) Grabar en un USB de 4 GB o más (se borra todo):   ./write-usb.sh OweeLinux-AAAAMMDD.iso /dev/sdX
+   (comprueba antes con lsblk cuál es tu USB; nunca copies "/dev/sdX" literal). También sirve balenaEtcher.
+2) Arrancar desde el USB (F12 / Esc / F9 según el equipo). Menú:
+   - Instalar OweeLinux  → asistente (disco del sistema; /home en otro disco si quieres)
+   - Probar OweeLinux    → escritorio sin instalar (usuario "live", los cambios se pierden)
+   - Modo seguro         → igual que Instalar, con gráficos por software (si la pantalla sale negra o se congela)
+3) Se necesita un disco de 8 GB o más para instalar.
+Verificar la descarga: sha256sum -c OweeLinux-AAAAMMDD.iso.sha256
+
+Probar en QEMU sin tocar tu equipo:  ./probar-en-qemu.sh OweeLinux-AAAAMMDD.iso   (instalar)  y luego  ./probar-en-qemu.sh --disco   (arrancar lo instalado: ahí ves el logo).
+  Añade --secureboot para Secure Boot, --nuevo para empezar con un disco virtual vacío.
+
+Estos guiones están en tools/usuario/ del repositorio. La ISO no se publica en GitHub (pesa 1,5 GB): se construye con docs/CONSTRUIR.md.
+No hay actualizaciones del sistema hasta que exista el servidor y la clave de publicación (docs/ACTUALIZACIONES.md).
